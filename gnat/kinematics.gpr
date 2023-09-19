@@ -1,0 +1,21 @@
+--
+--  Phoenix Hexapod Software
+--
+--  Copyright (C) 2023, Vadim Godunko
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+project Kinematics is
+
+   Target := Project'Target;
+
+   for Object_Dir use "../.objs/" & Target & "/kinematics";
+
+   for Source_Dirs use ("../source", "../source/kinematics");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g", "-gnat2022");
+   end Compiler;
+
+end Kinematics;
