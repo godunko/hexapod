@@ -12,10 +12,15 @@ project Kinematics is
 
    for Object_Dir use "../.objs/" & Target & "/kinematics";
 
-   for Source_Dirs use ("../source", "../source/kinematics");
+   for Source_Dirs use
+     ("../source",
+      "../source/kinematics",
+      "../source/mathematics",
+      "../source/mathematics/algebra",
+      "../source/mathematics/geometry");
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-gnat2022");
+      for Switches ("Ada") use ("-g", "-gnat2022", "-gnatW8", "-O1");
    end Compiler;
 
 end Kinematics;
