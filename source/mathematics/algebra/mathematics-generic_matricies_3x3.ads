@@ -35,4 +35,10 @@ package Mathematics.Generic_Matricies_3x3 is
      (Left  : Matrix_3x3;
       Right : Vectors_3.Vector_3) return Vectors_3.Vector_3;
 
+   function Determinant (Self : Matrix_3x3) return Real_Type;
+
+   function Inverse (Self : Matrix_3x3) return Matrix_3x3;
+
+   function Transpose (Self : Matrix_3x3) return Matrix_3x3;
+
 end Mathematics.Generic_Matricies_3x3;
