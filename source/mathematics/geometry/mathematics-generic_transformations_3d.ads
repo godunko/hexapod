@@ -33,11 +33,23 @@ package Mathematics.Generic_Transformations_3D is
      (Self : Transformation_3D;
       Item : Vectors_3D.Vector_3D) return Vectors_3D.Vector_3D;
 
+   function Rotation_Matrix
+     (Self : Transformation_3D) return Matricies_3x3.Matrix_3x3 with Inline;
+
+   function Displacement_Vector
+     (Self : Transformation_3D) return Vectors_3.Vector_3 with Inline;
+
 private
 
    type Transformation_3D is record
       Q : Matricies_3x3.Matrix_3x3;
       A : Vectors_3.Vector_3;
    end record;
+
+   function Rotation_Matrix
+     (Self : Transformation_3D) return Matricies_3x3.Matrix_3x3 is (Self.Q);
+
+   function Displacement_Vector
+     (Self : Transformation_3D) return Vectors_3.Vector_3 is (Self.A);
 
 end Mathematics.Generic_Transformations_3D;
