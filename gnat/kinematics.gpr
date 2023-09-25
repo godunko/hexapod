@@ -1,6 +1,4 @@
 --
---  Phoenix Hexapod Software
---
 --  Copyright (C) 2023, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
@@ -15,6 +13,7 @@ project Kinematics is
    for Source_Dirs use
      ("../source",
       "../source/kinematics",
+      "../source/kinematics/generated",
       "../source/mathematics",
       "../source/mathematics/algebra",
       "../source/mathematics/geometry");
