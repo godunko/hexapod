@@ -39,6 +39,21 @@ package Mathematics.Generic_Transformations_3D is
    function Displacement_Vector
      (Self : Transformation_3D) return Vectors_3.Vector_3 with Inline;
 
+   procedure Initialize
+     (Self : out Transformation_3D;
+      M_11 : Real_Type;
+      M_12 : Real_Type;
+      M_13 : Real_Type;
+      M_14 : Real_Type;
+      M_21 : Real_Type;
+      M_22 : Real_Type;
+      M_23 : Real_Type;
+      M_24 : Real_Type;
+      M_31 : Real_Type;
+      M_32 : Real_Type;
+      M_33 : Real_Type;
+      M_34 : Real_Type) with Inline;
+
 private
 
    type Transformation_3D is record

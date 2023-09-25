@@ -35,6 +35,41 @@ package body Mathematics.Generic_Transformations_3D is
                 + Left.A.M_3));
    end "*";
 
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize
+     (Self : out Transformation_3D;
+      M_11 : Real_Type;
+      M_12 : Real_Type;
+      M_13 : Real_Type;
+      M_14 : Real_Type;
+      M_21 : Real_Type;
+      M_22 : Real_Type;
+      M_23 : Real_Type;
+      M_24 : Real_Type;
+      M_31 : Real_Type;
+      M_32 : Real_Type;
+      M_33 : Real_Type;
+      M_34 : Real_Type) is
+   begin
+      Self.Q :=
+        (M_11 => M_11,
+         M_12 => M_12,
+         M_13 => M_13,
+         M_21 => M_21,
+         M_22 => M_22,
+         M_23 => M_23,
+         M_31 => M_31,
+         M_32 => M_32,
+         M_33 => M_33);
+      Self.A :=
+        (M_1 => M_14,
+         M_2 => M_24,
+         M_3 => M_34);
+   end Initialize;
+
    ---------------
    -- Transform --
    ---------------
