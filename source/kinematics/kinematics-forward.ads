@@ -20,4 +20,11 @@ package Kinematics.Forward is
       Result  : out Reals.Transformations_3D.Transformation_3D);
    --  Create transformation to compute position of the end effector.
 
+   function LF_E_Position
+     (Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real) return Reals.Vectors_3D.Vector_3D;
+   --  Returns position of the end effector in the body coordinate system with
+   --  specified angles.
+
 end Kinematics.Forward;
