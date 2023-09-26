@@ -15,28 +15,11 @@
 
 --  pragma Restrictions (No_Elaboration_Code);
 
-with Kinematics.Configuration;
+with Kinematics.Configuration.Derived;
 
 package body Kinematics.Forward is
 
    use type Reals.Real;
-
-   LF_Cos_Alpha_0 : constant Reals.Real :=
-     Reals.Elementary_Functions.Cos (Kinematics.Configuration.LF_Base_Alpha);
-   LF_Sin_Alpha_0 : constant Reals.Real :=
-     Reals.Elementary_Functions.Sin (Kinematics.Configuration.LF_Base_Alpha);
-   LF_Cos_Alpha_1 : constant Reals.Real :=
-     Reals.Elementary_Functions.Cos (Kinematics.Configuration.LF_DH_Alpha1);
-   LF_Sin_Alpha_1 : constant Reals.Real :=
-     Reals.Elementary_Functions.Sin (Kinematics.Configuration.LF_DH_Alpha1);
-   LF_Cos_Alpha_2 : constant Reals.Real :=
-     Reals.Elementary_Functions.Cos (Kinematics.Configuration.LF_DH_Alpha2);
-   LF_Sin_Alpha_2 : constant Reals.Real :=
-     Reals.Elementary_Functions.Sin (Kinematics.Configuration.LF_DH_Alpha2);
-   LF_Cos_Alpha_3 : constant Reals.Real :=
-     Reals.Elementary_Functions.Cos (Kinematics.Configuration.LF_DH_Alpha3);
-   LF_Sin_Alpha_3 : constant Reals.Real :=
-     Reals.Elementary_Functions.Sin (Kinematics.Configuration.LF_DH_Alpha3);
 
    procedure Compute_H_be_Matrix
      (Cos_Alpha_0 : Reals.Real;
@@ -110,14 +93,14 @@ package body Kinematics.Forward is
 
    begin
       Compute_H_be_Matrix
-        (Cos_Alpha_0 => LF_Cos_Alpha_0,
-         Sin_Alpha_0 => LF_Sin_Alpha_0,
-         Cos_Alpha_1 => LF_Cos_Alpha_1,
-         Sin_Alpha_1 => LF_Sin_Alpha_1,
-         Cos_Alpha_2 => LF_Cos_Alpha_2,
-         Sin_Alpha_2 => LF_Sin_Alpha_2,
-         Cos_Alpha_3 => LF_Cos_Alpha_3,
-         Sin_Alpha_3 => LF_Sin_Alpha_3,
+        (Cos_Alpha_0 => Kinematics.Configuration.Derived.LF_Cos_Alpha_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.LF_Sin_Alpha_0,
+         Cos_Alpha_1 => Kinematics.Configuration.Derived.LF_Cos_Alpha_1,
+         Sin_Alpha_1 => Kinematics.Configuration.Derived.LF_Sin_Alpha_1,
+         Cos_Alpha_2 => Kinematics.Configuration.Derived.LF_Cos_Alpha_2,
+         Sin_Alpha_2 => Kinematics.Configuration.Derived.LF_Sin_Alpha_2,
+         Cos_Alpha_3 => Kinematics.Configuration.Derived.LF_Cos_Alpha_3,
+         Sin_Alpha_3 => Kinematics.Configuration.Derived.LF_Sin_Alpha_3,
          Cos_Theta_1 => Cos_Theta_1,
          Sin_Theta_1 => Sin_Theta_1,
          Cos_Theta_2 => Cos_Theta_2,
