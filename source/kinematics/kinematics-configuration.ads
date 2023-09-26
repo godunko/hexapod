@@ -58,5 +58,4 @@ package Kinematics.Configuration is
    LF_DH_R3     : constant := 0.124;
    LF_DH_Alpha3 : constant := 0.0;
 
-
 end Kinematics.Configuration;
