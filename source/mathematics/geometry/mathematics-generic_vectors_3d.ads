@@ -37,13 +37,20 @@ package Mathematics.Generic_Vectors_3D is
    function "+"
      (Left : Vector_3D; Right : Vector_3D) return Vector_3D with Inline;
 
+   function "-"
+     (Left : Vector_3D; Right : Vector_3D) return Vector_3D with Inline;
+
 private
 
    type Vector_3D is new Vectors_3.Vector_3;
 
    function "+"
      (Left : Vector_3D; Right : Vector_3D) return Vector_3D
-        is (Sum (Left, Right));
+        is (Add (Left, Right));
+
+   function "-"
+     (Left : Vector_3D; Right : Vector_3D) return Vector_3D
+        is (Subtract (Left, Right));
 
    function As_Vector_3
      (Self : Vector_3D) return Vectors_3.Vector_3

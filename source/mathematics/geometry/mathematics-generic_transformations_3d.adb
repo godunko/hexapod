@@ -80,7 +80,7 @@ package body Mathematics.Generic_Transformations_3D is
    begin
       return
         Vectors_3D.To_Vector_3D
-          (Vectors_3.Sum
+          (Vectors_3.Add
              (Matricies_3x3.Product (Self.Q, Vectors_3D.As_Vector_3 (Item)),
               Self.A));
    end Transform;

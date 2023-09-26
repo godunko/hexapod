@@ -17,12 +17,21 @@ package Mathematics.Generic_Vectors_3 is
       M_3 : Real_Type;
    end record;
 
-   function Sum
+   function Add
+     (Left : Vector_3; Right : Vector_3) return Vector_3 with Inline;
+
+   function Subtract
      (Left : Vector_3; Right : Vector_3) return Vector_3 with Inline;
 
 private
 
-   function Sum (Left : Vector_3; Right : Vector_3) return Vector_3 is
-     (Left.M_1 + Right.M_1, Left.M_2 + Right.M_2, Left.M_3 + Right.M_3);
+   function Add
+     (Left : Vector_3; Right : Vector_3) return Vector_3
+       is (Left.M_1 + Right.M_1, Left.M_2 + Right.M_2, Left.M_3 + Right.M_3);
+
+   function Subtract
+     (Left : Vector_3; Right : Vector_3) return Vector_3
+       is (Left.M_1 - Right.M_1, Left.M_2 - Right.M_2, Left.M_3 - Right.M_3);
+
 
 end Mathematics.Generic_Vectors_3;
