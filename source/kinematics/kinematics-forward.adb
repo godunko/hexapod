@@ -13,7 +13,7 @@
 --  Formulas are used "as-is" without any preliminary optimization, so, it is
 --  compiler responsibility to optimize their execution.
 
---  pragma Restrictions (No_Elaboration_Code);
+pragma Restrictions (No_Elaboration_Code);
 
 with Kinematics.Configuration.Derived;
 

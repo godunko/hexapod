@@ -7,11 +7,13 @@
 --  Computes basic matricies of Forward Kinematics. Configuration parameters
 --  are defined in the Kinematics.Configuration package.
 
+pragma Restrictions (No_Elaboration_Code);
+
 with Reals;
 
 package Kinematics.Forward is
 
-   --  pragma Pure;
+   pragma Pure;
 
    procedure LF_T_BE
      (Theta_1 : Reals.Real;
