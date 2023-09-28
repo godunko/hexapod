@@ -86,17 +86,17 @@ package body Kinematics.Forward is
      (Posture : Kinematics.Posture) return Reals.Vectors_3D.Vector_3D
    is
       Cos_Theta_1 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Posture.Theta_1);
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
       Sin_Theta_1 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Posture.Theta_1);
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
       Cos_Theta_2 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Posture.Theta_2);
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
       Sin_Theta_2 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Posture.Theta_2);
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
       Cos_Theta_3 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Posture.Theta_3);
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
       Sin_Theta_3 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Posture.Theta_3);
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
 
       X : Reals.Real;
       Y : Reals.Real;
@@ -127,6 +127,57 @@ package body Kinematics.Forward is
          Z           => Z);
 
       return Reals.Vectors_3D.To_Vector_3D (X, Y, Z);
+   end LF_E_Position;
+
+   -------------------
+   -- LF_E_Position --
+   -------------------
+
+   function LF_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position
+   is
+      Cos_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
+      Sin_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
+      Cos_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
+      Sin_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
+      Cos_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
+      Sin_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
+
+      X : Reals.Real;
+      Y : Reals.Real;
+      Z : Reals.Real;
+
+   begin
+      Compute_E_Position
+        (B_x         => Kinematics.Configuration.LF_Base_X,
+         B_y         => Kinematics.Configuration.LF_Base_Y,
+         B_z         => Kinematics.Configuration.LF_Base_Z,
+         Cos_Alpha_0 => Kinematics.Configuration.Derived.LF_Cos_Alpha_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.LF_Sin_Alpha_0,
+         R_1         => Kinematics.Configuration.LF_DH_R1,
+         Cos_Alpha_1 => Kinematics.Configuration.Derived.LF_Cos_Alpha_1,
+         Sin_Alpha_1 => Kinematics.Configuration.Derived.LF_Sin_Alpha_1,
+         R_2         => Kinematics.Configuration.LF_DH_R2,
+         Cos_Alpha_2 => Kinematics.Configuration.Derived.LF_Cos_Alpha_2,
+         Sin_Alpha_2 => Kinematics.Configuration.Derived.LF_Sin_Alpha_2,
+         R_3         => Kinematics.Configuration.LF_DH_R3,
+         Cos_Theta_1 => Cos_Theta_1,
+         Sin_Theta_1 => Sin_Theta_1,
+         Cos_Theta_2 => Cos_Theta_2,
+         Sin_Theta_2 => Sin_Theta_2,
+         Cos_Theta_3 => Cos_Theta_3,
+         Sin_Theta_3 => Sin_Theta_3,
+         X           => X,
+         Y           => Y,
+         Z           => Z);
+
+      return (Value => (X, Y, Z));
    end LF_E_Position;
 
    -------------

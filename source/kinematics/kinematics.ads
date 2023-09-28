@@ -12,11 +12,18 @@ package Kinematics is
 
    pragma Pure;
 
-   type Position is record
-      X : Reals.Real;
-      Y : Reals.Real;
-      Z : Reals.Real;
-   end record;
+   type Position is private;
+
+   function X (Self : Position) return Reals.Real with Inline;
+   function Y (Self : Position) return Reals.Real with Inline;
+   function Z (Self : Position) return Reals.Real with Inline;
+   --  Coordinates of the position.
+
+   procedure Set
+     (Self : out Position;
+      X    : Reals.Real;
+      Y    : Reals.Real;
+      Z    : Reals.Real) with Inline;
 
    type Orientation is record
       U : Reals.Real;
@@ -29,10 +36,38 @@ package Kinematics is
       Orientation : Kinematics.Orientation;
    end record;
 
-   type Posture is record
+   type Posture is private;
+   --  Container of joint variables and a set of internal information.
+
+   function Theta_1 (Self : Posture) return Reals.Real with Inline;
+   function Theta_2 (Self : Posture) return Reals.Real with Inline;
+   function Theta_3 (Self : Posture) return Reals.Real with Inline;
+   --  Angular values of joint variables.
+
+   procedure Set
+     (Self    : out Posture;
       Theta_1 : Reals.Real;
       Theta_2 : Reals.Real;
-      Theta_3 : Reals.Real;
+      Theta_3 : Reals.Real);
+   --  Set values of joint variables.
+
+private
+
+   type Position is record
+      Value : Reals.Vectors_3.Vector_3;
    end record;
+
+   function X (Self : Position) return Reals.Real is (Self.Value.M_1);
+   function Y (Self : Position) return Reals.Real is (Self.Value.M_2);
+   function Z (Self : Position) return Reals.Real is (Self.Value.M_3);
+
+   type Posture is record
+      Theta : Reals.Vectors_3.Vector_3;
+      --  Vector of the joint variables.
+   end record;
+
+   function Theta_1 (Self : Posture) return Reals.Real is (Self.Theta.M_1);
+   function Theta_2 (Self : Posture) return Reals.Real is (Self.Theta.M_2);
+   function Theta_3 (Self : Posture) return Reals.Real is (Self.Theta.M_3);
 
 end Kinematics;
