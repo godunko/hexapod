@@ -23,6 +23,9 @@ package Mathematics.Generic_Vectors_3 is
    function Subtract
      (Left : Vector_3; Right : Vector_3) return Vector_3 with Inline;
 
+   function "-"
+     (Left : Vector_3; Right : Vector_3) return Vector_3 with Inline;
+
 private
 
    function Add
@@ -33,5 +36,7 @@ private
      (Left : Vector_3; Right : Vector_3) return Vector_3
        is (Left.M_1 - Right.M_1, Left.M_2 - Right.M_2, Left.M_3 - Right.M_3);
 
+   function "-"
+     (Left : Vector_3; Right : Vector_3) return Vector_3 renames Subtract;
 
 end Mathematics.Generic_Vectors_3;
