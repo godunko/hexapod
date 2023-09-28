@@ -29,6 +29,15 @@ package Mathematics.Generic_Matricies_3x3 is
       M_33 : Real_Type;
    end record;
 
+   function "+" (Left : Matrix_3x3; Right : Matrix_3x3) return Matrix_3x3;
+
+   function "*" (Left : Matrix_3x3; Right : Matrix_3x3) return Matrix_3x3;
+
+   function "*"
+     (Left : Matrix_3x3; Right : Vectors_3.Vector_3) return Vectors_3.Vector_3;
+
+   function Add (Left : Matrix_3x3; Right : Matrix_3x3) return Matrix_3x3;
+
    function Product (Left : Matrix_3x3; Right : Matrix_3x3) return Matrix_3x3;
 
    function Product
@@ -39,6 +48,36 @@ package Mathematics.Generic_Matricies_3x3 is
 
    function Inverse (Self : Matrix_3x3) return Matrix_3x3;
 
-   function Transpose (Self : Matrix_3x3) return Matrix_3x3;
+   function Transpose (Self : Matrix_3x3) return Matrix_3x3 with Inline;
+
+   procedure Transpose
+     (Self   : Matrix_3x3;
+      Result : out Matrix_3x3) with Inline;
+
+   function Scalar (Value : Real_Type) return Matrix_3x3 with Inline;
+
+   procedure Add
+     (Left   : Matrix_3x3;
+      Right  : Matrix_3x3;
+      Result : out Matrix_3x3);
+
+   procedure Product
+     (Left   : Matrix_3x3;
+      Right  : Matrix_3x3;
+      Result : out Matrix_3x3);
+
+   procedure Inverse (Self : in out Matrix_3x3);
+
+private
+
+   function "*" (Left : Matrix_3x3; Right : Matrix_3x3) return Matrix_3x3
+     renames Product;
+
+   function "*"
+     (Left : Matrix_3x3; Right : Vectors_3.Vector_3) return Vectors_3.Vector_3
+        renames Product;
+
+   function "+" (Left : Matrix_3x3; Right : Matrix_3x3) return Matrix_3x3
+     renames Add;
 
 end Mathematics.Generic_Matricies_3x3;
