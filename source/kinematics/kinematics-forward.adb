@@ -83,22 +83,20 @@ package body Kinematics.Forward is
    -------------------
 
    function LF_E_Position
-     (Theta_1 : Reals.Real;
-      Theta_2 : Reals.Real;
-      Theta_3 : Reals.Real) return Reals.Vectors_3D.Vector_3D
+     (Posture : Kinematics.Posture) return Reals.Vectors_3D.Vector_3D
    is
       Cos_Theta_1 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Theta_1);
+        Reals.Elementary_Functions.Cos (Posture.Theta_1);
       Sin_Theta_1 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Theta_1);
+        Reals.Elementary_Functions.Sin (Posture.Theta_1);
       Cos_Theta_2 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Theta_2);
+        Reals.Elementary_Functions.Cos (Posture.Theta_2);
       Sin_Theta_2 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Theta_2);
+        Reals.Elementary_Functions.Sin (Posture.Theta_2);
       Cos_Theta_3 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Theta_3);
+        Reals.Elementary_Functions.Cos (Posture.Theta_3);
       Sin_Theta_3 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Theta_3);
+        Reals.Elementary_Functions.Sin (Posture.Theta_3);
 
       X : Reals.Real;
       Y : Reals.Real;
