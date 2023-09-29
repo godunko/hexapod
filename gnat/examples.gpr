@@ -11,7 +11,8 @@ project Examples is
    for Object_Dir use "../.objs";
    for Source_Dirs use ("../examples");
    for Main use
-     ("kinematics_inverse_levenberg_marquardt.adb");
+     ("kinematics_inverse_gradient_descent.adb",
+      "kinematics_inverse_levenberg_marquardt.adb");
 
    package Compiler is
 
