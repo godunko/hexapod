@@ -1,0 +1,28 @@
+--
+--  Copyright (C) 2023, Vadim Godunko
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+with "../../b2f4a/gnat/bbf";
+
+with "kinematics";
+
+project Arduino is
+
+   for Target use "arm-eabi";
+   for Runtime ("Ada") use "light-arduino_due_x";
+
+   Target := Project'Target;
+
+   for Main use ("hexapod-driver.adb");
+   for Object_Dir use "../.objs/" & Target & "/arduino";
+
+   for Source_Dirs use
+     ("../source/arduino");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g", "-gnat2022", "-gnatW8", "-O2");
+   end Compiler;
+
+end Arduino;
