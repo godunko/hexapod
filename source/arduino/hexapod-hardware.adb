@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with System.Storage_Elements;
+
 with BBF.Board;
 with BBF.GPIO;
 
@@ -16,16 +18,24 @@ package body Hexapod.Hardware is
 
    LED : not null access BBF.GPIO.Pin'Class renames BBF.Board.Pin_LED;
 
+   procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
+   pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
+   pragma No_Return (Last_Chance_Handler);
+
    -------------------------
    -- Initialize_Hardware --
    -------------------------
 
    procedure Initialize_Hardware is
    begin
-      --  First, turn off onboard LED
+      --  First, turn off onboard LED (used by last chance handler)
 
       LED.Set_Direction (BBF.GPIO.Output);
       LED.Set (False);
+
+      --  Second, initialize delay controller (used by last chance handler)
+
+      BBF.Board.Initialize_Delay_Controller;
 
       --  Initialize console and output logo
 
@@ -39,5 +49,47 @@ package body Hexapod.Hardware is
       Console.Put_Line ("_.-'""           ""`-.`-.");
       Console.New_Line;
    end;
+
+   -------------------------
+   -- Last_Chance_Handler --
+   -------------------------
+
+   procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
+      J : System.Storage_Elements.Integer_Address :=
+        System.Storage_Elements.To_Integer (Msg);
+      L : constant String := Integer'Image (Line);
+
+   begin
+      Console.Put ("ADA EXCEPTION at ");
+
+      loop
+         declare
+            use type System.Storage_Elements.Integer_Address;
+
+            C : constant Character
+              with Import,
+                   Convention => Ada,
+                   Address    => System.Storage_Elements.To_Address (J);
+            S : constant String (1 .. 1) := (1 => C);
+
+         begin
+            exit when C = ASCII.NUL;
+
+            Console.Put (S);
+
+            J := @ + 1;
+         end;
+      end loop;
+
+      Console.Put_Line (":" & L (L'First + 1 .. L'Last));
+
+      loop
+         BBF.Board.Pin_LED.Set (False);
+         BBF.Board.Delay_Controller.Delay_Milliseconds (500);
+
+         BBF.Board.Pin_LED.Set (True);
+         BBF.Board.Delay_Controller.Delay_Milliseconds (500);
+      end loop;
+   end Last_Chance_Handler;
 
 end Hexapod.Hardware;
