@@ -16,7 +16,7 @@ package body Hexapod.Hardware is
    CHIP_FREQ_CPU_MAX : constant := 84_000_000;
    --  XXX Should be computed based on current settings of the chip
 
-   LED : not null access BBF.GPIO.Pin'Class renames BBF.Board.Pin_LED;
+   LED : not null access BBF.GPIO.Pin'Class renames BBF.Board.Pin_13_LED;
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
@@ -84,10 +84,10 @@ package body Hexapod.Hardware is
       Console.Put_Line (":" & L (L'First + 1 .. L'Last));
 
       loop
-         BBF.Board.Pin_LED.Set (False);
+         LED.Set (False);
          BBF.Board.Delay_Controller.Delay_Milliseconds (500);
 
-         BBF.Board.Pin_LED.Set (True);
+         LED.Set (True);
          BBF.Board.Delay_Controller.Delay_Milliseconds (500);
       end loop;
    end Last_Chance_Handler;
