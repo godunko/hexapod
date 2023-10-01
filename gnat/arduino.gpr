@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with "../../b2f4a/gnat/bbf";
+with "../subprojects/b2f4a/gnat/bbf";
 
 with "kinematics";
 
