@@ -22,32 +22,32 @@ package Kinematics.Configuration is
    LF_Base_X     : constant := 0.074;
    LF_Base_Y     : constant := 0.048;
    LF_Base_Z     : constant := 0.0;
-   LF_Base_Alpha : constant := 0.0;
+   LF_Base_Gamma : constant := 0.0;
 
    LM_Base_X     : constant := 0.0;
    LM_Base_Y     : constant := 0.065;
    LM_Base_Z     : constant := 0.0;
-   LM_Base_Alpha : constant := Ada.Numerics.Pi / 2.0;
+   LM_Base_Gamma : constant := Ada.Numerics.Pi / 2.0;
 
    LR_Base_X     : constant := -0.074;
    LR_Base_Y     : constant := -0.048;
    LR_Base_Z     : constant := 0.0;
-   LR_Base_Alpha : constant := Ada.Numerics.Pi;
+   LR_Base_Gamma : constant := Ada.Numerics.Pi;
 
    RF_Base_X     : constant := 0.074;
    RF_Base_Y     : constant := -0.048;
    RF_Base_Z     : constant := 0.0;
-   RF_Base_Alpha : constant := 0.0;
+   RF_Base_Gamma : constant := 0.0;
 
    RM_Base_X     : constant := 0.0;
    RM_Base_Y     : constant := -0.065;
    RM_Base_Z     : constant := 0.0;
-   RM_Base_Alpha : constant := -Ada.Numerics.Pi / 2.0;
+   RM_Base_Gamma : constant := -Ada.Numerics.Pi / 2.0;
 
    RR_Base_X     : constant := -0.074;
    RR_Base_Y     : constant := -0.048;
    RR_Base_Z     : constant := 0.0;
-   RR_Base_Alpha : constant := -Ada.Numerics.Pi;
+   RR_Base_Gamma : constant := -Ada.Numerics.Pi;
 
    --  DH parameters of the frames.
 

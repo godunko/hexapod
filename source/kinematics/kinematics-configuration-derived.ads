@@ -14,10 +14,10 @@ package Kinematics.Configuration.Derived is
 
    pragma Pure;
 
-   LF_Cos_Alpha_0 : constant := 1.0;
-   --  Cos (Kinematics.Configuration.LF_Base_Alpha);
-   LF_Sin_Alpha_0 : constant := 0.0;
-   --  Sin (Kinematics.Configuration.LF_Base_Alpha);
+   LF_Cos_Gamma_0 : constant := 1.0;
+   --  Cos (Kinematics.Configuration.LF_Base_Gamma);
+   LF_Sin_Gamma_0 : constant := 0.0;
+   --  Sin (Kinematics.Configuration.LF_Base_Gamma);
    LF_Cos_Alpha_1 : constant := 0.0;
    --  Cos (Kinematics.Configuration.LF_DH_Alpha1);
    LF_Sin_Alpha_1 : constant := 1.0;

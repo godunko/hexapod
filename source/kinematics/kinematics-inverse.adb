@@ -60,8 +60,8 @@ package body Kinematics.Inverse is
 
    begin
       Compute_Jv_Matrix
-        (Cos_Alpha_0 => Kinematics.Configuration.Derived.LF_Cos_Alpha_0,
-         Sin_Alpha_0 => Kinematics.Configuration.Derived.LF_Sin_Alpha_0,
+        (Cos_Alpha_0 => Kinematics.Configuration.Derived.LF_Cos_Gamma_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.LF_Sin_Gamma_0,
          Cos_Alpha_1 => Kinematics.Configuration.Derived.LF_Cos_Alpha_1,
          Sin_Alpha_1 => Kinematics.Configuration.Derived.LF_Sin_Alpha_1,
          Cos_Alpha_2 => Kinematics.Configuration.Derived.LF_Cos_Alpha_2,
