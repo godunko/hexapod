@@ -6,7 +6,6 @@
 
 with System.Storage_Elements;
 
-with BBF.Board;
 with BBF.GPIO;
 
 with Console;
@@ -16,11 +15,48 @@ package body Hexapod.Hardware is
    CHIP_FREQ_CPU_MAX : constant := 84_000_000;
    --  XXX Should be computed based on current settings of the chip
 
+   PWM_Frequency : constant := 100;
+
    LED : not null access BBF.GPIO.Pin'Class renames BBF.Board.Pin_13_LED;
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
    pragma No_Return (Last_Chance_Handler);
+
+   ---------------------------
+   -- Configure_Controllers --
+   ---------------------------
+
+   procedure Configure_Controllers is
+   begin
+      declare
+         Success : Boolean := True;
+
+      begin
+         Servo_Controller_Left.Configure
+           (Frequency => PWM_Frequency,
+            Success   => Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Servo Motors Controller (Left): configuration failed.");
+         end if;
+      end;
+
+      declare
+         Success : Boolean := True;
+
+      begin
+         Servo_Controller_Right.Configure
+           (Frequency => PWM_Frequency,
+            Success   => Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Servo Motors Controller (Right): configuration failed.");
+         end if;
+      end;
+   end Configure_Controllers;
 
    -------------------------
    -- Initialize_Hardware --
@@ -41,14 +77,37 @@ package body Hexapod.Hardware is
 
       Console.Initialize (CHIP_FREQ_CPU_MAX);
 
-      Console.New_Line;
-      Console.Put_Line ("          /\ .---._");
-      Console.Put_Line ("       /\/.-. /\ /\/\");
-      Console.Put_Line ("     //\\oo //\\/\\\\");
-      Console.Put_Line ("    //  /""/`---\\ \\""`-._");
-      Console.Put_Line ("_.-'""           ""`-.`-.");
-      Console.New_Line;
-   end;
+      --  Initialize I2C master controllers
+
+      BBF.Board.I2C.Initialize_I2C_0;
+      BBF.Board.I2C.Initialize_I2C_1;
+
+      --  Initiazlie PCA9685 PWM controllers
+
+      declare
+         Success : Boolean := True;
+
+      begin
+         Servo_Controller_Left.Initialize (Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Left Servo Motors Controller initialization failed.");
+         end if;
+      end;
+
+      declare
+         Success : Boolean := True;
+
+      begin
+         Servo_Controller_Right.Initialize (Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Right Servo Motors Controller initialization failure.");
+         end if;
+      end;
+   end Initialize_Hardware;
 
    -------------------------
    -- Last_Chance_Handler --
@@ -60,6 +119,12 @@ package body Hexapod.Hardware is
       L : constant String := Integer'Image (Line);
 
    begin
+      --  XXX Last chance handler can be called from the interrupt handler
+      --  when CPU interrupts are disabled. In such case asynchronous write
+      --  operation to console can't be used, and code should cancel UART IO
+      --  and use synchronous API. Thus, looks reasonable to move last chance
+      --  handler to Console package.
+
       Console.Put ("ADA EXCEPTION at ");
 
       loop
