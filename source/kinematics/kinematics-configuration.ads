@@ -58,4 +58,11 @@ package Kinematics.Configuration is
    LF_DH_R3     : constant := 0.124;
    LF_DH_Alpha3 : constant := 0.0;
 
+   RF_DH_R1     : constant := 0.029;
+   RF_DH_Alpha1 : constant := -Ada.Numerics.Pi / 2.0;
+   RF_DH_R2     : constant := 0.084;
+   RF_DH_Alpha2 : constant := 0.0;
+   RF_DH_R3     : constant := 0.124;
+   RF_DH_Alpha3 : constant := 0.0;
+
 end Kinematics.Configuration;
