@@ -33,6 +33,35 @@ package body Kinematics.Inverse.Geometric is
    is
       use type Reals.Real;
 
+      function Round (Value : Reals.Real) return Reals.Real;
+
+      -----------
+      -- Round --
+      -----------
+
+      function Round (Value : Reals.Real) return Reals.Real is
+      begin
+         if Value < -1.0 then
+            if Value >= -1.0 - Reals.Real'Epsilon then
+               return -1.0;
+
+            else
+               raise Constraint_Error;
+            end if;
+
+         elsif Value > 1.0 then
+            if Value <= 1.0 + Reals.Real'Epsilon then
+               return 1.0;
+
+            else
+               raise Constraint_Error;
+            end if;
+
+         else
+            return Value;
+         end if;
+      end Round;
+
       E_X1        : constant Reals.Real :=
         Cos_Gamma_0 * (E_X - B_X) + Sin_Gamma_0 * (E_Y - B_Y);
       E_Y1        : constant Reals.Real :=
@@ -63,9 +92,9 @@ package body Kinematics.Inverse.Geometric is
         Reals.Elementary_Functions.Sqrt
           ((E_X1 - C2_X1) * (E_X1 - C2_X1) + (E_Y1 - C2_Y1) * (E_Y1 - C2_Y1));
 
-      Cos_Theta_3 : Reals.Real;
       Cos_Alpha_1 : Reals.Real;
       Cos_Alpha_2 : Reals.Real;
+      Cos_Alpha_3 : Reals.Real;
       Alpha_1     : Reals.Real;
       Alpha_2     : Reals.Real;
 
@@ -95,9 +124,10 @@ package body Kinematics.Inverse.Geometric is
 
       --  Compute rotation of the third joind
 
-      Cos_Theta_3 := (R_2 * R_2 + R_3 * R_3 - L * L) / (2.0 * R_2 * R_3);
+      Cos_Alpha_3 :=
+        Round ((R_2 * R_2 + R_3 * R_3 - L * L) / (2.0 * R_2 * R_3));
       Theta_3     :=
-        Ada.Numerics.Pi - Reals.Elementary_Functions.Arccos (Cos_Theta_3);
+        Ada.Numerics.Pi - Reals.Elementary_Functions.Arccos (Cos_Alpha_3);
 
       --  Compute rotation of the second joint
 
@@ -105,24 +135,24 @@ package body Kinematics.Inverse.Geometric is
         (L * L + L_XY * L_XY - (E_Z1 - C2_Z1) * (E_Z1 - C2_Z1))
           / (2.0 * L * L_XY);
       Alpha_1     := Reals.Elementary_Functions.Arccos (Cos_Alpha_1);
-      Alpha_1     := (if E_Z1 < 0.0 then -@ else @);
+      Alpha_1     := (if E_Z1 > 0.0 then -@ else @);
 
       Cos_Alpha_2 := (L * L + R_2 * R_2 - R_3 * R_3) / (2.0 * L * R_2);
       Alpha_2     := Reals.Elementary_Functions.Arccos (Cos_Alpha_2);
 
-      Theta_2 := Alpha_1 + Alpha_2;
+      Theta_2 := Alpha_1 - Alpha_2;
 
       --  XXX Second solution is ignored.
-      --     Theta_2 := Alpha_1 - Alpha_2
+      --     Theta_2 := Alpha_1 + Alpha_2
 
       Success := True;
    end Solve;
 
-   -----------
-   -- Solve --
-   -----------
+   -------------
+   -- F_Solve --
+   -------------
 
-   procedure Solve
+   procedure LF_Solve
      (Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean)
@@ -150,6 +180,40 @@ package body Kinematics.Inverse.Geometric is
          Success     => Success);
 
       Set (Found_Posture, Theta_1, Theta_2, Theta_3);
-   end Solve;
+   end LF_Solve;
+
+   --------------
+   -- RF_Solve --
+   --------------
+
+   procedure RF_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean)
+   is
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real;
+
+   begin
+      Solve
+        (B_X         => Kinematics.Configuration.RF_Base_X,
+         B_Y         => Kinematics.Configuration.RF_Base_Y,
+         B_Z         => Kinematics.Configuration.RF_Base_Z,
+         Cos_Gamma_0 => Kinematics.Configuration.Derived.RF_Cos_Gamma_0,
+         Sin_Gamma_0 => Kinematics.Configuration.Derived.RF_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.RF_DH_R1,
+         R_2         => Kinematics.Configuration.RF_DH_R2,
+         R_3         => Kinematics.Configuration.RF_DH_R3,
+         E_X         => Kinematics.X (Desired_Position),
+         E_Y         => Kinematics.Y (Desired_Position),
+         E_Z         => Kinematics.Z (Desired_Position),
+         Theta_1     => Theta_1,
+         Theta_2     => Theta_2,
+         Theta_3     => Theta_3,
+         Success     => Success);
+
+      Set (Found_Posture, Theta_1, Theta_2, Theta_3);
+   end RF_Solve;
 
 end Kinematics.Inverse.Geometric;

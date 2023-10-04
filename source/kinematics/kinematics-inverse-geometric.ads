@@ -6,7 +6,12 @@
 
 package Kinematics.Inverse.Geometric is
 
-   procedure Solve
+   procedure LF_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean);
+
+   procedure RF_Solve
      (Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean);
