@@ -19,7 +19,8 @@ project Kinematics is
       "../source/mathematics/geometry");
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-gnat2022", "-gnatW8", "-O1");
+      for Switches ("Ada")
+        use ("-g", "-gnat2022", "-gnatW8", "-O1", "-ffunction-sections", "-fdata-sections", "-flto");
    end Compiler;
 
 end Kinematics;
