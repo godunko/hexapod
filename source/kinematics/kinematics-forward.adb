@@ -266,4 +266,55 @@ package body Kinematics.Forward is
          M_34 => M_34);
    end LF_T_BE;
 
+   -------------------
+   -- RF_E_Position --
+   -------------------
+
+   function RF_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position
+   is
+      Cos_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
+      Sin_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
+      Cos_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
+      Sin_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
+      Cos_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
+      Sin_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
+
+      X : Reals.Real;
+      Y : Reals.Real;
+      Z : Reals.Real;
+
+   begin
+      Compute_E_Position
+        (B_x         => Kinematics.Configuration.RF_Base_X,
+         B_y         => Kinematics.Configuration.RF_Base_Y,
+         B_z         => Kinematics.Configuration.RF_Base_Z,
+         Cos_Alpha_0 => Kinematics.Configuration.Derived.RF_Cos_Gamma_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.RF_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.RF_DH_R1,
+         Cos_Alpha_1 => Kinematics.Configuration.Derived.RF_Cos_Alpha_1,
+         Sin_Alpha_1 => Kinematics.Configuration.Derived.RF_Sin_Alpha_1,
+         R_2         => Kinematics.Configuration.RF_DH_R2,
+         Cos_Alpha_2 => Kinematics.Configuration.Derived.RF_Cos_Alpha_2,
+         Sin_Alpha_2 => Kinematics.Configuration.Derived.RF_Sin_Alpha_2,
+         R_3         => Kinematics.Configuration.RF_DH_R3,
+         Cos_Theta_1 => Cos_Theta_1,
+         Sin_Theta_1 => Sin_Theta_1,
+         Cos_Theta_2 => Cos_Theta_2,
+         Sin_Theta_2 => Sin_Theta_2,
+         Cos_Theta_3 => Cos_Theta_3,
+         Sin_Theta_3 => Sin_Theta_3,
+         X           => X,
+         Y           => Y,
+         Z           => Z);
+
+      return (Value => (X, Y, Z));
+   end RF_E_Position;
+
 end Kinematics.Forward;
