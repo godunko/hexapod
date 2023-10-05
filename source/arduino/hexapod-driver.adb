@@ -13,7 +13,7 @@ with Kinematics.Forward;
 with Kinematics.Inverse.Geometric;
 with Reals;
 
-with Console;
+with Hexapod.Console;
 with Hexapod.Hardware;
 
 procedure Hexapod.Driver is

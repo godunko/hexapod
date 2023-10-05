@@ -8,12 +8,9 @@ with System.Storage_Elements;
 
 with BBF.GPIO;
 
-with Console;
+with Hexapod.Console;
 
 package body Hexapod.Hardware is
-
-   CHIP_FREQ_CPU_MAX : constant := 84_000_000;
-   --  XXX Should be computed based on current settings of the chip
 
    PWM_Frequency : constant := 100;
 
@@ -75,7 +72,7 @@ package body Hexapod.Hardware is
 
       --  Initialize console and output logo
 
-      Console.Initialize (CHIP_FREQ_CPU_MAX);
+      Console.Initialize;
 
       --  Initialize I2C master controllers
 
