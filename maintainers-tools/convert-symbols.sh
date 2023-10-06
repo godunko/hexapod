@@ -15,6 +15,8 @@ cat $1 |
   sed -e 's/sin(%theta_2)/Sin_Theta_2/g' |
   sed -e 's/cos(%theta_3)/Cos_Theta_3/g' |
   sed -e 's/sin(%theta_3)/Sin_Theta_3/g' |
+  sed -e 's/\([^ ._^0-9][0-9]\+\)\([^.]\)/\1.0\2/g' |
+  sed -e 's/^\([0-9]\+\)/\1.0/g' |
   sed -e 's/r_1/R_1/g' |
   sed -e 's/r_2/R_2/g' |
   sed -e 's/r_3/R_3/g' |
@@ -24,5 +26,6 @@ cat $1 |
   sed -e 's/\*\([^$]\)/ \* \1/g' |
   sed -e 's/\*$/ \*/g' |
   sed -e 's/\([^( ]\)-\([^- $]\)/\1 - \2/g' |
-  sed -e 's/+/ + /g' |
+  sed -e 's/\([^ ]\)+/\1 + /g' |
+  sed -e 's/\^/ ** /g' |
   tee
