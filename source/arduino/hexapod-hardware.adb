@@ -7,6 +7,7 @@
 with System.Storage_Elements;
 
 with BBF.GPIO;
+with BBF.HPL;
 
 with Hexapod.Console;
 
@@ -122,28 +123,30 @@ package body Hexapod.Hardware is
       --  and use synchronous API. Thus, looks reasonable to move last chance
       --  handler to Console package.
 
-      Console.Put ("ADA EXCEPTION at ");
+      if BBF.HPL.Is_Interrupts_Enabled then
+         Console.Put ("ADA EXCEPTION at ");
 
-      loop
-         declare
-            use type System.Storage_Elements.Integer_Address;
+         loop
+            declare
+               use type System.Storage_Elements.Integer_Address;
 
-            C : constant Character
-              with Import,
-                   Convention => Ada,
-                   Address    => System.Storage_Elements.To_Address (J);
-            S : constant String (1 .. 1) := (1 => C);
+               C : constant Character
+                 with Import,
+                      Convention => Ada,
+                      Address    => System.Storage_Elements.To_Address (J);
+               S : constant String (1 .. 1) := (1 => C);
 
-         begin
-            exit when C = ASCII.NUL;
+            begin
+               exit when C = ASCII.NUL;
 
-            Console.Put (S);
+               Console.Put (S);
 
-            J := @ + 1;
-         end;
-      end loop;
+               J := @ + 1;
+            end;
+         end loop;
 
-      Console.Put_Line (":" & L (L'First + 1 .. L'Last));
+         Console.Put_Line (":" & L (L'First + 1 .. L'Last));
+      end if;
 
       loop
          LED.Set (False);
