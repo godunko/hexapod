@@ -1,0 +1,121 @@
+/* [wxMaxima: title   start ]
+Kinematics, общие элементы
+   [wxMaxima: title   end   ] */
+
+
+/* Этот документ содержит объявления матриц преобразования, описываюих лапу, и используется другими документами.
+
+Обозначения:
+H_ij - матрица преобразования из узла i в узел j
+Q_ij - матрица поворота из узла i в узел j
+T_ij - матрица переноса из узла i в узел j
+
+i и j - идентификаторы узлов: b - базовый, 1..3 - узлы поворотов, e - кончик лапы
+
+Используемые в матрицах символы:
+%alpha1 .. %alpha3 - DH угол поворота вокруг OX
+%theta1 .. %theta3 - DH угол поворота вокруг OZ
+r_1 .. r_3 - DH длина сегмента
+d_1 .. d_3 - DH смещение по Z
+b_x, b_y, b_z - координаты первого узла в системе координат базы
+%gamma_0 - поворот вокруг оси OZ в первом узле
+
+Внимание! При внесении изменений файл нужно преобразовать в mac скрипт. */
+
+declare(%alpha_1, constant)$
+declare(%alpha_2, constant)$
+declare(%alpha_3, constant)$
+declare(r_1, constant)$
+declare(r_2, constant)$
+declare(r_3, constant)$
+declare(d_1, constant)$
+declare(d_2, constant)$
+declare(d_3, constant)$
+declare(b_x, constant)$
+declare(b_y, constant)$
+declare(b_z, constant)$
+declare(%gamma_0, constant)$
+
+/* [wxMaxima: section start ]
+Преобразования в общем виде
+   [wxMaxima: section end   ] */
+
+
+T_transformation (x_n, y_n, z_n) := matrix (
+    [1, 0, 0, x_n],
+    [0, 1, 0, y_n],
+    [0, 0, 1, z_n],
+    [0, 0, 0, 1]
+);
+
+Rx_transformation (%alpha_n) := matrix (
+    [1, 0, 0, 0],
+    [0, cos(%alpha_n), -sin(%alpha_n), 0],
+    [0, sin(%alpha_n), cos(%alpha_n), 0],
+    [0, 0, 0, 1]
+);
+
+Ry_transformation (%beta_n) := matrix (
+    [cos(%beta_n), 0, sin(%beta_n), 0],
+    [0, 1, 0, 0],
+    [-sin(%beta_n), 0, cos(%beta_n), 0],
+    [0, 0, 0, 1]
+);
+
+Rz_transformation (%gamma_n)  := matrix (
+    [cos(%gamma_n), -sin(%gamma_n), 0, 0], 
+    [sin(%gamma_n), cos(%gamma_n), 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]
+);
+
+DH_transformation (%alpha_n, %theta_n, r_n, d_n) := matrix (
+    [cos(%theta_n), -sin(%theta_n)*cos(%alpha_n), sin(%theta_n)*sin(%alpha_n), r_n*cos(%theta_n)],
+    [sin(%theta_n), cos(%theta_n)*cos(%alpha_n), -cos(%theta_n)*sin(%alpha_n), r_n*sin(%theta_n)],
+    [0, sin(%alpha_n), cos(%alpha_n), d_n],
+    [0, 0, 0, 1]
+);
+
+/* [wxMaxima: section start ]
+Матрицы преобразования для робота
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Межузловые преобразования
+   [wxMaxima: subsect end   ] */
+
+
+H_b1: T_transformation (b_x, b_y, b_z) . Rz_transformation (%gamma_0);
+H_12:  DH_transformation (%alpha_1, %theta_1, r_1, d_1);
+H_23:  DH_transformation (%alpha_2, %theta_2, r_2, d_2);
+H_3e:  DH_transformation (%alpha_3, %theta_3, r_3, d_3);
+
+Q_b1: submatrix (4, H_b1, 4);
+T_b1: submatrix (4, H_b1, 1, 2, 3);
+Q_12: submatrix (4, H_12, 4);
+T_12: submatrix (4, H_12, 1, 2, 3);
+Q_23: submatrix (4, H_23, 4);
+T_23: submatrix (4, H_23, 1, 2, 3);
+Q_3e: submatrix (4, H_3e, 4);
+T_3e: submatrix (4, H_3e, 1, 2, 3);
+
+
+/* [wxMaxima: subsect start ]
+Преобразования относительно базы
+   [wxMaxima: subsect end   ] */
+
+
+H_b2: H_b1 . H_12;
+H_b3: H_b2 . H_23;
+H_be: H_b3 . H_3e;
+
+Q_b2: submatrix (4, H_b2, 4);
+T_b2: submatrix (4, H_b2, 1, 2, 3);
+Q_b3: submatrix (4, H_b3, 4);
+T_b3: submatrix (4, H_b3, 1, 2, 3);
+Q_be: submatrix (4, H_be, 4);
+T_be: submatrix (4, H_be, 1, 2, 3);
+
+
+
