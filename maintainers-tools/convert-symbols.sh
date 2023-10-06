@@ -3,6 +3,8 @@
 cat $1 |
   sed -e 's/cos(%alpha_0)/Cos_Alpha_0/g' |
   sed -e 's/sin(%alpha_0)/Sin_Alpha_0/g' |
+  sed -e 's/cos(%gamma_0)/Cos_Gamma_0/g' |
+  sed -e 's/sin(%gamma_0)/Sin_Gamma_0/g' |
   sed -e 's/cos(%alpha_1)/Cos_Alpha_1/g' |
   sed -e 's/sin(%alpha_1)/Sin_Alpha_1/g' |
   sed -e 's/cos(%alpha_2)/Cos_Alpha_2/g' |
