@@ -5,13 +5,16 @@
 --
 
 with Ada.Numerics;
+with Interfaces;
 
 with BBF.Board;
 with BBF.Drivers.PCA9685;
 
 with Kinematics.Forward;
+with Kinematics.Inverse.Algebraic;
 with Kinematics.Inverse.Geometric;
 with Reals;
+with Trajectory;
 
 with Hexapod.Console;
 with Hexapod.Hardware;
@@ -36,7 +39,9 @@ procedure Hexapod.Driver is
    M_2 : constant Motor_Descriptor :=
      (170, 1070, -Ada.Numerics.Pi / 2.0, Ada.Numerics.Pi / 2.0);
    M_3 : constant Motor_Descriptor :=
-     (170, 1070, -Ada.Numerics.Pi, Ada.Numerics.Pi / 2.0);
+     (170,
+      1070,
+      -Ada.Numerics.Pi + 0.16, Ada.Numerics.Pi / 2.0 + 0.32);
 
    function Coordinate_Image (Item : Reals.Real) return String;
 
@@ -83,9 +88,8 @@ procedure Hexapod.Driver is
    ----------
 
    procedure Move
-     (D_X : Reals.Real;
-      D_Y : Reals.Real;
-      D_Z : Reals.Real)
+     (Posture : Kinematics.Posture;
+      Wait    : Interfaces.Unsigned_32)
    is
       function Map
         (Descriptor : Motor_Descriptor;
@@ -116,12 +120,43 @@ procedure Hexapod.Driver is
                  + Reals.Real (Descriptor.Min_PWM));
       end Map;
 
+      A : BBF.Drivers.PCA9685.Value_Type;
+      B : BBF.Drivers.PCA9685.Value_Type;
+      C : BBF.Drivers.PCA9685.Value_Type;
+
+   begin
+      A := Map (M_1, - Kinematics.Theta_1 (Posture));
+      B := Map (M_2, + Kinematics.Theta_2 (Posture));
+      C := Map (M_3, - Kinematics.Theta_3 (Posture));
+      --  Motors of the first and third joints not installed on the base,
+      --  they rotate themself. Thus, '-' is necessary to "revert" rotation,
+      --  or mathematical model need to be fixed.
+
+      Console.Put_Line
+        ("Motors : "
+         & BBF.Drivers.PCA9685.Value_Type'Image (A)
+         & BBF.Drivers.PCA9685.Value_Type'Image (B)
+         & BBF.Drivers.PCA9685.Value_Type'Image (C));
+
+      Hexapod.Hardware.Servo_Controller_Left.Set_Something (2, C);
+      BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
+      Hexapod.Hardware.Servo_Controller_Left.Set_Something (0, A);
+      BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
+      Hexapod.Hardware.Servo_Controller_Left.Set_Something (1, B);
+   end Move;
+
+   ----------
+   -- Move --
+   ----------
+
+   procedure Move
+     (D_X : Reals.Real;
+      D_Y : Reals.Real;
+      D_Z : Reals.Real)
+   is
       Desired_Position : Kinematics.Position;
       Posture          : Kinematics.Posture;
       Success          : Boolean;
-      A                : BBF.Drivers.PCA9685.Value_Type;
-      B                : BBF.Drivers.PCA9685.Value_Type;
-      C                : BBF.Drivers.PCA9685.Value_Type;
 
    begin
       Kinematics.Set
@@ -161,28 +196,70 @@ procedure Hexapod.Driver is
             & " "
             & Angle_Image (Kinematics.Theta_3 (Posture)));
 
-         A := Map (M_1, - Kinematics.Theta_1 (Posture));
-         B := Map (M_2, + Kinematics.Theta_2 (Posture));
-         C := Map (M_3, - Kinematics.Theta_3 (Posture));
-         --  Motors of the first and third joints not installed on the base,
-         --  they rotate themself. Thus, '-' is necessary to "revert" rotation,
-         --  or mathematical model need to be fixed.
-
-         Console.Put_Line
-           ("Motors : "
-            & BBF.Drivers.PCA9685.Value_Type'Image (A)
-            & BBF.Drivers.PCA9685.Value_Type'Image (B)
-            & BBF.Drivers.PCA9685.Value_Type'Image (C));
-
-         Hexapod.Hardware.Servo_Controller_Left.Set_Something (2, C);
-         BBF.Board.Delay_Controller.Delay_Milliseconds (700);
-         Hexapod.Hardware.Servo_Controller_Left.Set_Something (0, A);
-         BBF.Board.Delay_Controller.Delay_Milliseconds (700);
-         Hexapod.Hardware.Servo_Controller_Left.Set_Something (1, B);
+         Move (Posture, 500);
 
       else
          Console.Put (" NO SOLUTION");
       end if;
+   end Move;
+
+   ----------
+   -- Move --
+   ----------
+
+   procedure Move is
+      From_Position : Kinematics.Position;
+      To_Position   : Kinematics.Position;
+      Posture       : Kinematics.Posture;
+      Success       : Boolean;
+   begin
+      Kinematics.Set (From_Position, 0.087, -0.138, -0.082);
+      Kinematics.Set (To_Position, 0.162, -0.138, -0.082);
+      Kinematics.Inverse.Geometric.RF_Solve (From_Position, Posture, Success);
+      Move (Posture, 2_000);
+      BBF.Board.Delay_Controller.Delay_Milliseconds (5_000);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+
+      for K in 1 .. 10 loop
+         for J in 0 .. 100 loop
+            Trajectory.Move_Swing
+              (From         => From_Position,
+               To           => To_Position,
+               Current      => Posture,
+               T            => 1.0 / 100.0 * Reals.Real (J),
+               New_Posture  => Posture);
+
+            --  Console.Put_Line
+            --    ("Angles : "
+            --     & Angle_Image (Kinematics.Theta_1 (Posture))
+            --     & " "
+            --     & Angle_Image (Kinematics.Theta_2 (Posture))
+            --     & " "
+            --     & Angle_Image (Kinematics.Theta_3 (Posture)));
+            Move (Posture, 3);
+         end loop;
+
+         for J in 0 .. 100 loop
+            Trajectory.Move_Support
+              (From         => To_Position,
+               To           => From_Position,
+               Current      => Posture,
+               T            => 1.0 / 100.0 * Reals.Real (J),
+               New_Posture  => Posture);
+
+            --  Console.Put_Line
+            --    ("Angles : "
+            --     & Angle_Image (Kinematics.Theta_1 (Posture))
+            --     & " "
+            --     & Angle_Image (Kinematics.Theta_2 (Posture))
+            --     & " "
+            --     & Angle_Image (Kinematics.Theta_3 (Posture)));
+            Move (Posture, 3);
+         end loop;
+      end loop;
    end Move;
 
    ----------------
@@ -190,11 +267,14 @@ procedure Hexapod.Driver is
    ----------------
 
    procedure Start_SMCs is
-   begin
-      --  Kinematics.Set (Posture, 0.0, 0.0, 0.0);
-      --  Position := Kinematics.Forward.RF_E_Position (Posture);
+      Posture : Kinematics.Posture;
 
-      Kinematics.Set (Position, 0.311, -0.048, 0.0);
+   begin
+      Kinematics.Set
+        (Posture, 0.0, -Ada.Numerics.Pi / 6.0, Ada.Numerics.Pi * 4.0 / 6.0);
+      Position := Kinematics.Forward.RF_E_Position (Posture);
+
+      --  Kinematics.Set (Position, 0.311, -0.048, 0.0);
       Move (0.0, 0.0, 0.0);
    end Start_SMCs;
 
@@ -215,22 +295,25 @@ begin
             Start_SMCs;
 
          when 'W' | 'w' =>
-            Move (0.010, 0.000, 0.000);
+            Move (0.005, 0.000, 0.000);
 
          when 'S' | 's' =>
-            Move (-0.010, 0.000, 0.000);
+            Move (-0.005, 0.000, 0.000);
 
          when 'D' | 'd' =>
-            Move (0.000, -0.010, 0.000);
+            Move (0.000, -0.005, 0.000);
 
          when 'A' | 'a' =>
-            Move (0.000, 0.010, 0.000);
+            Move (0.000, 0.005, 0.000);
 
          when 'R' | 'r' =>
-            Move (0.000, 0.000, 0.010);
+            Move (0.000, 0.000, 0.005);
 
          when 'F' | 'f' =>
-            Move (0.000, 0.000, -0.010);
+            Move (0.000, 0.000, -0.005);
+
+         when 'M' | 'm' =>
+            Move;
 
          when others =>
             null;
