@@ -14,7 +14,8 @@ project Examples is
      ("kinematics_inverse_algebraic.adb",
       "kinematics_inverse_geometric.adb",
       "kinematics_inverse_gradient_descent.adb",
-      "kinematics_inverse_levenberg_marquardt.adb");
+      "kinematics_inverse_levenberg_marquardt.adb",
+      "trajectory.adb");
 
    package Compiler is
 
