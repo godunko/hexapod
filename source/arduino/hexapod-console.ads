@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with Interfaces;
-
 package Hexapod.Console is
 
    pragma Preelaborate;

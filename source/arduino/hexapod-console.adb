@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with Interfaces;
 with System.Storage_Elements;
 
 with BBF.Board.UART;
