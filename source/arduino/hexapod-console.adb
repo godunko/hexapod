@@ -100,6 +100,31 @@ package body Hexapod.Console is
       BBF.HPL.Enable_Interrupts;
    end Append;
 
+   ----------------------
+   -- Get_Asynchronous --
+   ----------------------
+
+   procedure Get_Asynchronous
+     (Item    : out Character;
+      Success : in out Boolean) is
+   begin
+      if not Success then
+         Item := Character'Val (0);
+
+         return;
+      end if;
+
+      if not Received then
+         Success := False;
+         Item    := Character'Val (0);
+
+      else
+         Success  := True;
+         Item     := Character'Val (Receive_Buffer);
+         Received := False;
+      end if;
+   end Get_Asynchronous;
+
    ---------------------
    -- Get_Synchronous --
    ---------------------

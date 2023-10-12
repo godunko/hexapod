@@ -18,4 +18,8 @@ package Hexapod.Console is
 
    procedure Get_Synchronous (Item : out Character);
 
+   procedure Get_Asynchronous
+     (Item    : out Character;
+      Success : in out Boolean);
+
 end Hexapod.Console;
