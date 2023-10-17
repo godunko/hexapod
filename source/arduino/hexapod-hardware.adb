@@ -112,9 +112,60 @@ package body Hexapod.Hardware is
    -------------------------
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
-      J : System.Storage_Elements.Integer_Address :=
-        System.Storage_Elements.To_Integer (Msg);
-      L : constant String := Integer'Image (Line);
+
+      function Message return String;
+      --  Returns message. It might be file:line information or text message.
+
+      --------------
+      -- Location --
+      --------------
+
+      function Message return String is
+
+         use type System.Storage_Elements.Storage_Offset;
+
+         Line_Image : constant String := Integer'Image (Line);
+         Length     : System.Storage_Elements.Storage_Offset := 0;
+
+      begin
+         --  Compute length of the text, but limit it by 78 characters.
+
+         loop
+            declare
+               use type System.Storage_Elements.Integer_Address;
+
+               C : constant Character
+                 with Import,
+                      Convention => Ada,
+                      Address    => Msg + Length;
+
+            begin
+               exit when C = ASCII.NUL;
+               exit when Length = 78;
+
+               Length := Length + 1;
+            end;
+         end loop;
+
+         --  Construct String and return result
+
+         declare
+            Result : constant String (1 .. Natural (Length))
+              with Import, Address => Msg;
+
+         begin
+            if Line = 0 then
+               --  Text message
+
+               return Result;
+
+            else
+               --  file:line
+
+               return Result & ":" & Line_Image (2 ..Line_Image'Last);
+            end if;
+         end;
+      end Message;
 
    begin
       --  XXX Last chance handler can be called from the interrupt handler
@@ -124,28 +175,11 @@ package body Hexapod.Hardware is
       --  handler to Console package.
 
       if BBF.HPL.Is_Interrupts_Enabled then
-         Console.Put ("ADA EXCEPTION at ");
+         --  Pass all characters of the text by single call to Put. It give
+         --  better chance that text will be transmitted to console.
 
-         loop
-            declare
-               use type System.Storage_Elements.Integer_Address;
-
-               C : constant Character
-                 with Import,
-                      Convention => Ada,
-                      Address    => System.Storage_Elements.To_Address (J);
-               S : constant String (1 .. 1) := (1 => C);
-
-            begin
-               exit when C = ASCII.NUL;
-
-               Console.Put (S);
-
-               J := @ + 1;
-            end;
-         end loop;
-
-         Console.Put_Line (":" & L (L'First + 1 .. L'Last));
+         Console.Put
+           (ASCII.CR & ASCII.LF & "ADA: " & Message & ASCII.CR & ASCII.LF);
       end if;
 
       loop
