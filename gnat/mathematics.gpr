@@ -1,0 +1,21 @@
+--
+--  Copyright (C) 2023, Vadim Godunko
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+with "phoenyx_common.gpr";
+
+project Mathematics is
+
+   for Object_Dir use Phoenyx_Common'Object_Dir & "mathematics";
+
+   for Source_Dirs use
+     ("../source",
+      "../source/mathematics",
+      "../source/mathematics/algebra",
+      "../source/mathematics/geometry");
+
+   package Compiler renames Phoenyx_Common.Compiler;
+
+end Mathematics;

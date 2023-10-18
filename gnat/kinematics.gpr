@@ -4,23 +4,17 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with "phoenyx_common.gpr";
+with "mathematics.gpr";
+
 project Kinematics is
 
-   Target := Project'Target;
-
-   for Object_Dir use "../.objs/" & Target & "/kinematics";
+   for Object_Dir use Phoenyx_Common'Object_Dir & "kinematics";
 
    for Source_Dirs use
-     ("../source",
-      "../source/kinematics",
-      "../source/kinematics/generated",
-      "../source/mathematics",
-      "../source/mathematics/algebra",
-      "../source/mathematics/geometry");
+     ("../source/kinematics",
+      "../source/kinematics/generated");
 
-   package Compiler is
-      for Switches ("Ada")
-        use ("-g", "-gnat2022", "-gnatW8", "-O1", "-ffunction-sections", "-fdata-sections", "-flto");
-   end Compiler;
+   package Compiler renames Phoenyx_Common.Compiler;
 
 end Kinematics;
