@@ -13,7 +13,8 @@ with Hexapod.Console;
 
 package body Hexapod.Hardware is
 
-   PWM_Frequency : constant := 100;
+   PWM_Frequency : constant := 321;
+   --  Closest value for supported by PCA 9685 controller.
 
    LED : not null access BBF.GPIO.Pin'Class renames BBF.Board.Pin_13_LED;
 
