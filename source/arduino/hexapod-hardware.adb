@@ -76,6 +76,11 @@ package body Hexapod.Hardware is
 
       Console.Initialize;
 
+      --  Configure motor power relay control pin.
+
+      Motor_Power_Relay.Set_Direction (BBF.GPIO.Output);
+      Motor_Power_Relay.Set (False);
+
       --  Initialize real time clock
 
       BBF.Board.Initialize_Real_Time_Clock_Controller;

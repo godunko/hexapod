@@ -68,8 +68,12 @@ begin
       end if;
 
       case C is
+         when ' ' =>
+            Hexapod.Hardware.Motor_Power_Relay.Set (False);
+
          when 'U' | 'u' =>
             Hexapod.Hardware.Configure_Controllers;
+            Hexapod.Hardware.Motor_Power_Relay.Set (True);
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
             Hexapod.Movement.Prepare;
 
