@@ -157,6 +157,8 @@ package body Kinematics.Inverse.Geometric is
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean)
    is
+      use type Reals.Real;
+
       Theta_1 : Reals.Real;
       Theta_2 : Reals.Real;
       Theta_3 : Reals.Real;
@@ -179,7 +181,7 @@ package body Kinematics.Inverse.Geometric is
          Theta_3     => Theta_3,
          Success     => Success);
 
-      Set (Found_Posture, Theta_1, Theta_2, Theta_3);
+      Set (Found_Posture, Theta_1, -Theta_2, -Theta_3);
    end LF_Solve;
 
    --------------
