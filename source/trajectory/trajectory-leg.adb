@@ -36,8 +36,8 @@ package body Trajectory.Leg is
 
    begin
       X := Base_X + Length_X * T_XY;
-      Y := Base_X + Length_Y * T_XY;
-      Z := Base_X + Height_Z * T_Z;
+      Y := Base_Y + Length_Y * T_XY;
+      Z := Base_Z + Height_Z * T_Z;
    end Position_XYZ;
 
    ----------
