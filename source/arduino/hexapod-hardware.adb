@@ -75,6 +75,10 @@ package body Hexapod.Hardware is
 
       Console.Initialize;
 
+      --  Initialize real time clock
+
+      BBF.Board.Initialize_Real_Time_Clock_Controller;
+
       --  Initialize I2C master controllers
 
       BBF.Board.I2C.Initialize_I2C_0;
