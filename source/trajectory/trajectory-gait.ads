@@ -11,6 +11,8 @@ with Reals;
 
 package Trajectory.Gait is
 
+   pragma Pure;
+
    type Gait_Descriptor is record
       LF_Fase     : Reals.Real;
       LM_Fase     : Reals.Real;

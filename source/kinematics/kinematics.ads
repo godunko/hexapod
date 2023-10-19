@@ -12,7 +12,8 @@ package Kinematics is
 
    pragma Pure;
 
-   type Position is private;
+   type Position is private
+     with Preelaborable_Initialization;
 
    function X (Self : Position) return Reals.Real with Inline;
    function Y (Self : Position) return Reals.Real with Inline;
@@ -64,7 +65,8 @@ private
    type Posture is record
       Theta : Reals.Vectors_3.Vector_3;
       --  Vector of the joint variables.
-   end record;
+   end record
+     with Preelaborable_Initialization;
 
    function Theta_1 (Self : Posture) return Reals.Real is (Self.Theta.M_1);
    function Theta_2 (Self : Posture) return Reals.Real is (Self.Theta.M_2);

@@ -6,6 +6,8 @@
 
 package Kinematics.Inverse.Geometric is
 
+   pragma Pure;
+
    procedure LF_Solve
      (Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;

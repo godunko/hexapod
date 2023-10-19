@@ -10,6 +10,8 @@ with Reals;
 
 package Trajectory.Leg is
 
+   pragma Pure;
+
    procedure Position_XYZ
      (Base_X   : Reals.Real;
       Base_Y   : Reals.Real;
