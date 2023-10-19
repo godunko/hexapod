@@ -16,6 +16,8 @@ with Kinematics.Forward;
 with Kinematics.Inverse.Geometric;
 with Trajectory.Gait;
 
+--  with Hexapod.Console;
+--  with Hexapod.Debug;
 with Hexapod.Hardware;
 
 package body Hexapod.Movement is
@@ -23,10 +25,12 @@ package body Hexapod.Movement is
    use type Reals.Real;
 
    type Motor_Descriptor is record
-      Min_PWM   : BBF.Drivers.PCA9685.Value_Type;
-      Max_PWM   : BBF.Drivers.PCA9685.Value_Type;
-      Min_Angle : Reals.Real;
-      Max_Angle : Reals.Real;
+      Controller : not null access BBF.Drivers.PCA9685.PCA9685_Controller'Class;
+      Channel    : BBF.Drivers.PCA9685.Channel_Identifier;
+      Min_PWM    : BBF.Drivers.PCA9685.Value_Type;
+      Max_PWM    : BBF.Drivers.PCA9685.Value_Type;
+      Min_Angle  : Reals.Real;
+      Max_Angle  : Reals.Real;
    end record;
 
    LF_Base : Kinematics.Position;
@@ -36,20 +40,55 @@ package body Hexapod.Movement is
    RM_Base : Kinematics.Position;
    RH_Base : Kinematics.Position;
 
-   M_1 : constant Motor_Descriptor :=
-     (658, 3289, -Ada.Numerics.Pi / 2.0, Ada.Numerics.Pi / 2.0);
-   M_2 : constant Motor_Descriptor :=
-     (658, 3289, -Ada.Numerics.Pi / 2.0, Ada.Numerics.Pi / 2.0);
-   M_3 : constant Motor_Descriptor :=
-     (658,
+   RF_M_1 : constant Motor_Descriptor :=
+     (Hexapod.Hardware.Servo_Controller_Right'Access,
+      0,
+      658,
       3289,
-      -Ada.Numerics.Pi + 0.16, Ada.Numerics.Pi / 2.0 + 0.32);
+      -Ada.Numerics.Pi / 2.0,
+      Ada.Numerics.Pi / 2.0);
+   RF_M_2 : constant Motor_Descriptor :=
+     (Hexapod.Hardware.Servo_Controller_Right'Access,
+      1,
+      658,
+      3289,
+      -Ada.Numerics.Pi / 2.0,
+      Ada.Numerics.Pi / 2.0);
+   RF_M_3 : constant Motor_Descriptor :=
+     (Hexapod.Hardware.Servo_Controller_Right'Access,
+      2,
+      658,
+      3289,
+      -Ada.Numerics.Pi + 0.16,
+      Ada.Numerics.Pi / 2.0 + 0.32);
+
+   LF_M_1 : constant Motor_Descriptor :=
+     (Hexapod.Hardware.Servo_Controller_Left'Access,
+      0,
+      658,
+      3289,
+      -Ada.Numerics.Pi / 2.0,
+      Ada.Numerics.Pi / 2.0);
+   LF_M_2 : constant Motor_Descriptor :=
+     (Hexapod.Hardware.Servo_Controller_Left'Access,
+      1,
+      658,
+      3289,
+      -Ada.Numerics.Pi / 2.0,
+      Ada.Numerics.Pi / 2.0);
+   LF_M_3 : constant Motor_Descriptor :=
+     (Hexapod.Hardware.Servo_Controller_Left'Access,
+      2,
+      658,
+      3289,
+      -Ada.Numerics.Pi / 2.0 - 0.16,
+      Ada.Numerics.Pi - 0.32);
 
    Wave_Gait     : constant Trajectory.Gait.Gait_Descriptor :=
      (1.0 / 2.0,
       0.0,
-      0.0,
       1.0 / 2.0,
+      0.0,
       1.0 / 2.0,
       0.0,
       1.0 / 2.0);
@@ -84,6 +123,16 @@ package body Hexapod.Movement is
          -Ada.Numerics.Pi / 6.0,
          Ada.Numerics.Pi * 4.0 / 6.0);
       RF_Base := Kinematics.Forward.RF_E_Position (Posture);
+
+      Kinematics.Set
+        (Posture,
+         Ada.Numerics.Pi / 12.0,
+         Ada.Numerics.Pi / 6.0,
+         -Ada.Numerics.Pi * 4.0 / 6.0);
+      LF_Base := Kinematics.Forward.LF_E_Position (Posture);
+
+      --  Console.Put_Line ("LF: " & Debug.Position_Image (LF_Base));
+      --  Console.Put_Line ("RF: " & Debug.Position_Image (RF_Base));
    end Initialize;
 
    ----------
@@ -92,6 +141,9 @@ package body Hexapod.Movement is
 
    procedure Move
      (Posture : Kinematics.Posture;
+      M_1     : Motor_Descriptor;
+      M_2     : Motor_Descriptor;
+      M_3     : Motor_Descriptor;
       Wait    : Interfaces.Unsigned_32)
    is
       function Map
@@ -128,6 +180,8 @@ package body Hexapod.Movement is
       C : BBF.Drivers.PCA9685.Value_Type;
 
    begin
+      --  Console.Put_Line (Debug.Posture_Image (Posture));
+
       A := Map (M_1, - Kinematics.Theta_1 (Posture));
       B := Map (M_2, + Kinematics.Theta_2 (Posture));
       C := Map (M_3, - Kinematics.Theta_3 (Posture));
@@ -141,11 +195,11 @@ package body Hexapod.Movement is
       --     & BBF.Drivers.PCA9685.Value_Type'Image (B)
       --     & BBF.Drivers.PCA9685.Value_Type'Image (C));
 
-      Hexapod.Hardware.Servo_Controller_Left.Set_Something (2, C);
+      M_3.Controller.Set_Something (M_3.Channel, C);
       BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
-      Hexapod.Hardware.Servo_Controller_Left.Set_Something (0, A);
+      M_1.Controller.Set_Something (M_1.Channel, A);
       BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
-      Hexapod.Hardware.Servo_Controller_Left.Set_Something (1, B);
+      M_2.Controller.Set_Something (M_2.Channel, B);
       BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
    end Move;
 
@@ -154,14 +208,49 @@ package body Hexapod.Movement is
    -------------
 
    procedure Prepare is
-      Posture : Kinematics.Posture;
-      Success : Boolean;
+      LF_Position : Kinematics.Position;
+      LM_Position : Kinematics.Position;
+      LH_Position : Kinematics.Position;
+      RF_Position : Kinematics.Position;
+      RM_Position : Kinematics.Position;
+      RH_Position : Kinematics.Position;
+      Posture     : Kinematics.Posture;
+      Success     : Boolean;
 
    begin
-      Kinematics.Inverse.Geometric.RF_Solve (RF_Base, Posture, Success);
+      Trajectory.Gait.Position
+        (Descriptor  => Wave_Gait,
+         LF_Base     => LF_Base,
+         LM_Base     => LM_Base,
+         LH_Base     => LH_Base,
+         RF_Base     => RF_Base,
+         RM_Base     => RM_Base,
+         RH_Base     => RH_Base,
+         Cycle       => Cycle,
+         Time        => Cycle_Time,
+         Length_X    => Step_Length_X,
+         Length_Y    => Step_Length_Y,
+         Height_Z    => Step_Height,
+         LF_Position => LF_Position,
+         LM_Position => LM_Position,
+         LH_Position => LH_Position,
+         RF_Position => RF_Position,
+         RM_Position => RM_Position,
+         RH_Position => RH_Position);
+
+      Kinematics.Inverse.Geometric.RF_Solve (RF_Position, Posture, Success);
 
       if Success then
-         Move (Posture, 500);
+         Move (Posture, RF_M_1, RF_M_2, RF_M_3, 500);
+
+      --  else
+      --     Console.Put (" NO SOLUTION");
+      end if;
+
+      Kinematics.Inverse.Geometric.LF_Solve (LF_Position, Posture, Success);
+
+      if Success then
+         Move (Posture, LF_M_1, LF_M_2, LF_M_3, 500);
 
       --  else
       --     Console.Put (" NO SOLUTION");
@@ -221,10 +310,23 @@ package body Hexapod.Movement is
          RM_Position => RM_Position,
          RH_Position => RH_Position);
 
+      --  RH
+
       Kinematics.Inverse.Geometric.RF_Solve (RF_Position, Posture, Success);
 
       if Success then
-         Move (Posture, 0);
+         Move (Posture, RF_M_1, RF_M_2, RF_M_3, 0);
+
+      --  else
+      --     Console.Put_Line ("NO SOLUTION");
+      end if;
+
+      --  LH
+
+      Kinematics.Inverse.Geometric.LF_Solve (LF_Position, Posture, Success);
+
+      if Success then
+         Move (Posture, LF_M_1, LF_M_2, LF_M_3, 0);
 
       --  else
       --     Console.Put_Line ("NO SOLUTION");
