@@ -5,6 +5,7 @@
 --
 
 with "kinematics";
+with "trajectory";
 
 project Examples is
 
@@ -15,7 +16,7 @@ project Examples is
       "kinematics_inverse_geometric.adb",
       "kinematics_inverse_gradient_descent.adb",
       "kinematics_inverse_levenberg_marquardt.adb",
-      "trajectory.adb");
+      "trajectory_wave_gait.adb");
 
    package Compiler is
 
