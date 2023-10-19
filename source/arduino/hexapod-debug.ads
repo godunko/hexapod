@@ -15,4 +15,8 @@ package Hexapod.Debug is
 
    function Position_Image (Item : Kinematics.Position) return String;
 
+   function Angle_Image (Item : Reals.Real) return String;
+
+   function Posture_Image (Item : Kinematics.Posture) return String;
+
 end Hexapod.Debug;
