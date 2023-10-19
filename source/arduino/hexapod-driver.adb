@@ -82,11 +82,11 @@ begin
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
 
          when 'D' | 'd' =>
-            Step_Length_Y := @ + 0.010;
+            Step_Length_Y := @ - 0.010;
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
 
          when 'A' | 'a' =>
-            Step_Length_Y := @ - 0.010;
+            Step_Length_Y := @ + 0.010;
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
 
          --  when 'R' | 'r' =>
