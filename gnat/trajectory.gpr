@@ -1,0 +1,20 @@
+--
+--  Copyright (C) 2023, Vadim Godunko
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+with "kinematics.gpr";
+with "mathematics.gpr";
+with "phoenyx_common.gpr";
+
+project Trajectory is
+
+   for Object_Dir use Phoenyx_Common'Object_Dir & "trajectory";
+
+   for Source_Dirs use
+     ("../source/trajectory");
+
+   package Compiler renames Phoenyx_Common.Compiler;
+
+end Trajectory;
