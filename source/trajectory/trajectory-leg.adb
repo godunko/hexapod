@@ -47,7 +47,7 @@ package body Trajectory.Leg is
    function T_XY (Beta : Reals.Real; T_T : Reals.Real) return Reals.Real is
    begin
       if T_T <= Beta then
-         return -0.5 + T_T / Beta;
+         return 0.5 - T_T / Beta;
 
       else
          return
