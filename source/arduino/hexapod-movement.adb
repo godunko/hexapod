@@ -10,7 +10,7 @@ with Ada.Numerics;
 with Interfaces;
 
 with BBF.Board;
-with BBF.Drivers.PCA9685;
+with BBF.PCA9685;
 
 with Kinematics.Forward;
 with Kinematics.Inverse.Geometric;
@@ -25,12 +25,11 @@ package body Hexapod.Movement is
    use type Reals.Real;
 
    type Motor_Descriptor is record
-      Controller : not null access BBF.Drivers.PCA9685.PCA9685_Controller'Class;
-      Channel    : BBF.Drivers.PCA9685.Channel_Identifier;
-      Min_PWM    : BBF.Drivers.PCA9685.Value_Type;
-      Max_PWM    : BBF.Drivers.PCA9685.Value_Type;
-      Min_Angle  : Reals.Real;
-      Max_Angle  : Reals.Real;
+      Channel   : not null access BBF.PCA9685.PCA9685_Channel'Class;
+      Min_PWM   : BBF.PCA9685.Value_Type;
+      Max_PWM   : BBF.PCA9685.Value_Type;
+      Min_Angle : Reals.Real;
+      Max_Angle : Reals.Real;
    end record;
 
    LF_Base : Kinematics.Position;
@@ -41,44 +40,38 @@ package body Hexapod.Movement is
    RH_Base : Kinematics.Position;
 
    RF_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.Servo_Controller_Right'Access,
-      0,
+     (Hexapod.Hardware.RF_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RF_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.Servo_Controller_Right'Access,
-      1,
+     (Hexapod.Hardware.RF_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RF_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.Servo_Controller_Right'Access,
-      2,
+     (Hexapod.Hardware.RF_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi + 0.16,
       Ada.Numerics.Pi / 2.0 + 0.32);
 
    LF_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.Servo_Controller_Left'Access,
-      0,
+     (Hexapod.Hardware.LF_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LF_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.Servo_Controller_Left'Access,
-      1,
+     (Hexapod.Hardware.LF_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LF_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.Servo_Controller_Left'Access,
-      2,
+     (Hexapod.Hardware.LF_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0 - 0.16,
@@ -148,7 +141,7 @@ package body Hexapod.Movement is
    is
       function Map
         (Descriptor : Motor_Descriptor;
-         Angle      : Reals.Real) return BBF.Drivers.PCA9685.Value_Type;
+         Angle      : Reals.Real) return BBF.PCA9685.Value_Type;
 
       ---------
       -- Map --
@@ -156,9 +149,9 @@ package body Hexapod.Movement is
 
       function Map
         (Descriptor : Motor_Descriptor;
-         Angle      : Reals.Real) return BBF.Drivers.PCA9685.Value_Type
+         Angle      : Reals.Real) return BBF.PCA9685.Value_Type
       is
-         use type BBF.Drivers.PCA9685.Value_Type;
+         use type BBF.PCA9685.Value_Type;
 
          Angle_Middle : constant Reals.Real :=
            (Descriptor.Min_Angle + Descriptor.Max_Angle) / 2.0;
@@ -169,15 +162,15 @@ package body Hexapod.Movement is
 
       begin
          return
-           BBF.Drivers.PCA9685.Value_Type
+           BBF.PCA9685.Value_Type
              ((Angle - Descriptor.Min_Angle)
               / ( Descriptor.Max_Angle - Descriptor.Min_Angle) * PWM_Range
                  + Reals.Real (Descriptor.Min_PWM));
       end Map;
 
-      A : BBF.Drivers.PCA9685.Value_Type;
-      B : BBF.Drivers.PCA9685.Value_Type;
-      C : BBF.Drivers.PCA9685.Value_Type;
+      A : BBF.PCA9685.Value_Type;
+      B : BBF.PCA9685.Value_Type;
+      C : BBF.PCA9685.Value_Type;
 
    begin
       --  Console.Put_Line (Debug.Posture_Image (Posture));
@@ -195,11 +188,11 @@ package body Hexapod.Movement is
       --     & BBF.Drivers.PCA9685.Value_Type'Image (B)
       --     & BBF.Drivers.PCA9685.Value_Type'Image (C));
 
-      M_3.Controller.Set_Something (M_3.Channel, C);
+      M_3.Channel.Set (0, C);
       BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
-      M_1.Controller.Set_Something (M_1.Channel, A);
+      M_1.Channel.Set (0, A);
       BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
-      M_2.Controller.Set_Something (M_2.Channel, B);
+      M_2.Channel.Set (0, B);
       BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
    end Move;
 
