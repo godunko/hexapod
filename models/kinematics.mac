@@ -118,4 +118,18 @@ Q_be: submatrix (4, H_be, 4);
 T_be: submatrix (4, H_be, 1, 2, 3);
 
 
+/* [wxMaxima: subsect start ]
+Преобразования относительно лапы
+   [wxMaxima: subsect end   ] */
+
+
+H_13: H_12 . H_23;
+H_1e: H_13 . H_3e;
+
+Q_13: submatrix (4, H_13, 4);
+T_13: submatrix (4, H_13, 1, 2, 3);
+Q_1e: submatrix (4, H_1e, 4);
+T_1e: submatrix (4, H_1e, 1, 2, 3);
+
+
 
