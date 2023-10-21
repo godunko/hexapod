@@ -10,6 +10,233 @@ with Kinematics.Configuration.Derived;
 
 package body Kinematics.Inverse.Geometric is
 
+   procedure Solve
+     (B_X         : Reals.Real;
+      B_Y         : Reals.Real;
+      B_Z         : Reals.Real;
+      Cos_Gamma_0 : Reals.Real;
+      Sin_Gamma_0 : Reals.Real;
+      R_1         : Reals.Real;
+      R_2         : Reals.Real;
+      R_3         : Reals.Real;
+      E_X         : Reals.Real;
+      E_Y         : Reals.Real;
+      E_Z         : Reals.Real;
+      Theta_1     : out Reals.Real;
+      Theta_2     : out Reals.Real;
+      Theta_3     : out Reals.Real;
+      Success     : out Boolean);
+
+   --------------
+   -- LF_Solve --
+   --------------
+
+   procedure LF_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean)
+   is
+      use type Reals.Real;
+
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real;
+
+   begin
+      Solve
+        (B_X         => Kinematics.Configuration.LF_Base_X,
+         B_Y         => Kinematics.Configuration.LF_Base_Y,
+         B_Z         => Kinematics.Configuration.LF_Base_Z,
+         Cos_Gamma_0 => Kinematics.Configuration.Derived.LF_Cos_Gamma_0,
+         Sin_Gamma_0 => Kinematics.Configuration.Derived.LF_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.LF_DH_R1,
+         R_2         => Kinematics.Configuration.LF_DH_R2,
+         R_3         => Kinematics.Configuration.LF_DH_R3,
+         E_X         => Kinematics.X (Desired_Position),
+         E_Y         => Kinematics.Y (Desired_Position),
+         E_Z         => Kinematics.Z (Desired_Position),
+         Theta_1     => Theta_1,
+         Theta_2     => Theta_2,
+         Theta_3     => Theta_3,
+         Success     => Success);
+
+      Set (Found_Posture, Theta_1, -Theta_2, -Theta_3);
+   end LF_Solve;
+
+   --------------
+   -- LH_Solve --
+   --------------
+
+   procedure LH_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean)
+   is
+      use type Reals.Real;
+
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real;
+
+   begin
+      Solve
+        (B_X         => Kinematics.Configuration.LH_Base_X,
+         B_Y         => Kinematics.Configuration.LH_Base_Y,
+         B_Z         => Kinematics.Configuration.LH_Base_Z,
+         Cos_Gamma_0 => Kinematics.Configuration.Derived.LH_Cos_Gamma_0,
+         Sin_Gamma_0 => Kinematics.Configuration.Derived.LH_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.LH_DH_R1,
+         R_2         => Kinematics.Configuration.LH_DH_R2,
+         R_3         => Kinematics.Configuration.LH_DH_R3,
+         E_X         => Kinematics.X (Desired_Position),
+         E_Y         => Kinematics.Y (Desired_Position),
+         E_Z         => Kinematics.Z (Desired_Position),
+         Theta_1     => Theta_1,
+         Theta_2     => Theta_2,
+         Theta_3     => Theta_3,
+         Success     => Success);
+
+      Set (Found_Posture, Theta_1, -Theta_2, -Theta_3);
+   end LH_Solve;
+
+   --------------
+   -- LM_Solve --
+   --------------
+
+   procedure LM_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean)
+   is
+      use type Reals.Real;
+
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real;
+
+   begin
+      Solve
+        (B_X         => Kinematics.Configuration.LM_Base_X,
+         B_Y         => Kinematics.Configuration.LM_Base_Y,
+         B_Z         => Kinematics.Configuration.LM_Base_Z,
+         Cos_Gamma_0 => Kinematics.Configuration.Derived.LM_Cos_Gamma_0,
+         Sin_Gamma_0 => Kinematics.Configuration.Derived.LM_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.LM_DH_R1,
+         R_2         => Kinematics.Configuration.LM_DH_R2,
+         R_3         => Kinematics.Configuration.LM_DH_R3,
+         E_X         => Kinematics.X (Desired_Position),
+         E_Y         => Kinematics.Y (Desired_Position),
+         E_Z         => Kinematics.Z (Desired_Position),
+         Theta_1     => Theta_1,
+         Theta_2     => Theta_2,
+         Theta_3     => Theta_3,
+         Success     => Success);
+
+      Set (Found_Posture, Theta_1, -Theta_2, -Theta_3);
+   end LM_Solve;
+
+   --------------
+   -- RF_Solve --
+   --------------
+
+   procedure RF_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean)
+   is
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real;
+
+   begin
+      Solve
+        (B_X         => Kinematics.Configuration.RF_Base_X,
+         B_Y         => Kinematics.Configuration.RF_Base_Y,
+         B_Z         => Kinematics.Configuration.RF_Base_Z,
+         Cos_Gamma_0 => Kinematics.Configuration.Derived.RF_Cos_Gamma_0,
+         Sin_Gamma_0 => Kinematics.Configuration.Derived.RF_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.RF_DH_R1,
+         R_2         => Kinematics.Configuration.RF_DH_R2,
+         R_3         => Kinematics.Configuration.RF_DH_R3,
+         E_X         => Kinematics.X (Desired_Position),
+         E_Y         => Kinematics.Y (Desired_Position),
+         E_Z         => Kinematics.Z (Desired_Position),
+         Theta_1     => Theta_1,
+         Theta_2     => Theta_2,
+         Theta_3     => Theta_3,
+         Success     => Success);
+
+      Set (Found_Posture, Theta_1, Theta_2, Theta_3);
+   end RF_Solve;
+
+   --------------
+   -- RH_Solve --
+   --------------
+
+   procedure RH_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean)
+   is
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real;
+
+   begin
+      Solve
+        (B_X         => Kinematics.Configuration.RH_Base_X,
+         B_Y         => Kinematics.Configuration.RH_Base_Y,
+         B_Z         => Kinematics.Configuration.RH_Base_Z,
+         Cos_Gamma_0 => Kinematics.Configuration.Derived.RH_Cos_Gamma_0,
+         Sin_Gamma_0 => Kinematics.Configuration.Derived.RH_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.RH_DH_R1,
+         R_2         => Kinematics.Configuration.RH_DH_R2,
+         R_3         => Kinematics.Configuration.RH_DH_R3,
+         E_X         => Kinematics.X (Desired_Position),
+         E_Y         => Kinematics.Y (Desired_Position),
+         E_Z         => Kinematics.Z (Desired_Position),
+         Theta_1     => Theta_1,
+         Theta_2     => Theta_2,
+         Theta_3     => Theta_3,
+         Success     => Success);
+
+      Set (Found_Posture, Theta_1, Theta_2, Theta_3);
+   end RH_Solve;
+
+   --------------
+   -- RM_Solve --
+   --------------
+
+   procedure RM_Solve
+     (Desired_Position : Kinematics.Position;
+      Found_Posture    : out Kinematics.Posture;
+      Success          : out Boolean)
+   is
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real;
+
+   begin
+      Solve
+        (B_X         => Kinematics.Configuration.RM_Base_X,
+         B_Y         => Kinematics.Configuration.RM_Base_Y,
+         B_Z         => Kinematics.Configuration.RM_Base_Z,
+         Cos_Gamma_0 => Kinematics.Configuration.Derived.RM_Cos_Gamma_0,
+         Sin_Gamma_0 => Kinematics.Configuration.Derived.RM_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.RM_DH_R1,
+         R_2         => Kinematics.Configuration.RM_DH_R2,
+         R_3         => Kinematics.Configuration.RM_DH_R3,
+         E_X         => Kinematics.X (Desired_Position),
+         E_Y         => Kinematics.Y (Desired_Position),
+         E_Z         => Kinematics.Z (Desired_Position),
+         Theta_1     => Theta_1,
+         Theta_2     => Theta_2,
+         Theta_3     => Theta_3,
+         Success     => Success);
+
+      Set (Found_Posture, Theta_1, Theta_2, Theta_3);
+   end RM_Solve;
+
    -----------
    -- Solve --
    -----------
@@ -147,75 +374,5 @@ package body Kinematics.Inverse.Geometric is
 
       Success := True;
    end Solve;
-
-   -------------
-   -- F_Solve --
-   -------------
-
-   procedure LF_Solve
-     (Desired_Position : Kinematics.Position;
-      Found_Posture    : out Kinematics.Posture;
-      Success          : out Boolean)
-   is
-      use type Reals.Real;
-
-      Theta_1 : Reals.Real;
-      Theta_2 : Reals.Real;
-      Theta_3 : Reals.Real;
-
-   begin
-      Solve
-        (B_X         => Kinematics.Configuration.LF_Base_X,
-         B_Y         => Kinematics.Configuration.LF_Base_Y,
-         B_Z         => Kinematics.Configuration.LF_Base_Z,
-         Cos_Gamma_0 => Kinematics.Configuration.Derived.LF_Cos_Gamma_0,
-         Sin_Gamma_0 => Kinematics.Configuration.Derived.LF_Sin_Gamma_0,
-         R_1         => Kinematics.Configuration.LF_DH_R1,
-         R_2         => Kinematics.Configuration.LF_DH_R2,
-         R_3         => Kinematics.Configuration.LF_DH_R3,
-         E_X         => Kinematics.X (Desired_Position),
-         E_Y         => Kinematics.Y (Desired_Position),
-         E_Z         => Kinematics.Z (Desired_Position),
-         Theta_1     => Theta_1,
-         Theta_2     => Theta_2,
-         Theta_3     => Theta_3,
-         Success     => Success);
-
-      Set (Found_Posture, Theta_1, -Theta_2, -Theta_3);
-   end LF_Solve;
-
-   --------------
-   -- RF_Solve --
-   --------------
-
-   procedure RF_Solve
-     (Desired_Position : Kinematics.Position;
-      Found_Posture    : out Kinematics.Posture;
-      Success          : out Boolean)
-   is
-      Theta_1 : Reals.Real;
-      Theta_2 : Reals.Real;
-      Theta_3 : Reals.Real;
-
-   begin
-      Solve
-        (B_X         => Kinematics.Configuration.RF_Base_X,
-         B_Y         => Kinematics.Configuration.RF_Base_Y,
-         B_Z         => Kinematics.Configuration.RF_Base_Z,
-         Cos_Gamma_0 => Kinematics.Configuration.Derived.RF_Cos_Gamma_0,
-         Sin_Gamma_0 => Kinematics.Configuration.Derived.RF_Sin_Gamma_0,
-         R_1         => Kinematics.Configuration.RF_DH_R1,
-         R_2         => Kinematics.Configuration.RF_DH_R2,
-         R_3         => Kinematics.Configuration.RF_DH_R3,
-         E_X         => Kinematics.X (Desired_Position),
-         E_Y         => Kinematics.Y (Desired_Position),
-         E_Z         => Kinematics.Z (Desired_Position),
-         Theta_1     => Theta_1,
-         Theta_2     => Theta_2,
-         Theta_3     => Theta_3,
-         Success     => Success);
-
-      Set (Found_Posture, Theta_1, Theta_2, Theta_3);
-   end RF_Solve;
 
 end Kinematics.Inverse.Geometric;

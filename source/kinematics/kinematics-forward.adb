@@ -267,6 +267,108 @@ package body Kinematics.Forward is
    end LF_T_BE;
 
    -------------------
+   -- LH_E_Position --
+   -------------------
+
+   function LH_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position
+   is
+      Cos_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
+      Sin_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
+      Cos_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
+      Sin_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
+      Cos_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
+      Sin_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
+
+      X : Reals.Real;
+      Y : Reals.Real;
+      Z : Reals.Real;
+
+   begin
+      Compute_E_Position
+        (B_x         => Kinematics.Configuration.LH_Base_X,
+         B_y         => Kinematics.Configuration.LH_Base_Y,
+         B_z         => Kinematics.Configuration.LH_Base_Z,
+         Cos_Alpha_0 => Kinematics.Configuration.Derived.LH_Cos_Gamma_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.LH_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.LH_DH_R1,
+         Cos_Alpha_1 => Kinematics.Configuration.Derived.LH_Cos_Alpha_1,
+         Sin_Alpha_1 => Kinematics.Configuration.Derived.LH_Sin_Alpha_1,
+         R_2         => Kinematics.Configuration.LH_DH_R2,
+         Cos_Alpha_2 => Kinematics.Configuration.Derived.LH_Cos_Alpha_2,
+         Sin_Alpha_2 => Kinematics.Configuration.Derived.LH_Sin_Alpha_2,
+         R_3         => Kinematics.Configuration.LH_DH_R3,
+         Cos_Theta_1 => Cos_Theta_1,
+         Sin_Theta_1 => Sin_Theta_1,
+         Cos_Theta_2 => Cos_Theta_2,
+         Sin_Theta_2 => Sin_Theta_2,
+         Cos_Theta_3 => Cos_Theta_3,
+         Sin_Theta_3 => Sin_Theta_3,
+         X           => X,
+         Y           => Y,
+         Z           => Z);
+
+      return (Value => (X, Y, Z));
+   end LH_E_Position;
+
+   -------------------
+   -- LM_E_Position --
+   -------------------
+
+   function LM_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position
+   is
+      Cos_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
+      Sin_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
+      Cos_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
+      Sin_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
+      Cos_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
+      Sin_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
+
+      X : Reals.Real;
+      Y : Reals.Real;
+      Z : Reals.Real;
+
+   begin
+      Compute_E_Position
+        (B_x         => Kinematics.Configuration.LM_Base_X,
+         B_y         => Kinematics.Configuration.LM_Base_Y,
+         B_z         => Kinematics.Configuration.LM_Base_Z,
+         Cos_Alpha_0 => Kinematics.Configuration.Derived.LM_Cos_Gamma_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.LM_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.LM_DH_R1,
+         Cos_Alpha_1 => Kinematics.Configuration.Derived.LM_Cos_Alpha_1,
+         Sin_Alpha_1 => Kinematics.Configuration.Derived.LM_Sin_Alpha_1,
+         R_2         => Kinematics.Configuration.LM_DH_R2,
+         Cos_Alpha_2 => Kinematics.Configuration.Derived.LM_Cos_Alpha_2,
+         Sin_Alpha_2 => Kinematics.Configuration.Derived.LM_Sin_Alpha_2,
+         R_3         => Kinematics.Configuration.LM_DH_R3,
+         Cos_Theta_1 => Cos_Theta_1,
+         Sin_Theta_1 => Sin_Theta_1,
+         Cos_Theta_2 => Cos_Theta_2,
+         Sin_Theta_2 => Sin_Theta_2,
+         Cos_Theta_3 => Cos_Theta_3,
+         Sin_Theta_3 => Sin_Theta_3,
+         X           => X,
+         Y           => Y,
+         Z           => Z);
+
+      return (Value => (X, Y, Z));
+   end LM_E_Position;
+
+   -------------------
    -- RF_E_Position --
    -------------------
 
@@ -316,5 +418,107 @@ package body Kinematics.Forward is
 
       return (Value => (X, Y, Z));
    end RF_E_Position;
+
+   -------------------
+   -- RH_E_Position --
+   -------------------
+
+   function RH_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position
+   is
+      Cos_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
+      Sin_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
+      Cos_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
+      Sin_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
+      Cos_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
+      Sin_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
+
+      X : Reals.Real;
+      Y : Reals.Real;
+      Z : Reals.Real;
+
+   begin
+      Compute_E_Position
+        (B_x         => Kinematics.Configuration.RH_Base_X,
+         B_y         => Kinematics.Configuration.RH_Base_Y,
+         B_z         => Kinematics.Configuration.RH_Base_Z,
+         Cos_Alpha_0 => Kinematics.Configuration.Derived.RH_Cos_Gamma_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.RH_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.RH_DH_R1,
+         Cos_Alpha_1 => Kinematics.Configuration.Derived.RH_Cos_Alpha_1,
+         Sin_Alpha_1 => Kinematics.Configuration.Derived.RH_Sin_Alpha_1,
+         R_2         => Kinematics.Configuration.RH_DH_R2,
+         Cos_Alpha_2 => Kinematics.Configuration.Derived.RH_Cos_Alpha_2,
+         Sin_Alpha_2 => Kinematics.Configuration.Derived.RH_Sin_Alpha_2,
+         R_3         => Kinematics.Configuration.RH_DH_R3,
+         Cos_Theta_1 => Cos_Theta_1,
+         Sin_Theta_1 => Sin_Theta_1,
+         Cos_Theta_2 => Cos_Theta_2,
+         Sin_Theta_2 => Sin_Theta_2,
+         Cos_Theta_3 => Cos_Theta_3,
+         Sin_Theta_3 => Sin_Theta_3,
+         X           => X,
+         Y           => Y,
+         Z           => Z);
+
+      return (Value => (X, Y, Z));
+   end RH_E_Position;
+
+   -------------------
+   -- RM_E_Position --
+   -------------------
+
+   function RM_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position
+   is
+      Cos_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
+      Sin_Theta_1 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
+      Cos_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
+      Sin_Theta_2 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
+      Cos_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
+      Sin_Theta_3 : constant Reals.Real :=
+        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
+
+      X : Reals.Real;
+      Y : Reals.Real;
+      Z : Reals.Real;
+
+   begin
+      Compute_E_Position
+        (B_x         => Kinematics.Configuration.RM_Base_X,
+         B_y         => Kinematics.Configuration.RM_Base_Y,
+         B_z         => Kinematics.Configuration.RM_Base_Z,
+         Cos_Alpha_0 => Kinematics.Configuration.Derived.RM_Cos_Gamma_0,
+         Sin_Alpha_0 => Kinematics.Configuration.Derived.RM_Sin_Gamma_0,
+         R_1         => Kinematics.Configuration.RM_DH_R1,
+         Cos_Alpha_1 => Kinematics.Configuration.Derived.RM_Cos_Alpha_1,
+         Sin_Alpha_1 => Kinematics.Configuration.Derived.RM_Sin_Alpha_1,
+         R_2         => Kinematics.Configuration.RM_DH_R2,
+         Cos_Alpha_2 => Kinematics.Configuration.Derived.RM_Cos_Alpha_2,
+         Sin_Alpha_2 => Kinematics.Configuration.Derived.RM_Sin_Alpha_2,
+         R_3         => Kinematics.Configuration.RM_DH_R3,
+         Cos_Theta_1 => Cos_Theta_1,
+         Sin_Theta_1 => Sin_Theta_1,
+         Cos_Theta_2 => Cos_Theta_2,
+         Sin_Theta_2 => Sin_Theta_2,
+         Cos_Theta_3 => Cos_Theta_3,
+         Sin_Theta_3 => Sin_Theta_3,
+         X           => X,
+         Y           => Y,
+         Z           => Z);
+
+      return (Value => (X, Y, Z));
+   end RM_E_Position;
 
 end Kinematics.Forward;

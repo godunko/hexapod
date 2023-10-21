@@ -32,7 +32,27 @@ package Kinematics.Forward is
    --  Returns position of the end effector in the body coordinate system with
    --  specified angles.
 
+   function LM_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position;
+   --  Returns position of the end effector in the body coordinate system with
+   --  specified angles.
+
+   function LH_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position;
+   --  Returns position of the end effector in the body coordinate system with
+   --  specified angles.
+
    function RF_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position;
+   --  Returns position of the end effector in the body coordinate system with
+   --  specified angles.
+
+   function RM_E_Position
+     (Posture : Kinematics.Posture) return Kinematics.Position;
+   --  Returns position of the end effector in the body coordinate system with
+   --  specified angles.
+
+   function RH_E_Position
      (Posture : Kinematics.Posture) return Kinematics.Position;
    --  Returns position of the end effector in the body coordinate system with
    --  specified angles.

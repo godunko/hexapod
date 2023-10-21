@@ -29,10 +29,10 @@ package Kinematics.Configuration is
    LM_Base_Z     : constant := 0.0;
    LM_Base_Gamma : constant := Ada.Numerics.Pi / 2.0;
 
-   LR_Base_X     : constant := -0.074;
-   LR_Base_Y     : constant := -0.048;
-   LR_Base_Z     : constant := 0.0;
-   LR_Base_Gamma : constant := Ada.Numerics.Pi * 5.0 / 6.0;
+   LH_Base_X     : constant := -0.074;
+   LH_Base_Y     : constant := -0.048;
+   LH_Base_Z     : constant := 0.0;
+   LH_Base_Gamma : constant := Ada.Numerics.Pi * 5.0 / 6.0;
 
    RF_Base_X     : constant := 0.074;
    RF_Base_Y     : constant := -0.048;
@@ -44,10 +44,10 @@ package Kinematics.Configuration is
    RM_Base_Z     : constant := 0.0;
    RM_Base_Gamma : constant := -Ada.Numerics.Pi / 2.0;
 
-   RR_Base_X     : constant := -0.074;
-   RR_Base_Y     : constant := -0.048;
-   RR_Base_Z     : constant := 0.0;
-   RR_Base_Gamma : constant := -Ada.Numerics.Pi * 5.0 / 6.0;
+   RH_Base_X     : constant := -0.074;
+   RH_Base_Y     : constant := -0.048;
+   RH_Base_Z     : constant := 0.0;
+   RH_Base_Gamma : constant := -Ada.Numerics.Pi * 5.0 / 6.0;
 
    --  DH parameters of the frames.
 
@@ -71,15 +71,15 @@ package Kinematics.Configuration is
    LM_DH_D3     : constant := 0.0;
    LM_DH_R3     : constant := 0.124;
 
-   LR_DH_Alpha1 : constant := Ada.Numerics.Pi / 2.0;
-   LR_DH_D1     : constant := 0.0;
-   LR_DH_R1     : constant := 0.029;
-   LR_DH_Alpha2 : constant := 0.0;
-   LR_DH_D2     : constant := 0.0;
-   LR_DH_R2     : constant := 0.084;
-   LR_DH_Alpha3 : constant := 0.0;
-   LR_DH_D3     : constant := 0.0;
-   LR_DH_R3     : constant := 0.124;
+   LH_DH_Alpha1 : constant := Ada.Numerics.Pi / 2.0;
+   LH_DH_D1     : constant := 0.0;
+   LH_DH_R1     : constant := 0.029;
+   LH_DH_Alpha2 : constant := 0.0;
+   LH_DH_D2     : constant := 0.0;
+   LH_DH_R2     : constant := 0.084;
+   LH_DH_Alpha3 : constant := 0.0;
+   LH_DH_D3     : constant := 0.0;
+   LH_DH_R3     : constant := 0.124;
 
    RF_DH_Alpha1 : constant := -Ada.Numerics.Pi / 2.0;
    RF_DH_D1     : constant := 0.0;
@@ -101,14 +101,14 @@ package Kinematics.Configuration is
    RM_DH_D3     : constant := 0.0;
    RM_DH_R3     : constant := 0.124;
 
-   RR_DH_Alpha1 : constant := -Ada.Numerics.Pi / 2.0;
-   RR_DH_D1     : constant := 0.0;
-   RR_DH_R1     : constant := 0.029;
-   RR_DH_Alpha2 : constant := 0.0;
-   RR_DH_D2     : constant := 0.0;
-   RR_DH_R2     : constant := 0.084;
-   RR_DH_Alpha3 : constant := 0.0;
-   RR_DH_D3     : constant := 0.0;
-   RR_DH_R3     : constant := 0.124;
+   RH_DH_Alpha1 : constant := -Ada.Numerics.Pi / 2.0;
+   RH_DH_D1     : constant := 0.0;
+   RH_DH_R1     : constant := 0.029;
+   RH_DH_Alpha2 : constant := 0.0;
+   RH_DH_D2     : constant := 0.0;
+   RH_DH_R2     : constant := 0.084;
+   RH_DH_Alpha3 : constant := 0.0;
+   RH_DH_D3     : constant := 0.0;
+   RH_DH_R3     : constant := 0.124;
 
 end Kinematics.Configuration;
