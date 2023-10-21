@@ -12,6 +12,7 @@ with Reals;
 with Hexapod.Console;
 with Hexapod.Hardware;
 with Hexapod.Movement;
+with Hexapod.Motor_Playground;
 
 procedure Hexapod.Driver is
 
@@ -101,6 +102,12 @@ begin
 
          when 'M' | 'm' =>
             Movement_Enabled := not @;
+
+         when 'P' | 'p' =>
+            Hexapod.Hardware.Configure_Controllers;
+            Hexapod.Hardware.Motor_Power_Relay.Set (True);
+            Hexapod.Motor_Playground;
+            Hexapod.Hardware.Motor_Power_Relay.Set (False);
 
          when others =>
             null;

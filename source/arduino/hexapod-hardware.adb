@@ -32,7 +32,7 @@ package body Hexapod.Hardware is
          Success : Boolean := True;
 
       begin
-         Servo_Controller_Left.Configure
+         Left_PWM_Controller.Configure
            (Frequency => PWM_Frequency,
             Success   => Success);
 
@@ -46,7 +46,7 @@ package body Hexapod.Hardware is
          Success : Boolean := True;
 
       begin
-         Servo_Controller_Right.Configure
+         Right_PWM_Controller.Configure
            (Frequency => PWM_Frequency,
             Success   => Success);
 
@@ -96,7 +96,7 @@ package body Hexapod.Hardware is
          Success : Boolean := True;
 
       begin
-         Servo_Controller_Left.Initialize (Success);
+         Left_PWM_Controller.Initialize (Success);
 
          if not Success then
             Console.Put_Line
@@ -108,7 +108,7 @@ package body Hexapod.Hardware is
          Success : Boolean := True;
 
       begin
-         Servo_Controller_Right.Initialize (Success);
+         Right_PWM_Controller.Initialize (Success);
 
          if not Success then
             Console.Put_Line
