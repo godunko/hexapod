@@ -14,7 +14,7 @@ package Hexapod.Movement is
 
    pragma Preelaborate;
 
-   Cycle : constant := 2.0;
+   Cycle : constant := 3.0;
    --  Length of the cycle.
 
    Ticks : constant := 100.0;
