@@ -13,6 +13,7 @@ with Hexapod.Console;
 with Hexapod.Hardware;
 with Hexapod.Movement;
 with Hexapod.Motor_Playground;
+with Hexapod.Motor_Power_Consumption;
 
 procedure Hexapod.Driver is
 
@@ -30,6 +31,7 @@ procedure Hexapod.Driver is
 
 begin
    Hexapod.Hardware.Initialize_Hardware;
+   Hexapod.Motor_Power_Consumption.Initialize;
    Hexapod.Movement.Initialize;
 
    Next_Tick := BBF.Board.Real_Time_Clock_Controller.Clock + Tick_Duration;
@@ -61,6 +63,8 @@ begin
             if Movement_Enabled then
                Hexapod.Movement.Step;
             end if;
+
+            Hexapod.Motor_Power_Consumption.Step;
          end if;
       end loop;
 
@@ -79,19 +83,19 @@ begin
             Hexapod.Movement.Prepare;
 
          when 'W' | 'w' =>
-            Step_Length_X := @ + 0.010;
+            Step_Length_X := @ + 0.025;
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
 
          when 'S' | 's' =>
-            Step_Length_X := @ - 0.010;
+            Step_Length_X := @ - 0.025;
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
 
          when 'D' | 'd' =>
-            Step_Length_Y := @ - 0.010;
+            Step_Length_Y := @ - 0.025;
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
 
          when 'A' | 'a' =>
-            Step_Length_Y := @ + 0.010;
+            Step_Length_Y := @ + 0.025;
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
 
          --  when 'R' | 'r' =>
