@@ -7,7 +7,8 @@
 with System.Storage_Elements;
 
 with BBF.GPIO;
-with BBF.HPL;
+with BBF.HPL.PMC;
+with BBF.Drivers.MPU;
 
 with Hexapod.Console;
 
@@ -55,6 +56,31 @@ package body Hexapod.Hardware is
               ("FAIL: Servo Motors Controller (Right): configuration failed.");
          end if;
       end;
+
+      declare
+         Success : Boolean := True;
+
+      begin
+         --  Body_Position_Sensor.Configure
+         --    (BBF.Board.Delay_Controller,
+         --     BBF.Drivers.MPU.FSR_2G,
+         --     BBF.Drivers.MPU.FSR_2000DPS,
+         --     True,
+         --     True,
+         --     198,
+         --     Success);
+         Body_Position_Sensor.Configure
+           (BBF.Board.Delay_Controller,
+            200,
+            Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Body Position Sensor: configuration failed.");
+         end if;
+
+         Body_Position_Sensor.Enable (BBF.Board.Delay_Controller);
+      end;
    end Configure_Controllers;
 
    -------------------------
@@ -100,7 +126,7 @@ package body Hexapod.Hardware is
 
          if not Success then
             Console.Put_Line
-              ("FAIL: Left Servo Motors Controller initialization failed.");
+              ("FAIL: Servo Motors Controller (Left): initialization failed.");
          end if;
       end;
 
@@ -112,7 +138,28 @@ package body Hexapod.Hardware is
 
          if not Success then
             Console.Put_Line
-              ("FAIL: Right Servo Motors Controller initialization failure.");
+              ("FAIL: Servo Motors Controller (Right): initialization failed.");
+         end if;
+      end;
+
+      --  Initialize body position sensor
+
+      declare
+         Success : Boolean := True;
+
+      begin
+         BBF.HPL.PMC.Enable_Peripheral_Clock
+           (BBF.HPL.Parallel_IO_Controller_A);
+         BBF.HPL.PMC.Enable_Peripheral_Clock
+           (BBF.HPL.Parallel_IO_Controller_C);
+         --  XXX Must be moved out! Clock should be enabled when interrupt
+         --  handling on the pin is enabled.
+
+         Body_Position_Sensor.Initialize (BBF.Board.Delay_Controller, Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Body Position Sensor initialization failure.");
          end if;
       end;
    end Initialize_Hardware;

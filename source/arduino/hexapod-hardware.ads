@@ -8,6 +8,8 @@
 
 with BBF.Board.I2C;
 private with BBF.Drivers.PCA9685;
+--  with BBF.Drivers.MPU6050;
+with BBF.Drivers.MPU9250;
 with BBF.GPIO;
 with BBF.PCA9685;
 
@@ -16,7 +18,12 @@ package Hexapod.Hardware is
    pragma Preelaborate;
 
    Motor_Power_Relay      : not null access BBF.GPIO.Pin'Class
-     renames BBF.Board.Pin_52;
+     renames BBF.Board.Pin_53;
+
+   Body_Position_Sensor   :
+     constant not null access BBF.Drivers.MPU9250.MPU9250_Sensor'Class;
+   --  Body_Position_Sensor   :
+   --    constant not null access BBF.Drivers.MPU6050.MPU6050_Sensor'Class;
 
    Left_Servo_Controller  :
      constant not null access BBF.PCA9685.PCA9685_Controller'Class;
@@ -143,5 +150,18 @@ private
    RH_Motor_3_Channel     :
      constant not null access BBF.PCA9685.PCA9685_Channel'Class :=
        Right_PWM_Controller.Channel_08'Access;
+
+   --  Body_Position_Sensor_I : aliased BBF.Drivers.MPU6050.MPU6050_Sensor
+   Body_Position_Sensor_I : aliased BBF.Drivers.MPU9250.MPU9250_Sensor
+     (Bus    => BBF.Board.I2C.I2C0,
+      Device => 16#68#,
+      --  Pin    => BBF.Board.Pin_50,
+      Pin    => BBF.Board.Pin_23,
+      Clocks => BBF.Board.Real_Time_Clock_Controller);
+
+   Body_Position_Sensor   :
+     constant not null access BBF.Drivers.MPU9250.MPU9250_Sensor'Class :=
+     --  constant not null access BBF.Drivers.MPU6050.MPU6050_Sensor'Class :=
+       Body_Position_Sensor_I'Access;
 
 end Hexapod.Hardware;

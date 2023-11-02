@@ -5,6 +5,9 @@
 --
 
 with BBF.Board;
+with BBF.Drivers.MPU;
+--  with BBF.Drivers.MPU6050;
+with BBF.Drivers.MPU9250;
 with BBF.Clocks;
 
 with Reals;
@@ -19,6 +22,38 @@ procedure Hexapod.Driver is
 
    use type Reals.Real;
    use type BBF.Clocks.Time;
+
+   Last_Timestamp : BBF.Clocks.Time := 0.0;
+
+   procedure Body_Position_Step is
+      Data      : BBF.Drivers.MPU9250.Sensor_Data;
+      --  Data      : BBF.Drivers.MPU6050.Sensor_Data;
+      Timestamp : BBF.Clocks.Time;
+
+   begin
+      Hexapod.Hardware.Body_Position_Sensor.Get (Data, Timestamp);
+
+      if Timestamp - Last_Timestamp >= 1.0 then
+         Console.Put_Line
+           ("Body Position: GA ("
+            & BBF.Drivers.MPU.Gravitational_Acceleration'Image
+              (Data.Acceleration_X)
+            & " "
+            & BBF.Drivers.MPU.Gravitational_Acceleration'Image
+              (Data.Acceleration_Y)
+            & " "
+            & BBF.Drivers.MPU.Gravitational_Acceleration'Image
+              (Data.Acceleration_Z)
+            & ")  AV ("
+            & BBF.Drivers.MPU.Angular_Velosity'Image (Data.Velocity_U)
+            & " "
+            & BBF.Drivers.MPU.Angular_Velosity'Image (Data.Velocity_U)
+            & " "
+            & BBF.Drivers.MPU.Angular_Velosity'Image (Data.Velocity_U)
+            & ")");
+         Last_Timestamp := Timestamp;
+      end if;
+   end Body_Position_Step;
 
    Tick_Duration    : constant := 1.0 / Hexapod.Movement.Ticks;
    Movement_Enabled : Boolean := False;
@@ -65,6 +100,7 @@ begin
             end if;
 
             Hexapod.Motor_Power_Consumption.Step;
+            Body_Position_Step;
          end if;
       end loop;
 
