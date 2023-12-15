@@ -9,8 +9,11 @@ build-core:
 
 build-arduino:
 	gprbuild gnat/arduino.gpr
-	arm-eabi-objcopy -O binary .objs/arm-eabi/arduino/hexapod-driver .objs/arm-eabi/hexapod.bin
-	ls -l .objs/arm-eabi/arduino/hexapod-driver .objs/arm-eabi/hexapod.bin
+	arm-eabi-objcopy -O binary .objs/arm-eabi/arduino/hexapod.elf .objs/arm-eabi/hexapod.bin
+	ls -l .objs/arm-eabi/arduino/hexapod.elf .objs/arm-eabi/hexapod.bin
+
+clean:
+	rm -rf .objs
 
 update:
 	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-forward-compute_h_be_matrix.ada > source/kinematics/generated/kinematics-forward-compute_h_be_matrix.adb
@@ -23,5 +26,8 @@ upload: build-arduino
 	$(BOSSAC) --arduino-erase
 	$(BOSSAC) --info --write --verify --boot .objs/arm-eabi/hexapod.bin
 
-clean:
-	rm -rf .objs
+ocd:
+	openocd -f interface/cmsis-dap.cfg -c 'cmsis_dap_backend hid' -f maintainers-tools/debug/arduino_due.cfg
+
+gdb:
+	arm-eabi-gdb --command="maintainers-tools/debug/gdbinit" .objs/arm-eabi/arduino/hexapod.elf

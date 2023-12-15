@@ -12,7 +12,7 @@ with "trajectory";
 project Arduino is
 
    for Target use "arm-eabi";
-   for Runtime ("Ada") use "light-arduino_due_x";
+   for Runtime ("Ada") use "light-tasking-arduino_due_x";
 
    Target := Project'Target;
 
@@ -20,7 +20,12 @@ project Arduino is
    for Object_Dir use "../.objs/" & Target & "/arduino";
 
    for Source_Dirs use
-     ("../source/arduino");
+     ("../source/arduino",
+      "../subprojects/b2f4a/source/sandbox");
+
+   package Builder is
+      for Executable ("hexapod-driver.adb") use "hexapod.elf";
+   end Builder;
 
    package Compiler is
       for Switches ("Ada") use ("-g", "-gnat2022", "-gnatW8", "-O2");
