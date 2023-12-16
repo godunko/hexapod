@@ -22,7 +22,7 @@ update:
 	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-inverse-algebraic-generic_compute_t.ada > source/kinematics/generated/kinematics-inverse-algebraic-generic_compute_t.adb
 	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-inverse-algebraic-generic_compute_12.ada > source/kinematics/generated/kinematics-inverse-algebraic-generic_compute_12.adb
 
-upload: build-arduino
+flash: build-arduino
 	$(BOSSAC) --arduino-erase
 	$(BOSSAC) --info --write --verify --boot .objs/arm-eabi/hexapod.bin
 
