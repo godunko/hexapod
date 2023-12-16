@@ -6,8 +6,6 @@
 
 package Hexapod.Console is
 
-   pragma Preelaborate;
-
    procedure Initialize;
 
    procedure Put (Item : String);

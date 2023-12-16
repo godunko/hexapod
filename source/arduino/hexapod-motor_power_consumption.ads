@@ -8,8 +8,6 @@ pragma Restrictions (No_Elaboration_Code);
 
 package Hexapod.Motor_Power_Consumption is
 
-   pragma Preelaborate;
-
    procedure Initialize;
 
    procedure Step;

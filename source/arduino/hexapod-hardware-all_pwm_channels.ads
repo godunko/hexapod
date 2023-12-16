@@ -6,9 +6,9 @@
 
 --  Direct access to all PWM channels. For use by motors playground only!
 
-package Hexapod.Hardware.All_PWM_Channels is
+pragma Restrictions (No_Elaboration_Code);
 
-   pragma Preelaborate;
+package Hexapod.Hardware.All_PWM_Channels is
 
    L_Channel_00 : constant not null access BBF.PCA9685.PCA9685_Channel'Class;
    L_Channel_01 : constant not null access BBF.PCA9685.PCA9685_Channel'Class;

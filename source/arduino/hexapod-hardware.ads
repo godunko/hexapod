@@ -15,8 +15,6 @@ with BBF.PCA9685;
 
 package Hexapod.Hardware is
 
-   pragma Preelaborate;
-
    Motor_Power_Relay      : not null access BBF.GPIO.Pin'Class
      renames BBF.Board.Pin_53;
 

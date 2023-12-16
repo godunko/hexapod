@@ -12,8 +12,6 @@ with Reals;
 
 package Hexapod.Movement is
 
-   pragma Preelaborate;
-
    Cycle : constant := 3.0;
    --  Length of the cycle.
 

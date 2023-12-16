@@ -5,6 +5,8 @@
 --
 
 with System.Storage_Elements;
+pragma Warnings (Off, """System.Semihosting"" is an internal GNAT unit");
+with System.Semihosting;
 
 with BBF.GPIO;
 with BBF.HPL.PMC;
@@ -225,6 +227,11 @@ package body Hexapod.Hardware is
       end Message;
 
    begin
+      --  First, put message to hardware debug probe.
+
+      System.Semihosting.Put
+        (ASCII.CR & ASCII.LF & "ADA: " & Message & ASCII.CR & ASCII.LF);
+
       --  XXX Last chance handler can be called from the interrupt handler
       --  when CPU interrupts are disabled. In such case asynchronous write
       --  operation to console can't be used, and code should cancel UART IO
