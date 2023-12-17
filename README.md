@@ -16,3 +16,12 @@ Hardware
  * 2x ACS7125A (5A) current sensors, connected to MCU's ADC ports
  * 2x relay modules
  * MPU9150 MotionTracking board
+
+Implemented Features
+--------------------
+
+ * Forward kinematics
+ * Inverse kinematic solvers
+   * Algebraic
+   * Geometric
+   * Numerical (Gradient Descent and Levenberg-Marquardt)
