@@ -332,47 +332,12 @@ package body Hexapod.Movement is
          RM_Position => RM_Position,
          RH_Position => RH_Position);
 
+      --  LF & RH
 
       Kinematics.Inverse.Geometric.LF_Solve (LF_Position, Posture, Success);
 
       if Success then
-         Move (Posture, LF_M_1, LF_M_2, LF_M_3, 500);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
-
-      Kinematics.Inverse.Geometric.LM_Solve (LM_Position, Posture, Success);
-
-      if Success then
-         Move (Posture, LM_M_1, LM_M_2, LM_M_3, 500);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
-
-      Kinematics.Inverse.Geometric.LH_Solve (LH_Position, Posture, Success);
-
-      if Success then
-         Move (Posture, LH_M_1, LH_M_2, LH_M_3, 500);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
-
-      Kinematics.Inverse.Geometric.RF_Solve (RF_Position, Posture, Success);
-
-      if Success then
-         Move (Posture, RF_M_1, RF_M_2, RF_M_3, 500);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
-
-      Kinematics.Inverse.Geometric.RM_Solve (RM_Position, Posture, Success);
-
-      if Success then
-         Move (Posture, RM_M_1, RM_M_2, RM_M_3, 500);
+         Move (Posture, LF_M_1, LF_M_2, LF_M_3, 50);
 
       else
          Console.Put (" NO SOLUTION");
@@ -381,7 +346,47 @@ package body Hexapod.Movement is
       Kinematics.Inverse.Geometric.RH_Solve (RH_Position, Posture, Success);
 
       if Success then
-         Move (Posture, RH_M_1, RH_M_2, RH_M_3, 500);
+         Move (Posture, RH_M_1, RH_M_2, RH_M_3, 50);
+
+      else
+         Console.Put (" NO SOLUTION");
+      end if;
+
+      --  LM & RM
+
+      Kinematics.Inverse.Geometric.LM_Solve (LM_Position, Posture, Success);
+
+      if Success then
+         Move (Posture, LM_M_1, LM_M_2, LM_M_3, 50);
+
+      else
+         Console.Put (" NO SOLUTION");
+      end if;
+
+      Kinematics.Inverse.Geometric.RM_Solve (RM_Position, Posture, Success);
+
+      if Success then
+         Move (Posture, RM_M_1, RM_M_2, RM_M_3, 50);
+
+      else
+         Console.Put (" NO SOLUTION");
+      end if;
+
+      --  LH & RF
+
+      Kinematics.Inverse.Geometric.LH_Solve (LH_Position, Posture, Success);
+
+      if Success then
+         Move (Posture, LH_M_1, LH_M_2, LH_M_3, 50);
+
+      else
+         Console.Put (" NO SOLUTION");
+      end if;
+
+      Kinematics.Inverse.Geometric.RF_Solve (RF_Position, Posture, Success);
+
+      if Success then
+         Move (Posture, RF_M_1, RF_M_2, RF_M_3, 50);
 
       else
          Console.Put (" NO SOLUTION");
