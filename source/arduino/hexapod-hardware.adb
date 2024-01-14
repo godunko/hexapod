@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -85,6 +85,26 @@ package body Hexapod.Hardware is
       end;
    end Configure_Controllers;
 
+   --------------------------
+   -- Disable_Motors_Power --
+   --------------------------
+
+   procedure Disable_Motors_Power is
+   begin
+      Left_Motor_Power_Relay.Set (True);
+      Right_Motor_Power_Relay.Set (True);
+   end Disable_Motors_Power;
+
+   -------------------------
+   -- Enable_Motors_Power --
+   -------------------------
+
+   procedure Enable_Motors_Power is
+   begin
+      Left_Motor_Power_Relay.Set (False);
+      Right_Motor_Power_Relay.Set (False);
+   end Enable_Motors_Power;
+
    -------------------------
    -- Initialize_Hardware --
    -------------------------
@@ -106,8 +126,10 @@ package body Hexapod.Hardware is
 
       --  Configure motor power relay control pin.
 
-      Motor_Power_Relay.Set_Direction (BBF.GPIO.Output);
-      Motor_Power_Relay.Set (False);
+      Left_Motor_Power_Relay.Set (True);
+      Right_Motor_Power_Relay.Set (True);
+      Left_Motor_Power_Relay.Set_Direction (BBF.GPIO.Output);
+      Right_Motor_Power_Relay.Set_Direction (BBF.GPIO.Output);
 
       --  Initialize real time clock
 

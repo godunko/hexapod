@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -110,11 +110,11 @@ begin
 
       case C is
          when ' ' =>
-            Hexapod.Hardware.Motor_Power_Relay.Set (False);
+            Hexapod.Hardware.Disable_Motors_Power;
 
          when 'U' | 'u' =>
             Hexapod.Hardware.Configure_Controllers;
-            Hexapod.Hardware.Motor_Power_Relay.Set (True);
+            Hexapod.Hardware.Enable_Motors_Power;
             Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
             Hexapod.Movement.Prepare;
 
@@ -145,9 +145,9 @@ begin
 
          when 'P' | 'p' =>
             Hexapod.Hardware.Configure_Controllers;
-            Hexapod.Hardware.Motor_Power_Relay.Set (True);
+            Hexapod.Hardware.Enable_Motors_Power;
             Hexapod.Motor_Playground;
-            Hexapod.Hardware.Motor_Power_Relay.Set (False);
+            Hexapod.Hardware.Disable_Motors_Power;
 
          when others =>
             null;
