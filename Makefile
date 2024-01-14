@@ -29,5 +29,8 @@ flash: build-arduino
 ocd:
 	openocd -f interface/cmsis-dap.cfg -c 'cmsis_dap_backend hid' -f maintainers-tools/debug/arduino_due.cfg
 
+stlink:
+	openocd -f interface/stlink-dap.cfg -f maintainers-tools/debug/arduino_due.cfg
+
 gdb:
 	arm-eabi-gdb --command="maintainers-tools/debug/gdbinit" .objs/arm-eabi/arduino/hexapod.elf
