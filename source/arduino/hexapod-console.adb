@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -60,8 +60,21 @@ package body Hexapod.Console is
    ---------------------
 
    procedure Get_Synchronous (Item : out Character) is
+      use type BBF.Unsigned_16;
+
+      Buffer : BBF.Unsigned_8_Array_16 (0 ..0);
+      Size   : BBF.Unsigned_16;
+
    begin
-      raise Program_Error;
+      loop
+         UART.Receive_Asynchronous (Buffer, Size);
+
+         if Size /= 0 then
+            Item := Character'Val (Buffer (0));
+
+            return;
+         end if;
+      end loop;
    end Get_Synchronous;
 
    ----------------
