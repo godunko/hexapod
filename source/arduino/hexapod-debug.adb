@@ -48,6 +48,25 @@ package body Hexapod.Debug is
       return B;
    end Coordinate_Image;
 
+   ----------------------
+   -- Parametric_Image --
+   ----------------------
+
+   function Parametric_Image (Item : Reals.Real) return String is
+      I  : constant Integer := Integer (Item * 1_000.0);
+      F  : constant Integer := I / 1_000;
+      A  : constant Integer := I mod 1_000;
+      FI : constant String := Integer'Image (F);
+      AI : constant String := Integer'Image (A);
+      B  : String := " 0.000";
+
+   begin
+      B (2 - (FI'Length) + 1 .. 2) := FI (FI'First .. FI'Last);
+      B (6 - (AI'Length - 1) + 1 .. 6) := AI (AI'First + 1 .. AI'Last);
+
+      return B;
+   end Parametric_Image;
+
    --------------------
    -- Position_Image --
    --------------------

@@ -19,4 +19,7 @@ package Hexapod.Debug is
 
    function Posture_Image (Item : Kinematics.Posture) return String;
 
+   function Parametric_Image (Item : Reals.Real) return String;
+   -- Formats number in the -1.0 .. 1.0 range with 3 digits after point
+
 end Hexapod.Debug;
