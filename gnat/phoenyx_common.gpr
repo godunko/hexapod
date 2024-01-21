@@ -17,8 +17,8 @@ abstract project Phoenyx_Common is
          "-gnatW8",
          "-O1",
          "-ffunction-sections",
-         "-fdata-sections");
-         -- "-flto");
+         "-fdata-sections",
+         "-flto");
    end Compiler;
 
 end Phoenyx_Common;
