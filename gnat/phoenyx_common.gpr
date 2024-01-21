@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -11,8 +11,14 @@ abstract project Phoenyx_Common is
    for Object_Dir use "../.objs/" & Target & "/";
 
    package Compiler is
-      for Switches ("Ada")
-        use ("-g", "-gnat2022", "-gnatW8", "-O1", "-ffunction-sections", "-fdata-sections", "-flto");
+      for Switches ("Ada") use
+        ("-g",
+         "-gnat2022",
+         "-gnatW8",
+         "-O1",
+         "-ffunction-sections",
+         "-fdata-sections");
+         -- "-flto");
    end Compiler;
 
 end Phoenyx_Common;
