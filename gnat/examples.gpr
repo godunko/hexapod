@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -16,6 +16,7 @@ project Examples is
       "kinematics_inverse_geometric.adb",
       "kinematics_inverse_gradient_descent.adb",
       "kinematics_inverse_levenberg_marquardt.adb",
+      "trajectory_steps.adb",
       "trajectory_wave_gait.adb");
 
    package Compiler is
