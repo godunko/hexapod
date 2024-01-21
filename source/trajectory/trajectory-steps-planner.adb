@@ -98,13 +98,14 @@ package body Trajectory.Steps.Planner is
          --  --  if Is_Subset_1 (Known_State_Swing)
          --  --    and Is_Subset_2 (Known_State_Swing)
       if not Is_Stable (Known_State_Swing) then
+         --  Position at First_Step_Ticks offset is not reachable, returns.
+
          --  --  then
          --     Success := False;
          --     Put (" UNSTABLE");
          --     New_Line;
          --
-         --     return;
-         raise Program_Error;
+         return;
       end if;
 
          --  New_Line;
@@ -146,11 +147,11 @@ package body Trajectory.Steps.Planner is
                      return;
 
                   elsif not Is_Stable (Current_State_Swing) then
-         --                 Success := False;
+                     Success := False;
          --                 Put ("  UNSTABLE");
          --
-                     raise Program_Error;
-         --                 exit;
+                     --  raise Program_Error;
+                     exit;
          --
                   else
                      Compute (Current, Gait, Step, Ticks, Success);
@@ -253,24 +254,22 @@ package body Trajectory.Steps.Planner is
       elsif Is_In_Subset_1 (Current_State_Swing)
         and not Is_In_Subset_2 (Current_State_Swing)
       then
---              Compute_Step
---                (Current_State,
---                 Gait.State (Next_Step),
---                 Subset_1,
---                 Ticks);
-            raise Program_Error;
+         Compute_Step
+           (Current_Configuration,
+            Gait.Step (Next_Step),
+            Subset_1,
+            Ticks);
 
       elsif not Is_In_Subset_1 (Current_State_Swing)
         and Is_In_Subset_2 (Current_State_Swing)
       then
---              Compute_Step
---                (Current_State,
---                 Gait.State (Next_Step),
---                 Subset_2,
---                 Ticks);
-            raise Program_Error;
+         Compute_Step
+           (Current_Configuration,
+            Gait.Step (Next_Step),
+            Subset_2,
+            Ticks);
 
-         elsif Is_In (Current_Step_Swing, Current_State_Swing) then
+      elsif Is_In (Current_Step_Swing, Current_State_Swing) then
 --  --              --  elsif Count (Current_State_Swing)
 --  --              --    = Count (Current_State_Swing + Gait_Step_Swing)
 --  --              --  then
@@ -378,7 +377,6 @@ package body Trajectory.Steps.Planner is
          end if;
       end Compute;
 
-      Ratio         : Reals.Real := 0.0;
       Success       : Boolean := True;
       Swing         : Mask_Type;
       Stance_Factor : Reals.Real := 1.0;
@@ -389,7 +387,7 @@ package body Trajectory.Steps.Planner is
 
       --  Compute velocity ratio.
 
-      Ratio :=
+      Result.Ratio :=
         Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks);
 
       --     Next_Step           : constant Gait_Step_Index :=
@@ -411,24 +409,6 @@ package body Trajectory.Steps.Planner is
          Next_Step_Ticks,
          Success);
       pragma Assert (Success);
-
-      --  Special case: duty factor of the "stop" state is equal to 1.0: only
-      --  swing legs are moving.
-
-      --  Factor := Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks);
-      --    (if Current_Step_Ticks = 0 then 1.0 else Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks));
-      --  Duty_Factor :=
-      --    (if Current_Step_Ticks = 0
-      --     then 1.0
-      --     else Reals.Real (Current_Step_Ticks)
-      --            / Reals.Real (Support_Ticks + Current_Step_Ticks));
-        --  Reals.Real (Active_Gait.Ticks)
-        --    / (Reals.Real (Active_Gait.Last + 1)
-        --         * Reals.Real (Active_Gait.Ticks));
-      --  Duty_Factor :=
-      --    Reals.Real (Current_Step_Ticks)
-      --      / Reals.Real (Support_Ticks + Current_Step_Ticks);
-      --  Stance_Factor := 1.0 - Duty_Factor;
 
       Swing :=
         Swing_Stance
