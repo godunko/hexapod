@@ -13,6 +13,8 @@
 --  executor computes coordinates of the legs using fase parameter in range
 --  [0 .. 1].
 
+pragma Restrictions (No_Elaboration_Code);
+
 with Reals;
 
 package Trajectory.Steps is
@@ -23,7 +25,7 @@ package Trajectory.Steps is
 
    type Stage_Kind is (Stance, Swing);
 
---     subtype Step_Fase is Reals.Real range 0.0 .. 1.0;
+   subtype Step_Fase is Reals.Real range 0.0 .. 1.0;
 --
 --     subtype Stage_Fase is Reals.Real range 0.0 .. 1.0;
 --
@@ -33,7 +35,7 @@ package Trajectory.Steps is
 
    subtype Trajectory_Position is Reals.Real range -0.5 .. 0.5;
 
-   type Leg_Step_Descriptor (Stage : Stage_Kind := Stance) is record
+   type Leg_Step_Plan_Descriptor (Stage : Stage_Kind := Stance) is record
       Length_X       : Reals.Real;
       Length_Y       : Reals.Real;
       --  Projection of the stance trajectory on X and Y axes.
@@ -50,6 +52,16 @@ package Trajectory.Steps is
             Height_Z : Reals.Real;
             --  Height of the swing.
       end case;
+   end record;
+
+   type Step_Plan_Descriptor is record
+      Ratio : Reals.Real               := 0.0;
+      LF    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
+      LM    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
+      LH    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
+      RF    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
+      RM    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
+      RH    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
    end record;
 
 end Trajectory.Steps;

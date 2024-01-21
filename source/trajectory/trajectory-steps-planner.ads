@@ -17,46 +17,13 @@ package Trajectory.Steps.Planner is
    Quadro_Gait : constant Gait_Descriptor;
    Tripod_Gait : constant Gait_Descriptor;
 
-   type Leg_Step_Plan (Support : Boolean := True) is record
-      Start_Fase : Reals.Real;
-      End_Fase   : Reals.Real;
+   procedure Compute_Step
+     (Length_X : Reals.Real;
+      Length_Y : Reals.Real;
+      Height_Z : Reals.Real;
+      Result   : out Step_Plan_Descriptor);
 
-      case Support is
-         when False =>
-            --  Swing state
-
-            Swing_Begin : Reals.Real;
-            Swing_End   : Reals.Real;
-            --  Interval of the step length for swing.
-
-         when True =>
-            -- Support state
-
-            Support_Initial_Fase : Reals.Real;
-            Support_Final_Fase   : Reals.Real;
-            --  Initial and final fase of the support internal.
-      end case;
-   end record;
-   --  Plan information for the single step. One step means swing of the leg
-   --  from initial point to the next point. In opposite, support leg moves
-   --  only for some segment.
-
-   --  type Planner is private;
-
-   procedure Step
-     --  (Self : in out Planner);
-   --    (Duty_Factor : out Reals.Real;
-     (Factor : out Reals.Real;
-      LF     : out Leg_Step_Plan;
-      LM     : out Leg_Step_Plan;
-      LH     : out Leg_Step_Plan;
-      RF     : out Leg_Step_Plan;
-      RM     : out Leg_Step_Plan;
-      RH     : out Leg_Step_Plan);
-
-   procedure Transition
-     --  (Self : in out Planner;
-     (Gait : Gait_Descriptor);
+   procedure Transition (Gait : Gait_Descriptor);
 
 private
 
@@ -119,7 +86,5 @@ private
    Wave_Gait   : constant Gait_Descriptor := Wave_Gait_Data'Access;
    Quadro_Gait : constant Gait_Descriptor := Quadro_Gait_Data'Access;
    Tripod_Gait : constant Gait_Descriptor := Tripod_Gait_Data'Access;
-
-   --  type Planner is null record;
 
 end Trajectory.Steps.Planner;

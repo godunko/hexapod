@@ -326,137 +326,19 @@ package body Trajectory.Steps.Planner is
       Compute (Current.L_6, Next_Gait_State.L_6, Force.L_6);
    end Compute_Step;
 
-   ---------------
-   -- Is_Stable --
-   ---------------
+   ------------------
+   -- Compute_Step --
+   ------------------
 
-   function Is_Stable (Swing : Mask_Type) return Boolean is
-      Table :
-        array (Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)
-        of Boolean :=
-          (others => (others => (others => (others => (others => (others => False))))));
-
-   begin
-      Table (False, True,  True,  True,  True,  False) := True;
-      Table (False, True,  False, True,  False, True)  := True;
-      Table (False, True,  False, True,  True,  True)  := True;
-      Table (False, True,  True,  True,  False, True)  := True;
-      Table (False, True,  True,  True,  True,  True)  := True;
-      Table (True,  False, True,  False, True,  False) := True;
-      Table (True,  False, True,  True,  True,  False) := True;
-      Table (True,  False, True,  False, True,  True)  := True;
-      Table (True,  False, True,  True,  False, True)  := True;
-      Table (True,  False, True,  True,  True,  True)  := True;
-      Table (True,  True,  True,  False, True,  False) := True;
-      Table (True,  True,  True,  True,  True,  False) := True;
-      Table (True,  True,  False, False, True,  True)  := True;
-      Table (True,  True,  False, True,  False, True)  := True;
-      Table (True,  True,  False, True,  True,  True)  := True;
-      Table (True,  True,  True,  False, True,  True)  := True;
-      Table (True,  True,  True,  True,  False, True)  := True;
-      Table (True,  True,  True,  True,  True,  True)  := True;
-
-      return
-        Table
-          (not Swing.L_1, not Swing.L_3, not Swing.L_5,
-           not Swing.L_2, not Swing.L_4, not Swing.L_6);
-      --  if Count (Swing) = 1 then
-      --     return True;
-      --
-      --  elsif  then
-      --  end if;
-   end Is_Stable;
-
-   -----------
-   -- Is_In --
-   -----------
-
-   function Is_In
-     (State : Mask_Type;
-      Set   : Mask_Type) return Boolean is
-   begin
-      --  Put (State);
-      --  Put ("/");
-      --  Put (Set);
-
-      return Result : Boolean := True do
-         if State.L_1 and not Set.L_1 then
-            Result := False;
-         end if;
-
-         if State.L_2 and not Set.L_2 then
-            Result := False;
-         end if;
-
-         if State.L_3 and not Set.L_3 then
-            Result := False;
-         end if;
-
-         if State.L_4 and not Set.L_4 then
-            Result := False;
-         end if;
-
-         if State.L_5 and not Set.L_5 then
-            Result := False;
-         end if;
-
-         if State.L_6 and not Set.L_6 then
-            Result := False;
-         end if;
-      end return;
-   end Is_In;
-   --------------------
-   -- Is_In_Subset_1 --
-   --------------------
-
-   function Is_In_Subset_1 (Item : Mask_Type) return Boolean is
-   begin
-      return Item.L_1 or Item.L_4 or Item.L_5;
-   end Is_In_Subset_1;
-
-   --------------------
-   -- Is_In_Subset_2 --
-   --------------------
-
-   function Is_In_Subset_2 (Item : Mask_Type) return Boolean is
-   begin
-      return Item.L_2 or Item.L_3 or Item.L_6;
-   end Is_In_Subset_2;
-
-   ----------------
-   -- Must_Swing --
-   ----------------
-
-   function Must_Swing
-     (Item : Configuration; Ticks : Integer) return Mask_Type is
-   begin
-      return Result : Mask_Type do
-         Result.L_1 := Item.L_1 - Ticks < -5;
-         Result.L_2 := Item.L_2 - Ticks < -5;
-         Result.L_3 := Item.L_3 - Ticks < -5;
-         Result.L_4 := Item.L_4 - Ticks < -5;
-         Result.L_5 := Item.L_5 - Ticks < -5;
-         Result.L_6 := Item.L_6 - Ticks < -5;
-      end return;
-   end Must_Swing;
-
-   ----------
-   -- Step --
-   ----------
-
-   procedure Step
-     (Factor : out Reals.Real;
-      LF     : out Leg_Step_Plan;
-      LM     : out Leg_Step_Plan;
-      LH     : out Leg_Step_Plan;
-      RF     : out Leg_Step_Plan;
-      RM     : out Leg_Step_Plan;
-      RH     : out Leg_Step_Plan)
+   procedure Compute_Step
+     (Length_X : Reals.Real;
+      Length_Y : Reals.Real;
+      Height_Z : Reals.Real;
+      Result   : out Step_Plan_Descriptor)
    is
-      use type Reals.Real;
 
       procedure Compute
-        (Result        : out Leg_Step_Plan;
+        (Result        : out Leg_Step_Plan_Descriptor;
          Stance_Factor : Reals.Real;
          Is_Swing      : Boolean;
          Previous      : Integer;
@@ -467,7 +349,7 @@ package body Trajectory.Steps.Planner is
       -------------
 
       procedure Compute
-        (Result        : out Leg_Step_Plan;
+        (Result        : out Leg_Step_Plan_Descriptor;
          Stance_Factor : Reals.Real;
          Is_Swing      : Boolean;
          Previous      : Integer;
@@ -475,41 +357,47 @@ package body Trajectory.Steps.Planner is
       begin
          if Is_Swing then
             Result :=
-              (Support     => False,
-               Start_Fase  => 1.0,
+              (Stage          => Swing,
+               Length_X       => Length_X,
+               Length_Y       => Length_Y,
+               Height_Z       => Height_Z,
+               Start_Position => 0.0,  --  ???
                --  Start_Fase  => 1.0 - Duty_Factor,
                  --  Stance_Factor
                  --    * Reals.Real (5 - Previous_Configuration.L_1)
                  --    / Reals.Real (Support_Ticks),
-               End_Fase    => 1.0,
+               End_Position   => 0.0);  --  ???
                  --  Stance_Factor
                  --    * Reals.Real (5 - Current_Configuration.L_1)
                  --    / Reals.Real (Support_Ticks),
-               Swing_Begin =>
-                 Reals.Real (Previous) / Reals.Real (Support_Ticks), -- * 2.0,
-               Swing_End   =>
-                 Reals.Real (Current) / Reals.Real (Support_Ticks)); -- * 2.0);
+               --  Swing_Begin =>
+               --    Reals.Real (Previous) / Reals.Real (Support_Ticks), -- * 2.0,
+               --  Swing_End   =>
+               --    Reals.Real (Current) / Reals.Real (Support_Ticks)); -- * 2.0);
 
          else
             Result :=
-              (Support    => True,
-               Start_Fase =>
-                 (if Stance_Factor /= 0.0 then Stance_Factor else 1.0)
-                   * Reals.Real (5 - Previous)
-                   / Reals.Real (Support_Ticks),
-               End_Fase   =>
-                 (if Stance_Factor /= 0.0 then Stance_Factor else 1.0)
-                   * Reals.Real (5 - Current)
-                   / Reals.Real (Support_Ticks),
-               Support_Initial_Fase =>
-                 Reals.Real (Previous) / Reals.Real (Support_Ticks),
+              (Stage          => Stance,
+               Length_X       => Length_X,
+               Length_Y       => Length_Y,
+               Start_Position => 0.0,  --  ???
+               --    (if Stance_Factor /= 0.0 then Stance_Factor else 1.0)
+                  --   * Reals.Real (5 - Previous)
+                  --   / Reals.Real (Support_Ticks),
+               End_Position   => 0.0);  --  ???
+               --    (if Stance_Factor /= 0.0 then Stance_Factor else 1.0)
+                  --   * Reals.Real (5 - Current)
+                  --   / Reals.Real (Support_Ticks),
+               --  Support_Initial_Fase =>
+               --    Reals.Real (Previous) / Reals.Real (Support_Ticks),
                --    Reals.Real (5 - Previous) / Reals.Real (Support_Ticks),
-               Support_Final_Fase =>
-                 Reals.Real (Current) / Reals.Real (Support_Ticks));
+               --  Support_Final_Fase =>
+               --    Reals.Real (Current) / Reals.Real (Support_Ticks));
                --    Reals.Real (5 - Current) / Reals.Real (Support_Ticks));
          end if;
       end Compute;
 
+      Ratio         : Reals.Real := 0.0;
       Success       : Boolean := True;
       Swing         : Mask_Type;
       Stance_Factor : Reals.Real := 1.0;
@@ -517,6 +405,13 @@ package body Trajectory.Steps.Planner is
    begin
       Previous_Configuration := Current_Configuration;
       Current_Step_Ticks     := Next_Step_Ticks;
+
+      --  Compute velocity ratio.
+
+      Ratio :=
+      --    (if Active_Gait.Last = 0
+         --    then 0.0 else 1.0 / Reals.Real (Active_Gait.Last));
+         Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks);
 
       --     Next_Step           : constant Gait_Step_Index :=
       --       (Self.Step + 1) mod Self.Gait.State'Length;
@@ -541,7 +436,7 @@ package body Trajectory.Steps.Planner is
       --  Special case: duty factor of the "stop" state is equal to 1.0: only
       --  swing legs are moving.
 
-      Factor := Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks);
+      --  Factor := Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks);
       --    (if Current_Step_Ticks = 0 then 1.0 else Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks));
       --  Duty_Factor :=
       --    (if Current_Step_Ticks = 0
@@ -561,37 +456,37 @@ package body Trajectory.Steps.Planner is
           (Previous_Configuration, Current_Configuration, Current_Step_Ticks);
 
       Compute
-        (Result        => LF,
+        (Result        => Result.LF,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_1,
          Previous      => Previous_Configuration.L_1,
          Current       => Current_Configuration.L_1);
       Compute
-        (Result        => RF,
+        (Result        => Result.RF,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_2,
          Previous      => Previous_Configuration.L_2,
          Current       => Current_Configuration.L_2);
       Compute
-        (Result        => LM,
+        (Result        => Result.LM,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_3,
          Previous      => Previous_Configuration.L_3,
          Current       => Current_Configuration.L_3);
       Compute
-        (Result        => RM,
+        (Result        => Result.RM,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_4,
          Previous      => Previous_Configuration.L_4,
          Current       => Current_Configuration.L_4);
       Compute
-        (Result        => LH,
+        (Result        => Result.LH,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_5,
          Previous      => Previous_Configuration.L_5,
          Current       => Current_Configuration.L_5);
       Compute
-        (Result        => RH,
+        (Result        => Result.RH,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_6,
          Previous      => Previous_Configuration.L_6,
@@ -677,7 +572,122 @@ package body Trajectory.Steps.Planner is
       --  else
       --     RH:= (Support => True);
       --  end if;
-   end Step;
+   end Compute_Step;
+
+   ---------------
+   -- Is_Stable --
+   ---------------
+
+   function Is_Stable (Swing : Mask_Type) return Boolean is
+      Table :
+        array (Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)
+        of Boolean :=
+          (others => (others => (others => (others => (others => (others => False))))));
+
+   begin
+      Table (False, True,  True,  True,  True,  False) := True;
+      Table (False, True,  False, True,  False, True)  := True;
+      Table (False, True,  False, True,  True,  True)  := True;
+      Table (False, True,  True,  True,  False, True)  := True;
+      Table (False, True,  True,  True,  True,  True)  := True;
+      Table (True,  False, True,  False, True,  False) := True;
+      Table (True,  False, True,  True,  True,  False) := True;
+      Table (True,  False, True,  False, True,  True)  := True;
+      Table (True,  False, True,  True,  False, True)  := True;
+      Table (True,  False, True,  True,  True,  True)  := True;
+      Table (True,  True,  True,  False, True,  False) := True;
+      Table (True,  True,  True,  True,  True,  False) := True;
+      Table (True,  True,  False, False, True,  True)  := True;
+      Table (True,  True,  False, True,  False, True)  := True;
+      Table (True,  True,  False, True,  True,  True)  := True;
+      Table (True,  True,  True,  False, True,  True)  := True;
+      Table (True,  True,  True,  True,  False, True)  := True;
+      Table (True,  True,  True,  True,  True,  True)  := True;
+
+      return
+        Table
+          (not Swing.L_1, not Swing.L_3, not Swing.L_5,
+           not Swing.L_2, not Swing.L_4, not Swing.L_6);
+      --  if Count (Swing) = 1 then
+      --     return True;
+      --
+      --  elsif  then
+      --  end if;
+   end Is_Stable;
+
+   -----------
+   -- Is_In --
+   -----------
+
+   function Is_In
+     (State : Mask_Type;
+      Set   : Mask_Type) return Boolean is
+   begin
+      --  Put (State);
+      --  Put ("/");
+      --  Put (Set);
+
+      return Result : Boolean := True do
+         if State.L_1 and not Set.L_1 then
+            Result := False;
+         end if;
+
+         if State.L_2 and not Set.L_2 then
+            Result := False;
+         end if;
+
+         if State.L_3 and not Set.L_3 then
+            Result := False;
+         end if;
+
+         if State.L_4 and not Set.L_4 then
+            Result := False;
+         end if;
+
+         if State.L_5 and not Set.L_5 then
+            Result := False;
+         end if;
+
+         if State.L_6 and not Set.L_6 then
+            Result := False;
+         end if;
+      end return;
+   end Is_In;
+
+   --------------------
+   -- Is_In_Subset_1 --
+   --------------------
+
+   function Is_In_Subset_1 (Item : Mask_Type) return Boolean is
+   begin
+      return Item.L_1 or Item.L_4 or Item.L_5;
+   end Is_In_Subset_1;
+
+   --------------------
+   -- Is_In_Subset_2 --
+   --------------------
+
+   function Is_In_Subset_2 (Item : Mask_Type) return Boolean is
+   begin
+      return Item.L_2 or Item.L_3 or Item.L_6;
+   end Is_In_Subset_2;
+
+   ----------------
+   -- Must_Swing --
+   ----------------
+
+   function Must_Swing
+     (Item : Configuration; Ticks : Integer) return Mask_Type is
+   begin
+      return Result : Mask_Type do
+         Result.L_1 := Item.L_1 - Ticks < -5;
+         Result.L_2 := Item.L_2 - Ticks < -5;
+         Result.L_3 := Item.L_3 - Ticks < -5;
+         Result.L_4 := Item.L_4 - Ticks < -5;
+         Result.L_5 := Item.L_5 - Ticks < -5;
+         Result.L_6 := Item.L_6 - Ticks < -5;
+      end return;
+   end Must_Swing;
 
    ------------------
    -- Swing_Stance --
@@ -701,11 +711,7 @@ package body Trajectory.Steps.Planner is
    -- Transition --
    ----------------
 
-   procedure Transition
-     --  (Self : in out Planner;
-     (Gait : Gait_Descriptor)
-   is
-      --  raise Program_Error;
+   procedure Transition (Gait : Gait_Descriptor) is
       Active_Gait_Ticks : constant Natural := Active_Gait.Ticks;
            --  (if Self.Gait = null then 0 else Self.Gait.Ticks);
       Success           : Boolean          := True;
