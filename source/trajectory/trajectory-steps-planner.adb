@@ -361,39 +361,20 @@ package body Trajectory.Steps.Planner is
                Length_X       => Length_X,
                Length_Y       => Length_Y,
                Height_Z       => Height_Z,
-               Start_Position => 0.0,  --  ???
-               --  Start_Fase  => 1.0 - Duty_Factor,
-                 --  Stance_Factor
-                 --    * Reals.Real (5 - Previous_Configuration.L_1)
-                 --    / Reals.Real (Support_Ticks),
-               End_Position   => 0.0);  --  ???
-                 --  Stance_Factor
-                 --    * Reals.Real (5 - Current_Configuration.L_1)
-                 --    / Reals.Real (Support_Ticks),
-               --  Swing_Begin =>
-               --    Reals.Real (Previous) / Reals.Real (Support_Ticks), -- * 2.0,
-               --  Swing_End   =>
-               --    Reals.Real (Current) / Reals.Real (Support_Ticks)); -- * 2.0);
+               Start_Position =>
+                 Reals.Real (Previous) / Reals.Real (Support_Ticks),
+               End_Position   =>
+                 Reals.Real (Current) / Reals.Real (Support_Ticks));
 
          else
             Result :=
               (Stage          => Stance,
                Length_X       => Length_X,
                Length_Y       => Length_Y,
-               Start_Position => 0.0,  --  ???
-               --    (if Stance_Factor /= 0.0 then Stance_Factor else 1.0)
-                  --   * Reals.Real (5 - Previous)
-                  --   / Reals.Real (Support_Ticks),
-               End_Position   => 0.0);  --  ???
-               --    (if Stance_Factor /= 0.0 then Stance_Factor else 1.0)
-                  --   * Reals.Real (5 - Current)
-                  --   / Reals.Real (Support_Ticks),
-               --  Support_Initial_Fase =>
-               --    Reals.Real (Previous) / Reals.Real (Support_Ticks),
-               --    Reals.Real (5 - Previous) / Reals.Real (Support_Ticks),
-               --  Support_Final_Fase =>
-               --    Reals.Real (Current) / Reals.Real (Support_Ticks));
-               --    Reals.Real (5 - Current) / Reals.Real (Support_Ticks));
+               Start_Position =>
+                 Reals.Real (Previous) / Reals.Real (Support_Ticks),
+               End_Position   =>
+                 Reals.Real (Current) / Reals.Real (Support_Ticks));
          end if;
       end Compute;
 
@@ -409,9 +390,7 @@ package body Trajectory.Steps.Planner is
       --  Compute velocity ratio.
 
       Ratio :=
-      --    (if Active_Gait.Last = 0
-         --    then 0.0 else 1.0 / Reals.Real (Active_Gait.Last));
-         Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks);
+        Reals.Real (Current_Step_Ticks) / Reals.Real (Support_Ticks);
 
       --     Next_Step           : constant Gait_Step_Index :=
       --       (Self.Step + 1) mod Self.Gait.State'Length;

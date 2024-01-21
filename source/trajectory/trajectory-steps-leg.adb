@@ -17,7 +17,7 @@ package body Trajectory.Steps.Leg is
       T     : Step_Fase) return Trajectory_Position
       with Pre => Ratio in 0.0 .. 1.0;
 
-   function T_Z_Swing (T : Step_Fase) return Trajectory_Position;
+   function T_Z_Swing (T : Step_Fase) return Reals.Real;
 
    ------------------
    -- Position_XYZ --
@@ -62,7 +62,7 @@ package body Trajectory.Steps.Leg is
 
    function T_XY_Stance (T : Step_Fase) return Trajectory_Position is
    begin
-      return 0.5 - T;
+      return T - 0.5;
    end T_XY_Stance;
 
    ----------------
@@ -82,16 +82,16 @@ package body Trajectory.Steps.Leg is
    -- T_Z_Swing --
    ---------------
 
-   function T_Z_Swing (T : Step_Fase) return Trajectory_Position is
+   function T_Z_Swing (T : Step_Fase) return Reals.Real is
       use Ada.Numerics;
       use Reals.Elementary_Functions;
 
    begin
       if T <= 0.5 then
-         return -(Sin(4.0 * Pi * T) - 4.0 * Pi * T) / (2.0 * Pi);
+         return -(Sin (4.0 * Pi * T) - 4.0 * Pi * T) / (2.0 * Pi);
 
       else
-         return (Sin(4.0 * Pi * T) - 4.0 * Pi * T + 4.0 * Pi) / (2.0 * Pi);
+         return (Sin (4.0 * Pi * T) - 4.0 * Pi * T + 4.0 * Pi) / (2.0 * Pi);
       end if;
    end T_Z_Swing;
 
