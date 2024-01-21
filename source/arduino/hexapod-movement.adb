@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-pragma Restrictions (No_Elaboration_Code);
+--  pragma Restrictions (No_Elaboration_Code);
 
 with Ada.Numerics;
 with Interfaces;
@@ -14,7 +14,8 @@ with BBF.PCA9685;
 
 with Kinematics.Forward;
 with Kinematics.Inverse.Geometric;
-with Trajectory.Gait;
+with Trajectory.Steps.Executor;
+with Trajectory.Steps.Planner;
 
 with Hexapod.Console;
 --  with Hexapod.Debug;
@@ -153,23 +154,6 @@ package body Hexapod.Movement is
       -Ada.Numerics.Pi + 0.16,
       Ada.Numerics.Pi / 2.0 + 0.32);
 
-   Wave_Gait     : constant Trajectory.Gait.Gait_Descriptor :=
-     (1.0 / 2.0,
-      0.0,
-      1.0 / 2.0,
-      0.0,
-      1.0 / 2.0,
-      0.0,
-      1.0 / 2.0);
-   --  Wave_Gait     : constant Trajectory.Gait.Gait_Descriptor :=
-   --    (LF_Fase     => 5.0 / 6.0,
-   --     LM_Fase     => 4.0 / 6.0,
-   --     LH_Fase     => 3.0 / 6.0,
-   --     RH_Fase     => 2.0 / 6.0,
-   --     RM_Fase     => 1.0 / 6.0,
-   --     RF_Fase     => 0.0,
-   --     Duty_Factor => 9.0 / 10.0);
-
    Tick_Duration : constant := 1.0 / Ticks;
 
    Cycle_Time    : Reals.Real := 0.0;
@@ -177,6 +161,15 @@ package body Hexapod.Movement is
    Step_Length_X : Reals.Real := 0.000;
    Step_Length_Y : Reals.Real := 0.000;
    Step_Height   : constant := 0.020;
+
+   Step_Plan : Trajectory.Steps.Step_Plan_Descriptor := (others => <>);
+   --    (Ratio => 0.0,
+   --     LF    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
+   --     LM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
+   --     LH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
+   --     RF    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
+   --     RM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
+   --     RH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0));
 
    ----------------
    -- Initialize --
@@ -312,19 +305,16 @@ package body Hexapod.Movement is
       Success     : Boolean;
 
    begin
-      Trajectory.Gait.Position
-        (Descriptor  => Wave_Gait,
-         LF_Base     => LF_Base,
+      Trajectory.Steps.Planner.Compute_Step (0.070, 0.000, 0.030, Step_Plan);
+      Trajectory.Steps.Executor.Compute_Position
+        (LF_Base     => LF_Base,
          LM_Base     => LM_Base,
          LH_Base     => LH_Base,
          RF_Base     => RF_Base,
          RM_Base     => RM_Base,
          RH_Base     => RH_Base,
-         Cycle       => Cycle,
-         Time        => Cycle_Time,
-         Length_X    => Step_Length_X,
-         Length_Y    => Step_Length_Y,
-         Height_Z    => Step_Height,
+         Plan        => Step_Plan,
+         Fase        => 1.0,
          LF_Position => LF_Position,
          LM_Position => LM_Position,
          LH_Position => LH_Position,
@@ -391,6 +381,12 @@ package body Hexapod.Movement is
       else
          Console.Put (" NO SOLUTION");
       end if;
+
+      Trajectory.Steps.Planner.Transition
+        (Trajectory.Steps.Planner.Wave_Gait);
+      --    (Trajectory.Steps.Planner.Tripod_Gait);
+      Trajectory.Steps.Planner.Compute_Step
+        (0.070, 0.000, 0.030, Step_Plan);
    end Prepare;
 
    ---------------------
@@ -420,25 +416,25 @@ package body Hexapod.Movement is
       Success     : Boolean;
 
    begin
+      --  Hexapod.Console.Put ("*");
+
       Cycle_Time := @ + Tick_Duration;
 
       if Cycle_Time >= Cycle then
-         Cycle_Time := @ - Cycle;
+         Cycle_Time := 0.0;
+         Trajectory.Steps.Planner.Compute_Step
+           (0.070, 0.000, 0.030, Step_Plan);
       end if;
 
-      Trajectory.Gait.Position
-        (Descriptor  => Wave_Gait,
-         LF_Base     => LF_Base,
+      Trajectory.Steps.Executor.Compute_Position
+        (LF_Base     => LF_Base,
          LM_Base     => LM_Base,
          LH_Base     => LH_Base,
          RF_Base     => RF_Base,
          RM_Base     => RM_Base,
          RH_Base     => RH_Base,
-         Cycle       => Cycle,
-         Time        => Cycle_Time,
-         Length_X    => Step_Length_X,
-         Length_Y    => Step_Length_Y,
-         Height_Z    => Step_Height,
+         Plan        => Step_Plan,
+         Fase        => Cycle_Time / Cycle,
          LF_Position => LF_Position,
          LM_Position => LM_Position,
          LH_Position => LH_Position,

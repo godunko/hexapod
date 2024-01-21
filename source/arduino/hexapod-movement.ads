@@ -1,21 +1,21 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 --  Movement of the hexapod.
 
-pragma Restrictions (No_Elaboration_Code);
+--  pragma Restrictions (No_Elaboration_Code);
 
 with Reals;
 
 package Hexapod.Movement is
 
-   Cycle : constant := 3.0;
+   Cycle : constant := 0.5;
    --  Length of the cycle.
 
-   Ticks : constant := 100.0;
+   Ticks : constant := 50.0;
    --  Number of ticks per second.
 
    procedure Initialize;
