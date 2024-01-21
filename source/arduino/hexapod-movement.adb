@@ -381,25 +381,32 @@ package body Hexapod.Movement is
       else
          Console.Put (" NO SOLUTION");
       end if;
-
-      Trajectory.Steps.Planner.Transition
-        (Trajectory.Steps.Planner.Wave_Gait);
-      --    (Trajectory.Steps.Planner.Tripod_Gait);
-      Trajectory.Steps.Planner.Compute_Step
-        (0.070, 0.000, 0.030, Step_Plan);
    end Prepare;
 
-   ---------------------
-   -- Set_Step_Length --
-   ---------------------
+   --------------
+   -- Set_Gait --
+   --------------
 
-   procedure Set_Step_Length
-     (Step_Length_X : Reals.Real;
-      Step_Length_Y : Reals.Real) is
+   procedure Set_Gait (Gait : Gait_Kind) is
    begin
-      Movement.Step_Length_X := Step_Length_X;
-      Movement.Step_Length_Y := Step_Length_Y;
-   end Set_Step_Length;
+      case Gait is
+         when Stop   =>
+            Trajectory.Steps.Planner.Transition
+              (Trajectory.Steps.Planner.Stop_Gait);
+
+         when Wave   =>
+            Trajectory.Steps.Planner.Transition
+              (Trajectory.Steps.Planner.Wave_Gait);
+
+         when Quadro =>
+            Trajectory.Steps.Planner.Transition
+              (Trajectory.Steps.Planner.Quadro_Gait);
+
+         when Tripod =>
+            Trajectory.Steps.Planner.Transition
+              (Trajectory.Steps.Planner.Tripod_Gait);
+      end case;
+   end Set_Gait;
 
    ----------
    -- Step --

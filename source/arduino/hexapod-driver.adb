@@ -22,6 +22,7 @@ procedure Hexapod.Driver is
 
    use type Reals.Real;
    use type BBF.Clocks.Time;
+   use type Hexapod.Movement.Gait_Kind;
 
    Last_Timestamp : BBF.Clocks.Time := 0.0;
 
@@ -58,9 +59,7 @@ procedure Hexapod.Driver is
    Tick_Duration    : constant := 1.0 / Hexapod.Movement.Ticks;
    Movement_Enabled : Boolean := False;
    Next_Tick        : BBF.Clocks.Time;
-
-   Step_Length_X    : Reals.Real := 0.0;
-   Step_Length_Y    : Reals.Real := 0.0;
+   Gait             : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
 
    C                : Character;
 
@@ -115,33 +114,22 @@ begin
          when 'U' | 'u' =>
             Hexapod.Hardware.Configure_Controllers;
             Hexapod.Hardware.Enable_Motors_Power;
-            Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
             Hexapod.Movement.Prepare;
-
-         when 'W' | 'w' =>
-            Step_Length_X := @ + 0.025;
-            Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
-
-         when 'S' | 's' =>
-            Step_Length_X := @ - 0.025;
-            Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
-
-         when 'D' | 'd' =>
-            Step_Length_Y := @ - 0.025;
-            Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
-
-         when 'A' | 'a' =>
-            Step_Length_Y := @ + 0.025;
-            Hexapod.Movement.Set_Step_Length (Step_Length_X, Step_Length_Y);
-
-         --  when 'R' | 'r' =>
-         --     Move (0.000, 0.000, 0.005);
-         --
-         --  when 'F' | 'f' =>
-         --     Move (0.000, 0.000, -0.005);
 
          when 'M' | 'm' =>
             Movement_Enabled := not @;
+
+         when '-' | '_' =>
+            if Gait /= Hexapod.Movement.Gait_Kind'First then
+               Gait := Hexapod.Movement.Gait_Kind'Pred (@);
+               Hexapod.Movement.Set_Gait (Gait);
+            end if;
+
+         when '+' | '=' =>
+            if Gait /= Hexapod.Movement.Gait_Kind'Last then
+               Gait := Hexapod.Movement.Gait_Kind'Succ (@);
+               Hexapod.Movement.Set_Gait (Gait);
+            end if;
 
          when 'P' | 'p' =>
             Hexapod.Hardware.Configure_Controllers;
