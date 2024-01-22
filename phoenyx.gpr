@@ -1,0 +1,19 @@
+--
+--  Copyright (C) 2024, Vadim Godunko
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  This project file aggregates all components to have complete navigation
+--  in VS Code/GNAT Studio. It is not intended to build project!
+
+aggregate project Phoenyx is
+
+   for Project_Files use
+     ("gnat/arduino.gpr",
+      "gnat/examples.gpr",
+      "gnat/kinematics.gpr",
+      "gnat/mathematics.gpr",
+      "gnat/trajectory.gpr");
+
+end Phoenyx;
