@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -7,6 +7,7 @@
 with "../subprojects/b2f4a/gnat/bbf";
 
 with "kinematics";
+with "phoenyx_common";
 with "trajectory";
 
 project Arduino is
@@ -27,8 +28,6 @@ project Arduino is
       for Executable ("hexapod-driver.adb") use "hexapod.elf";
    end Builder;
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-gnat2022", "-gnatW8", "-O2");
-   end Compiler;
+   package Compiler renames Phoenyx_Common.Compiler;
 
 end Arduino;
