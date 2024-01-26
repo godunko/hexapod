@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -19,7 +19,10 @@ package Hexapod.Debug is
 
    function Posture_Image (Item : Kinematics.Posture) return String;
 
-   function Parametric_Image (Item : Reals.Real) return String;
-   -- Formats number in the -1.0 .. 1.0 range with 3 digits after point
+   function Parametric_Image
+     (Item      : Reals.Real;
+      Precision : Positive := 3) return String;
+   --  Formats number in the -1.0 .. 1.0 range with given number of digits
+   --  after decimal point.
 
 end Hexapod.Debug;

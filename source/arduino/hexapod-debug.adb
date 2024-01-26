@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -52,17 +52,23 @@ package body Hexapod.Debug is
    -- Parametric_Image --
    ----------------------
 
-   function Parametric_Image (Item : Reals.Real) return String is
-      I  : constant Integer := Integer (Item * 1_000.0);
-      F  : constant Integer := I / 1_000;
-      A  : constant Integer := I mod 1_000;
+   function Parametric_Image
+     (Item      : Reals.Real;
+      Precision : Positive := 3) return String
+   is
+      P  : constant Integer := 10 ** Precision;
+      I  : constant Integer := Integer (Item * Reals.Real (P));
+      F  : constant Integer := I / P;
+      A  : constant Integer := I mod P;
       FI : constant String := Integer'Image (F);
       AI : constant String := Integer'Image (A);
-      B  : String := " 0.000";
+      B  : String (1 .. 3 + Precision) :=
+        (1 => ' ', 2 => '0', 3 => '.', others => '0');
 
    begin
       B (2 - (FI'Length) + 1 .. 2) := FI (FI'First .. FI'Last);
-      B (6 - (AI'Length - 1) + 1 .. 6) := AI (AI'First + 1 .. AI'Last);
+      B (3 + Precision - (AI'Length - 1) + 1 .. 3 + Precision) :=
+        AI (AI'First + 1 .. AI'Last);
 
       return B;
    end Parametric_Image;
