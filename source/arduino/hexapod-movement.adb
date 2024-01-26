@@ -18,7 +18,7 @@ with Trajectory.Steps.Executor;
 with Trajectory.Steps.Planner;
 
 with Hexapod.Console;
---  with Hexapod.Debug;
+with Hexapod.Debug;
 with Hexapod.Hardware;
 
 package body Hexapod.Movement is
@@ -170,6 +170,28 @@ package body Hexapod.Movement is
    --     RF    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
    --     RM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
    --     RH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0));
+
+   function Image (Item : Trajectory.Steps.Leg_Step_Plan_Descriptor) return String is
+      use type Trajectory.Steps.Stage_Kind;
+
+   begin
+      return
+        (if Item.Stage = Trajectory.Steps.Stance then "  _ " else "  ^ ")
+           & Hexapod.Debug.Parametric_Image (Item.Start_Position, 1)
+           & Hexapod.Debug.Parametric_Image (Item.End_Position, 1);
+   end Image;
+
+   --  function Image (Item : Trajectory.Steps.Step_Plan_Descriptor) return String is
+   procedure Put (Item : Trajectory.Steps.Step_Plan_Descriptor) is
+   begin
+      Hexapod.Console.Put (Hexapod.Debug.Parametric_Image (Item.Ratio));
+      Hexapod.Console.Put (Image (Item.LF));
+      Hexapod.Console.Put (Image (Item.LM));
+      Hexapod.Console.Put (Image (Item.LH));
+      Hexapod.Console.Put (Image (Item.RF));
+      Hexapod.Console.Put (Image (Item.RM));
+      Hexapod.Console.Put (Image (Item.RH));
+   end Put;
 
    ----------------
    -- Initialize --
@@ -431,6 +453,9 @@ package body Hexapod.Movement is
          Cycle_Time := 0.0;
          Trajectory.Steps.Planner.Compute_Step
            (0.070, 0.000, 0.030, Step_Plan);
+
+         Put (Step_Plan);
+         Hexapod.Console.New_Line;
       end if;
 
       Trajectory.Steps.Executor.Compute_Position
