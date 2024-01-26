@@ -14,7 +14,7 @@ package body Trajectory.Steps.Leg is
 
    function T_XY_Swing
      (Ratio : Reals.Real;
-      T     : Step_Fase) return Trajectory_Position
+      T     : Step_Fase) return Reals.Real
       with Pre => Ratio in 0.0 .. 1.0;
 
    function T_Z_Swing (T : Step_Fase) return Reals.Real;
@@ -71,7 +71,7 @@ package body Trajectory.Steps.Leg is
 
    function T_XY_Swing
      (Ratio : Reals.Real;
-      T     : Step_Fase) return Trajectory_Position is
+      T     : Step_Fase) return Reals.Real is
    begin
       return
         ((12.0 * T ** 5 - 30.0 * T ** 4 + 20.0 * T ** 3 - 2.0 * T) * Ratio
