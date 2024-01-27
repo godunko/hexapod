@@ -25,3 +25,4 @@ Implemented Features
    * Algebraic
    * Geometric
    * Numerical (Gradient Descent and Levenberg-Marquardt)
+ * Gait transition (fixed step)
