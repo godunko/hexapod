@@ -28,3 +28,12 @@ Implemented Features
    * Geometric
    * Numerical (Gradient Descent and Levenberg-Marquardt)
  * Gait transition (fixed step)
+
+Notes
+-----
+
+There are some notes about use of things. They was done to don't forgot key features, even if they not implemented in robot.
+
+They are written on Russian, I hope Google Translator can translate them to your language.
+
+ * [Unit Hopf CPG (Central Pattern Generator)](documentation/ru/Unit_Hopf_CPG.md)
