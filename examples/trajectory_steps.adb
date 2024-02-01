@@ -25,7 +25,12 @@ procedure Trajectory_Steps is
    RM_Base : Kinematics.Position;
    RH_Base : Kinematics.Position;
 
-   Iterations : Positive := 10;
+   SW_Iterations : Positive := 10;
+   WQ_Iterations : Positive := 10;
+   QT_Iterations : Positive := 10;
+   TQ_Iterations : Positive := 10;
+   QW_Iterations : Positive := 10;
+   WS_Iterations : Positive := 10;
 
    procedure Do_Tick is
 
@@ -91,8 +96,46 @@ procedure Trajectory_Steps is
 
 begin
    if Ada.Command_Line.Argument_Count = 1 then
-      Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+      SW_Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+      WQ_Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+      QT_Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+      TQ_Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+      QW_Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+      WS_Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+
+   elsif Ada.Command_Line.Argument_Count = 6 then
+      SW_Iterations := Integer'Value (Ada.Command_Line.Argument (1));
+      WQ_Iterations := Integer'Value (Ada.Command_Line.Argument (2));
+      QT_Iterations := Integer'Value (Ada.Command_Line.Argument (3));
+      TQ_Iterations := Integer'Value (Ada.Command_Line.Argument (4));
+      QW_Iterations := Integer'Value (Ada.Command_Line.Argument (5));
+      WS_Iterations := Integer'Value (Ada.Command_Line.Argument (6));
    end if;
+
+   --  if Ada.Command_Line.Argument_Count >= 2 then
+   --     SW_Iterations := Integer'Value (Ada.Command_Line.Argument (2));
+   --  end if;
+
+   --  if Ada.Command_Line.Argument_Count >= 3 then
+   --     WQ_Iterations := Integer'Value (Ada.Command_Line.Argument (3));
+   --  end if;
+
+   --  if Ada.Command_Line.Argument_Count >= 4 then
+   --     QT_Iterations := Integer'Value (Ada.Command_Line.Argument (4));
+   --  end if;
+
+   --  if Ada.Command_Line.Argument_Count >= 5 then
+   --     TQ_Iterations := Integer'Value (Ada.Command_Line.Argument (5));
+   --  end if;
+
+   --  if Ada.Command_Line.Argument_Count >= 6 then
+   --     QW_Iterations := Integer'Value (Ada.Command_Line.Argument (6));
+   --  end if;
+
+   --  if Ada.Command_Line.Argument_Count >= 7 then
+   --     WS_Iterations := Integer'Value (Ada.Command_Line.Argument (7));
+   --  end if;
+
 
    Kinematics.Set (LF_Base, 0.0, 0.0, 0.0);
    Kinematics.Set (LM_Base, 0.0, 0.0, 0.0);
@@ -101,42 +144,42 @@ begin
    Kinematics.Set (RM_Base, 0.0, 0.0, 0.0);
    Kinematics.Set (RH_Base, 0.0, 0.0, 0.0);
 
-   for J in 1 .. Iterations loop
+   for J in 1 .. SW_Iterations loop
       Do_Tick;
    end loop;
 
    Put_Line ("---------- WAVE ----------");
    Trajectory.Steps.Planner.Transition (Trajectory.Steps.Planner.Wave_Gait);
 
-   for J in 1 .. Iterations loop
+   for J in 1 .. WQ_Iterations loop
       Do_Tick;
    end loop;
 
    Put_Line ("---------- QUAD ----------");
    Trajectory.Steps.Planner.Transition (Trajectory.Steps.Planner.Quadro_Gait);
 
-   for J in 1 .. Iterations loop
+   for J in 1 .. QT_Iterations loop
       Do_Tick;
    end loop;
 
    Put_Line ("---------- TRIP ----------");
    Trajectory.Steps.Planner.Transition (Trajectory.Steps.Planner.Tripod_Gait);
 
-   for J in 1 .. Iterations loop
+   for J in 1 .. TQ_Iterations loop
       Do_Tick;
    end loop;
 
    Put_Line ("---------- WAVE ----------");
    Trajectory.Steps.Planner.Transition (Trajectory.Steps.Planner.Wave_Gait);
 
-   for J in 1 .. Iterations loop
+   for J in 1 .. QW_Iterations loop
       Do_Tick;
    end loop;
 
    Put_Line ("---------- STOP ----------");
    Trajectory.Steps.Planner.Transition (Trajectory.Steps.Planner.Stop_Gait);
 
-   for J in 1 .. Iterations loop
+   for J in 1 .. WS_Iterations loop
       Do_Tick;
    end loop;
 end Trajectory_Steps;
