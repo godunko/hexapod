@@ -53,5 +53,5 @@ fx(i+1) = x;
 fy(i+1) = y;
 
 ##plot(fx, fy)
-plot(fx, "", fy, "", fdx, "", fdy)
+plot(fx, "-", fy, "--", fdx, "-", fdy, "--")
 grid on
