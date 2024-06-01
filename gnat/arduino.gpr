@@ -6,14 +6,16 @@
 
 with "../subprojects/b2f4a/gnat/bbf";
 
+with "arduino_due_startup";
+
 with "kinematics";
 with "phoenyx_common";
 with "trajectory";
 
 project Arduino is
 
-   for Target use "arm-eabi";
-   for Runtime ("Ada") use "light-tasking-arduino_due_x";
+   for Target use Arduino_Due_Startup'Target;
+   for Runtime use Arduino_Due_Startup'Runtime;
 
    Target := Project'Target;
 
@@ -29,5 +31,11 @@ project Arduino is
    end Builder;
 
    package Compiler renames Phoenyx_Common.Compiler;
+
+   package Linker is
+      for Switches ("Ada") use
+        Arduino_Due_Startup.Linker_Switches
+         & ("-Wl,--gc-sections");
+   end Linker;
 
 end Arduino;
