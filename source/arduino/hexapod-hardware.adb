@@ -11,7 +11,7 @@ with System.Semihosting;
 with BBF.HPL;
 --  with BBF.HPL.PMC;
 --  with BBF.Drivers.MPU;
---  with A0B.ATSAM3X8E.SVD.WDT_Base;
+with A0B.ATSAM3X8E.SVD.SYSC;
 
 with Hexapod.Console;
 
@@ -112,6 +112,23 @@ package body Hexapod.Hardware is
 
    procedure Initialize_Hardware is
    begin
+      --  Disable watchdog timer.
+
+      A0B.ATSAM3X8E.SVD.SYSC.WDT_Periph.MR :=
+        (WDFIEN    => False,
+         -- A Watchdog fault (underflow or error) has no effect on interrupt.
+         WDRSTEN   => False,
+         --  A Watchdog fault (underflow or error) has no effect on the
+         --  resets.
+         WDRPROC   => <>,
+         WDDIS     => True,  --  Disables the Watchdog Timer.
+         WDD       => <>,
+         WDDBGHLT  => True,
+         --  The Watchdog stops when the processor is in debug state.
+         WDIDLEHLT => False,
+         --  The Watchdog runs when the processor is in debug state.
+         others    => <>);
+
       --  Turn off onboard LED (used by last chance handler)
 
       LED.Configure_Output;
