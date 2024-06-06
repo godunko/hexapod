@@ -15,7 +15,7 @@ package Hexapod.Movement is
    Cycle : constant := 0.5;
    --  Length of the cycle.
 
-   Ticks : constant := 50.0;
+   Ticks : constant := 50;
    --  Number of ticks per second.
 
    type Gait_Kind is (Stop, Wave, Quadro, Tripod);

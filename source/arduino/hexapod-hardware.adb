@@ -8,9 +8,10 @@ with System.Storage_Elements;
 pragma Warnings (Off, """System.Semihosting"" is an internal GNAT unit");
 with System.Semihosting;
 
-with BBF.GPIO;
-with BBF.HPL.PMC;
-with BBF.Drivers.MPU;
+with BBF.HPL;
+--  with BBF.HPL.PMC;
+--  with BBF.Drivers.MPU;
+--  with A0B.ATSAM3X8E.SVD.WDT_Base;
 
 with Hexapod.Console;
 
@@ -19,7 +20,7 @@ package body Hexapod.Hardware is
    PWM_Frequency : constant := 321;
    --  Closest value for supported by PCA 9685 controller.
 
-   LED : not null access BBF.GPIO.Pin'Class renames BBF.Board.Pin_13_LED;
+   LED : A0B.ATSAM3X8E.PIO.ATSAM3X8E_Pin'Class renames BBF.Board.Pin_13_LED;
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
@@ -59,30 +60,30 @@ package body Hexapod.Hardware is
          end if;
       end;
 
-      declare
-         Success : Boolean := True;
+      --  declare
+      --     Success : Boolean := True;
 
-      begin
-         --  Body_Position_Sensor.Configure
-         --    (BBF.Board.Delay_Controller,
-         --     BBF.Drivers.MPU.FSR_2G,
-         --     BBF.Drivers.MPU.FSR_2000DPS,
-         --     True,
-         --     True,
-         --     198,
-         --     Success);
-         Body_Position_Sensor.Configure
-           (BBF.Board.Delay_Controller,
-            200,
-            Success);
+      --  begin
+      --     --  Body_Position_Sensor.Configure
+      --     --    (BBF.Board.Delay_Controller,
+      --     --     BBF.Drivers.MPU.FSR_2G,
+      --     --     BBF.Drivers.MPU.FSR_2000DPS,
+      --     --     True,
+      --     --     True,
+      --     --     198,
+      --     --     Success);
+      --     Body_Position_Sensor.Configure
+      --       (BBF.Board.Delay_Controller,
+      --        200,
+      --        Success);
 
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Body Position Sensor: configuration failed.");
-         end if;
+      --     if not Success then
+      --        Console.Put_Line
+      --          ("FAIL: Body Position Sensor: configuration failed.");
+      --     end if;
 
-         Body_Position_Sensor.Enable (BBF.Board.Delay_Controller);
-      end;
+      --     Body_Position_Sensor.Enable (BBF.Board.Delay_Controller);
+      --  end;
    end Configure_Controllers;
 
    --------------------------
@@ -111,14 +112,10 @@ package body Hexapod.Hardware is
 
    procedure Initialize_Hardware is
    begin
-      --  First, turn off onboard LED (used by last chance handler)
+      --  Turn off onboard LED (used by last chance handler)
 
-      LED.Set_Direction (BBF.GPIO.Output);
+      LED.Configure_Output;
       LED.Set (False);
-
-      --  Second, initialize delay controller (used by last chance handler)
-
-      BBF.Board.Initialize_Delay_Controller;
 
       --  Initialize console and output logo
 
@@ -126,19 +123,15 @@ package body Hexapod.Hardware is
 
       --  Configure motor power relay control pin.
 
+      Left_Motor_Power_Relay.Configure_Output;
       Left_Motor_Power_Relay.Set (True);
+      Right_Motor_Power_Relay.Configure_Output;
       Right_Motor_Power_Relay.Set (True);
-      Left_Motor_Power_Relay.Set_Direction (BBF.GPIO.Output);
-      Right_Motor_Power_Relay.Set_Direction (BBF.GPIO.Output);
-
-      --  Initialize real time clock
-
-      BBF.Board.Initialize_Real_Time_Clock_Controller;
 
       --  Initialize I2C master controllers
 
-      BBF.Board.I2C.Initialize_I2C_0;
-      BBF.Board.I2C.Initialize_I2C_1;
+      A0B.I2C.ATSAM3X8E_TWI.TWI0.TWI0.Configure;
+      A0B.I2C.ATSAM3X8E_TWI.TWI1.TWI1.Configure;
 
       --  Initiazlie PCA9685 PWM controllers
 
@@ -168,24 +161,24 @@ package body Hexapod.Hardware is
 
       --  Initialize body position sensor
 
-      declare
-         Success : Boolean := True;
+      --  declare
+      --     Success : Boolean := True;
 
-      begin
-         BBF.HPL.PMC.Enable_Peripheral_Clock
-           (BBF.HPL.Parallel_IO_Controller_A);
-         BBF.HPL.PMC.Enable_Peripheral_Clock
-           (BBF.HPL.Parallel_IO_Controller_C);
-         --  XXX Must be moved out! Clock should be enabled when interrupt
-         --  handling on the pin is enabled.
+      --  begin
+      --     BBF.HPL.PMC.Enable_Peripheral_Clock
+      --       (BBF.HPL.Parallel_IO_Controller_A);
+      --     BBF.HPL.PMC.Enable_Peripheral_Clock
+      --       (BBF.HPL.Parallel_IO_Controller_C);
+      --     --  XXX Must be moved out! Clock should be enabled when interrupt
+      --     --  handling on the pin is enabled.
 
-         Body_Position_Sensor.Initialize (BBF.Board.Delay_Controller, Success);
+      --     Body_Position_Sensor.Initialize (BBF.Board.Delay_Controller, Success);
 
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Body Position Sensor initialization failure.");
-         end if;
-      end;
+      --     if not Success then
+      --        Console.Put_Line
+      --          ("FAIL: Body Position Sensor initialization failure.");
+      --     end if;
+      --  end;
    end Initialize_Hardware;
 
    -------------------------
@@ -270,10 +263,10 @@ package body Hexapod.Hardware is
 
       loop
          LED.Set (False);
-         BBF.Board.Delay_Controller.Delay_Milliseconds (500);
+         --  BBF.Board.Delay_Controller.Delay_Milliseconds (500);
 
          LED.Set (True);
-         BBF.Board.Delay_Controller.Delay_Milliseconds (500);
+         --  BBF.Board.Delay_Controller.Delay_Milliseconds (500);
       end loop;
    end Last_Chance_Handler;
 

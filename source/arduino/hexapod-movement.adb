@@ -9,7 +9,10 @@
 with Ada.Numerics;
 with Interfaces;
 
+with A0B.Time;
+
 with BBF.Board;
+with BBF.Delays;
 with BBF.PCA9685;
 
 with Kinematics.Forward;
@@ -305,11 +308,11 @@ package body Hexapod.Movement is
       --     & BBF.PCA9685.Value_Type'Image (C));
 
       M_3.Channel.Set (0, C);
-      BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
+      BBF.Delays.Delay_For (A0B.Time.Milliseconds (Integer (Wait)));
       M_1.Channel.Set (0, A);
-      BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
+      BBF.Delays.Delay_For (A0B.Time.Milliseconds (Integer (Wait)));
       M_2.Channel.Set (0, B);
-      BBF.Board.Delay_Controller.Delay_Milliseconds (Wait);
+      BBF.Delays.Delay_For (A0B.Time.Milliseconds (Integer (Wait)));
    end Move;
 
    -------------
@@ -474,6 +477,9 @@ package body Hexapod.Movement is
          RM_Position => RM_Position,
          RH_Position => RH_Position);
 
+      Hexapod.Hardware.Left_Servo_Controller.Start_Transaction;
+      Hexapod.Hardware.Right_Servo_Controller.Start_Transaction;
+
       --  LF
 
       Kinematics.Inverse.Geometric.LF_Solve (LF_Position, Posture, Success);
@@ -539,6 +545,9 @@ package body Hexapod.Movement is
       --  else
       --     Console.Put_Line ("NO SOLUTION");
       end if;
+
+      Hexapod.Hardware.Left_Servo_Controller.Commit_Transaction;
+      Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction;
    end Step;
 
 end Hexapod.Movement;
