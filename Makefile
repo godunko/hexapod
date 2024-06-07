@@ -3,17 +3,17 @@ BOSSAC = bossac
 all: build-core build-arduino
 
 build-core:
-	gprbuild gnat/kinematics.gpr --target='arm-eabi' --RTS='light-arduino_due_x'
-	gprbuild gnat/kinematics.gpr
-	gprbuild gnat/examples.gpr
+	eval `alr printenv`; gprbuild gnat/kinematics.gpr --target='arm-eabi' --RTS='light-cortex-m3'
+	# eval `alr printenv`; gprbuild gnat/kinematics.gpr
+	# eval `alr printenv`; gprbuild gnat/examples.gpr
 
 build-arduino:
-	gprbuild gnat/arduino.gpr
-	arm-eabi-objcopy -O binary .objs/arm-eabi/arduino/hexapod.elf .objs/arm-eabi/hexapod.bin
-	ls -l .objs/arm-eabi/arduino/hexapod.elf .objs/arm-eabi/hexapod.bin
+	alr build
+	eval `alr printenv`; arm-eabi-objcopy -O binary bin/arduino.elf bin/arduino.bin
+	ls -l bin/arduino.bin bin/arduino.elf
 
 clean:
-	rm -rf .objs
+	rm -rf .objs bin
 
 update:
 	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-forward-compute_h_be_matrix.ada > source/kinematics/generated/kinematics-forward-compute_h_be_matrix.adb
@@ -24,7 +24,7 @@ update:
 
 flash: build-arduino
 	$(BOSSAC) --arduino-erase
-	$(BOSSAC) --info --write --verify --boot .objs/arm-eabi/hexapod.bin
+	$(BOSSAC) --info --write --verify --boot bin/arduino.bin
 
 ocd:
 	openocd -f interface/cmsis-dap.cfg -c 'cmsis_dap_backend hid' -f maintainers-tools/debug/arduino_due.cfg
@@ -33,4 +33,4 @@ stlink:
 	openocd -f interface/stlink-dap.cfg -f maintainers-tools/debug/arduino_due.cfg
 
 gdb:
-	arm-eabi-gdb --command="maintainers-tools/debug/gdbinit" .objs/arm-eabi/arduino/hexapod.elf
+	eval `alr printenv`; arm-eabi-gdb --command="maintainers-tools/debug/gdbinit" bin/arduino.elf
