@@ -4,9 +4,14 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with Ada.Unchecked_Conversion;
 with System.Storage_Elements;
 pragma Warnings (Off, """System.Semihosting"" is an internal GNAT unit");
 with System.Semihosting;
+
+with A0B.ARMv7M.System_Control_Block;
+with A0B.ARMv7M.CMSIS;
+with A0B.Types;
 
 with BBF.HPL;
 --  with BBF.HPL.PMC;
@@ -25,6 +30,22 @@ package body Hexapod.Hardware is
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
    pragma No_Return (Last_Chance_Handler);
+
+   procedure HardFault_Handler
+     with Export, Convention => C, External_Name => "HardFault_Handler";
+
+   Fault_Message  : String :=
+     "ICSR  => XXXX_XXXX" & ASCII.LF
+     & "CFSR  => XXXX_XXXX" & ASCII.LF
+     & "HFSR  => XXXX_XXXX" & ASCII.LF
+     & "MMFAR => XXXX_XXXX" & ASCII.LF
+     & "BFAR  => XXXX_XXXX" & ASCII.LF
+     with Volatile;
+   ICSR_Position  : constant := 10;
+   CFSR_Position  : constant := ICSR_Position + 19;
+   HFSR_Position  : constant := CFSR_Position + 19;
+   MMFAR_Position : constant := HFSR_Position + 19;
+   BFAR_Position  : constant := MMFAR_Position + 19;
 
    ---------------------------
    -- Configure_Controllers --
@@ -105,6 +126,92 @@ package body Hexapod.Hardware is
       Left_Motor_Power_Relay.Set (False);
       Right_Motor_Power_Relay.Set (False);
    end Enable_Motors_Power;
+
+   -----------------------
+   -- HardFault_Handler --
+   -----------------------
+
+   procedure HardFault_Handler is
+
+      function To_Unsigned_32 is
+        new Ada.Unchecked_Conversion
+             (A0B.ARMv7M.System_Control_Block.SCB_CFSR_Register,
+              A0B.Types.Unsigned_32);
+
+      function To_Unsigned_32 is
+        new Ada.Unchecked_Conversion
+             (A0B.ARMv7M.System_Control_Block.SCB_HFSR_Register,
+              A0B.Types.Unsigned_32);
+
+      function To_Unsigned_32 is
+        new Ada.Unchecked_Conversion
+             (A0B.ARMv7M.System_Control_Block.SCB_ICSR_Register,
+              A0B.Types.Unsigned_32);
+
+      function To_Unsigned_32 is
+        new Ada.Unchecked_Conversion (System.Address, A0B.Types.Unsigned_32);
+
+      --------------
+      -- Fill_Hex --
+      --------------
+
+      procedure Fill_Hex
+        (Value    : A0B.Types.Unsigned_32;
+         Position : Positive)
+      is
+         use type A0B.Types.Unsigned_32;
+
+         To_Hex : constant
+           array (A0B.Types.Unsigned_32 range 0 .. 15) of Character :=
+             "0123456789ABCDEF";
+         Aux    : A0B.Types.Unsigned_32 := Value;
+         --  Offset : Natural := 8;
+
+      begin
+         Fault_Message (Position + 8) := To_Hex (Aux and 2#1111#);
+         Aux := @ / 16;
+         Fault_Message (Position + 7) := To_Hex (Aux and 2#1111#);
+         Aux := @ / 16;
+         Fault_Message (Position + 6) := To_Hex (Aux and 2#1111#);
+         Aux := @ / 16;
+         Fault_Message (Position + 5) := To_Hex (Aux and 2#1111#);
+         Aux := @ / 16;
+         Fault_Message (Position + 3) := To_Hex (Aux and 2#1111#);
+         Aux := @ / 16;
+         Fault_Message (Position + 2) := To_Hex (Aux and 2#1111#);
+         Aux := @ / 16;
+         Fault_Message (Position + 1) := To_Hex (Aux and 2#1111#);
+         Aux := @ / 16;
+         Fault_Message (Position + 0) := To_Hex (Aux and 2#1111#);
+      end Fill_Hex;
+
+   begin
+      Fill_Hex
+        (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.ICSR),
+         ICSR_Position);
+      Fill_Hex
+        (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.CFSR),
+         CFSR_Position);
+      Fill_Hex
+        (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.HFSR),
+         HFSR_Position);
+
+      if A0B.ARMv7M.System_Control_Block.SCB.CFSR.MemManage.MMARVALID then
+         Fill_Hex
+           (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.MMFAR),
+            MMFAR_Position);
+      end if;
+
+      if A0B.ARMv7M.System_Control_Block.SCB.CFSR.BusFault.BFARVALID then
+         Fill_Hex
+           (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.BFAR),
+            BFAR_Position);
+      end if;
+
+      loop
+         null;
+      end loop;
+   end HardFault_Handler;
 
    -------------------------
    -- Initialize_Hardware --
