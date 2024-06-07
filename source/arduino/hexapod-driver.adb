@@ -6,6 +6,7 @@
 
 with A0B.ARMv7M.SysTick;
 with A0B.ATSAM3X8E.TC5_Timer;
+with A0B.Tasking;
 with A0B.Time.Clock;
 with A0B.Time.Constants;
 
@@ -16,6 +17,7 @@ with BBF.Board;
 
 with Reals;
 
+with Hexapod.Command_Line;
 with Hexapod.Console;
 with Hexapod.Hardware;
 with Hexapod.Movement;
@@ -63,13 +65,13 @@ procedure Hexapod.Driver is
       --  end if;
    end Body_Position_Step;
 
-   Tick_Duration    : constant A0B.Time.Time_Span :=
-     A0B.Time.Milliseconds (1000 / Hexapod.Movement.Ticks);
-   Movement_Enabled : Boolean := False;
-   Next_Tick        : A0B.Time.Monotonic_Time;
-   Gait             : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
-
-   C                : Character;
+   --  Tick_Duration    : constant A0B.Time.Time_Span :=
+   --    A0B.Time.Milliseconds (1000 / Hexapod.Movement.Ticks);
+   --  Movement_Enabled : Boolean := False;
+   --  Next_Tick        : A0B.Time.Monotonic_Time;
+   --  Gait             : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
+   --
+   --  C                : Character;
 
 begin
    A0B.ARMv7M.SysTick.Initialize
@@ -83,74 +85,43 @@ begin
    --  Hexapod.Motor_Power_Consumption.Initialize;
    Hexapod.Movement.Initialize;
 
-   Next_Tick := A0B.Time.Clock + Tick_Duration;
+   A0B.Tasking.Initialize (16#400#);
 
-   loop
-      Console.New_Line;
-      Console.Put ("Phoenix Hexapod CLI> ");
+   Hexapod.Command_Line.Register_Task;
+   Hexapod.Movement.Register_Task;
 
-      loop
-         declare
-            Success : Boolean := True;
+   A0B.Tasking.Run;
 
-         begin
-            Console.Get_Asynchronous (C, Success);
-
-            exit when Success;
-         end;
-
-         if Next_Tick <= A0B.Time.Clock then
-            if A0B.Time.Clock - Next_Tick > Tick_Duration then
-               Console.Put ("-");
-            end if;
-
-            Next_Tick := A0B.Time.Clock + Tick_Duration;
-
-            if Movement_Enabled then
-               Hexapod.Movement.Step;
-            end if;
-
-            --  Hexapod.Motor_Power_Consumption.Step;
-            Body_Position_Step;
-         end if;
-      end loop;
-
-      if C >= ' ' then
-         Console.Put_Line ((1 => C));
-      end if;
-
-      case C is
-         when ' ' =>
-            Hexapod.Hardware.Disable_Motors_Power;
-
-         when 'U' | 'u' =>
-            Hexapod.Hardware.Configure_Controllers;
-            Hexapod.Hardware.Enable_Motors_Power;
-            Hexapod.Movement.Prepare;
-
-         when 'M' | 'm' =>
-            Movement_Enabled := not @;
-
-         when '-' | '_' =>
-            if Gait /= Hexapod.Movement.Gait_Kind'First then
-               Gait := Hexapod.Movement.Gait_Kind'Pred (@);
-               Hexapod.Movement.Set_Gait (Gait);
-            end if;
-
-         when '+' | '=' =>
-            if Gait /= Hexapod.Movement.Gait_Kind'Last then
-               Gait := Hexapod.Movement.Gait_Kind'Succ (@);
-               Hexapod.Movement.Set_Gait (Gait);
-            end if;
-
-         when 'P' | 'p' =>
-            Hexapod.Hardware.Configure_Controllers;
-            Hexapod.Hardware.Enable_Motors_Power;
-            Hexapod.Motor_Playground;
-            Hexapod.Hardware.Disable_Motors_Power;
-
-         when others =>
-            null;
-      end case;
-   end loop;
+   --  Next_Tick := A0B.Time.Clock + Tick_Duration;
+   --
+   --  loop
+   --     Console.New_Line;
+   --     Console.Put ("Phoenix Hexapod CLI> ");
+   --
+   --     loop
+   --        declare
+   --           Success : Boolean := True;
+   --
+   --        begin
+   --           Console.Get_Asynchronous (C, Success);
+   --
+   --           exit when Success;
+   --        end;
+   --
+   --        if Next_Tick <= A0B.Time.Clock then
+   --           if A0B.Time.Clock - Next_Tick > Tick_Duration then
+   --              Console.Put ("-");
+   --           end if;
+   --
+   --           Next_Tick := A0B.Time.Clock + Tick_Duration;
+   --
+   --           if Movement_Enabled then
+   --              Hexapod.Movement.Step;
+   --           end if;
+   --
+   --           --  Hexapod.Motor_Power_Consumption.Step;
+   --           Body_Position_Step;
+   --        end if;
+   --     end loop;
+   --  end loop;
 end Hexapod.Driver;

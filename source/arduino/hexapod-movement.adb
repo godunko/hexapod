@@ -9,7 +9,8 @@
 with Ada.Numerics;
 with Interfaces;
 
-with A0B.Time;
+with A0B.Tasking;
+with A0B.Time.Clock;
 
 with BBF.Board;
 with BBF.Delays;
@@ -27,6 +28,11 @@ with Hexapod.Hardware;
 package body Hexapod.Movement is
 
    use type Reals.Real;
+
+   TCB : aliased A0B.Tasking.Task_Control_Block;
+
+   procedure Thread;
+   --  Task thread subprogram.
 
    type Motor_Descriptor is record
       Channel   : not null access BBF.PCA9685.PCA9685_Channel'Class;
@@ -173,6 +179,10 @@ package body Hexapod.Movement is
    --     RF    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
    --     RM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
    --     RH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0));
+
+   -----------
+   -- Image --
+   -----------
 
    function Image (Item : Trajectory.Steps.Leg_Step_Plan_Descriptor) return String is
       use type Trajectory.Steps.Stage_Kind;
@@ -408,6 +418,15 @@ package body Hexapod.Movement is
       end if;
    end Prepare;
 
+   -------------------
+   -- Register_Task --
+   -------------------
+
+   procedure Register_Task is
+   begin
+      A0B.Tasking.Register_Thread (TCB, Thread'Access, 16#400#);
+   end Register_Task;
+
    --------------
    -- Set_Gait --
    --------------
@@ -549,5 +568,33 @@ package body Hexapod.Movement is
       Hexapod.Hardware.Left_Servo_Controller.Commit_Transaction;
       Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction;
    end Step;
+
+   ------------
+   -- Thread --
+   ------------
+
+   procedure Thread is
+      use type A0B.Time.Monotonic_Time;
+      use type A0B.Time.Time_Span;
+
+      Tick_Duration : constant A0B.Time.Time_Span :=
+        A0B.Time.Milliseconds (1000 / Hexapod.Movement.Ticks);
+      Next_Tick     : A0B.Time.Monotonic_Time := A0B.Time.Clock;
+
+   begin
+      loop
+         if Next_Tick <= A0B.Time.Clock then
+            if A0B.Time.Clock - Next_Tick > Tick_Duration then
+               Console.Put ("-");
+            end if;
+
+            Next_Tick := A0B.Time.Clock + Tick_Duration;
+
+            if Movement_Enabled then
+               Step;
+            end if;
+         end if;
+      end loop;
+   end Thread;
 
 end Hexapod.Movement;

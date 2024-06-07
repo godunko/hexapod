@@ -18,6 +18,8 @@ package Hexapod.Movement is
    Ticks : constant := 50;
    --  Number of ticks per second.
 
+   Movement_Enabled : Boolean := False;
+
    type Gait_Kind is (Stop, Wave, Quadro, Tripod);
 
    procedure Initialize;
@@ -27,5 +29,8 @@ package Hexapod.Movement is
    procedure Step;
 
    procedure Set_Gait (Gait : Gait_Kind);
+
+   procedure Register_Task;
+   --  Register task
 
 end Hexapod.Movement;
