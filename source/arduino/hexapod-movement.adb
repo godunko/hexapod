@@ -9,8 +9,10 @@
 with Ada.Numerics;
 with Interfaces;
 
+with A0B.ARMv7M.DWT;
 with A0B.Tasking;
 with A0B.Time.Clock;
+with A0B.Types;
 
 with BBF.Board;
 with BBF.Delays;
@@ -590,6 +592,11 @@ package body Hexapod.Movement is
    -- Task_Subprogram --
    ---------------------
 
+   Cur_Cycles : A0B.Types.Unsigned_32 := 0 with Volatile;
+   Max_Cycles : A0B.Types.Unsigned_32 := 0 with Volatile;
+   Min_Cycles : A0B.Types.Unsigned_32 := A0B.Types.Unsigned_32'Last with Volatile;
+
+
    procedure Task_Subprogram is
    begin
       Hexapod.Hardware.Initialize_Servo_Controllers;
@@ -624,7 +631,14 @@ package body Hexapod.Movement is
                      Console.Put ("-");
                   end if;
 
+                  A0B.ARMv7M.DWT.DWT_CTRL.CYCCNTENA := True;
+                  A0B.ARMv7M.DWT.DWT_CYCCNT.CYCCNT  := 0;
+
                   Step;
+
+                  Cur_Cycles := A0B.ARMv7M.DWT.DWT_CYCCNT.CYCCNT;
+                  Max_Cycles := A0B.Types.Unsigned_32'Max (@, Cur_Cycles);
+                  Min_Cycles := A0B.Types.Unsigned_32'Min (@, Cur_Cycles);
             end case;
 
             Next_Tick := @ + Tick_Duration;
