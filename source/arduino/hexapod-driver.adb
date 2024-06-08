@@ -23,6 +23,7 @@ with Hexapod.Hardware;
 with Hexapod.Movement;
 with Hexapod.Motor_Playground;
 --  with Hexapod.Motor_Power_Consumption;
+with Hexapod.Remote_Control;
 
 procedure Hexapod.Driver is
 
@@ -88,6 +89,7 @@ begin
    A0B.Tasking.Initialize (16#400#);
 
    Hexapod.Command_Line.Register_Task;
+   Hexapod.Remote_Control.Register_Task;
    Hexapod.Movement.Register_Task;
 
    A0B.Tasking.Run;

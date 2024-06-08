@@ -19,6 +19,7 @@ with BBF.HPL;
 with A0B.ATSAM3X8E.SVD.SYSC;
 
 with Hexapod.Console;
+with Hexapod.Remote_Control;
 
 package body Hexapod.Hardware is
 
@@ -245,6 +246,10 @@ package body Hexapod.Hardware is
 
       Console.Initialize;
 
+      --  Initialize remote control
+
+      Remote_Control.Initialize;
+
       --  Configure motor power relay control pin.
 
       Left_Motor_Power_Relay.Configure_Output;
@@ -257,32 +262,32 @@ package body Hexapod.Hardware is
       A0B.I2C.ATSAM3X8E_TWI.TWI0.TWI0.Configure;
       A0B.I2C.ATSAM3X8E_TWI.TWI1.TWI1.Configure;
 
-      --  Initiazlie PCA9685 PWM controllers
-
-      declare
-         Success : Boolean := True;
-
-      begin
-         Left_PWM_Controller.Initialize (Success);
-
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Servo Motors Controller (Left): initialization failed.");
-         end if;
-      end;
-
-      declare
-         Success : Boolean := True;
-
-      begin
-         Right_PWM_Controller.Initialize (Success);
-
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Servo Motors Controller (Right): initialization failed.");
-         end if;
-      end;
-
+      --  --  Initiazlie PCA9685 PWM controllers
+      --
+      --  declare
+      --     Success : Boolean := True;
+      --
+      --  begin
+      --     Left_PWM_Controller.Initialize (Success);
+      --
+      --     if not Success then
+      --        Console.Put_Line
+      --          ("FAIL: Servo Motors Controller (Left): initialization failed.");
+      --     end if;
+      --  end;
+      --
+      --  declare
+      --     Success : Boolean := True;
+      --
+      --  begin
+      --     Right_PWM_Controller.Initialize (Success);
+      --
+      --     if not Success then
+      --        Console.Put_Line
+      --          ("FAIL: Servo Motors Controller (Right): initialization failed.");
+      --     end if;
+      --  end;
+      --
       --  Initialize body position sensor
 
       --  declare

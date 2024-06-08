@@ -9,12 +9,12 @@
 with A0B.GPIO;
 with A0B.ATSAM3X8E.PIO;
 
-private with A0B.I2C.ATSAM3X8E_TWI.TWI0;
-private with A0B.I2C.ATSAM3X8E_TWI.TWI1;
+with A0B.I2C.ATSAM3X8E_TWI.TWI0;
+with A0B.I2C.ATSAM3X8E_TWI.TWI1;
 
 with BBF.Board;
 --  with BBF.Board.I2C;
-private with BBF.Drivers.PCA9685;
+with BBF.Drivers.PCA9685;
 --  with BBF.Drivers.MPU6050;
 --  with BBF.Drivers.MPU9250;
 --  with BBF.GPIO;
@@ -90,14 +90,14 @@ package Hexapod.Hardware is
    procedure Disable_Motors_Power;
    --  Switch relays to power off motors.
 
-private
-
    Left_PWM_Controller    : aliased BBF.Drivers.PCA9685.PCA9685_Controller_Driver
     (Controller => A0B.I2C.ATSAM3X8E_TWI.TWI0.TWI0'Access,
      Address    => 16#40#);
    Right_PWM_Controller   : aliased BBF.Drivers.PCA9685.PCA9685_Controller_Driver
     (Controller => A0B.I2C.ATSAM3X8E_TWI.TWI1.TWI1'Access,
      Address    => 16#40#);
+
+private
 
    Left_Servo_Controller  :
      constant not null access BBF.PCA9685.PCA9685_Controller'Class :=

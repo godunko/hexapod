@@ -31,7 +31,7 @@ package body Hexapod.Movement is
 
    TCB : aliased A0B.Tasking.Task_Control_Block;
 
-   procedure Thread;
+   procedure Task_Subprogram;
    --  Task thread subprogram.
 
    type Motor_Descriptor is record
@@ -257,6 +257,39 @@ package body Hexapod.Movement is
       RH_Base := Kinematics.Forward.RH_E_Position (Posture);
    end Initialize;
 
+   -------------------------
+   -- Initialize_Hardware --
+   -------------------------
+
+   procedure Initialize_Hardware is
+   begin
+      --  Initiazlie PCA9685 PWM controllers
+
+      declare
+         Success : Boolean := True;
+
+      begin
+         Hexapod.Hardware.Left_PWM_Controller.Initialize (Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Servo Motors Controller (Left): initialization failed.");
+         end if;
+      end;
+
+      declare
+         Success : Boolean := True;
+
+      begin
+         Hexapod.Hardware.Right_PWM_Controller.Initialize (Success);
+
+         if not Success then
+            Console.Put_Line
+              ("FAIL: Servo Motors Controller (Right): initialization failed.");
+         end if;
+      end;
+   end Initialize_Hardware;
+
    ----------
    -- Move --
    ----------
@@ -424,7 +457,7 @@ package body Hexapod.Movement is
 
    procedure Register_Task is
    begin
-      A0B.Tasking.Register_Thread (TCB, Thread'Access, 16#400#);
+      A0B.Tasking.Register_Thread (TCB, Task_Subprogram'Access, 16#400#);
    end Register_Task;
 
    --------------
@@ -569,32 +602,40 @@ package body Hexapod.Movement is
       Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction;
    end Step;
 
-   ------------
-   -- Thread --
-   ------------
+   ---------------------
+   -- Task_Subprogram --
+   ---------------------
 
-   procedure Thread is
-      use type A0B.Time.Monotonic_Time;
-      use type A0B.Time.Time_Span;
-
-      Tick_Duration : constant A0B.Time.Time_Span :=
-        A0B.Time.Milliseconds (1000 / Hexapod.Movement.Ticks);
-      Next_Tick     : A0B.Time.Monotonic_Time := A0B.Time.Clock;
-
+   procedure Task_Subprogram is
    begin
-      loop
-         if Next_Tick <= A0B.Time.Clock then
-            if A0B.Time.Clock - Next_Tick > Tick_Duration then
-               Console.Put ("-");
-            end if;
+      Initialize_Hardware;
+      --  ??? It is unclear how to initialize hardware in tasking environment.
+      --  Code was moved here just to avoid crash at startup and need to be
+      --  reviewed.
 
-            Next_Tick := A0B.Time.Clock + Tick_Duration;
+      declare
+         use type A0B.Time.Monotonic_Time;
+         use type A0B.Time.Time_Span;
 
-            if Movement_Enabled then
-               Step;
+         Tick_Duration : constant A0B.Time.Time_Span :=
+           A0B.Time.Milliseconds (1000 / Hexapod.Movement.Ticks);
+         Next_Tick     : A0B.Time.Monotonic_Time := A0B.Time.Clock;
+
+      begin
+         loop
+            if Next_Tick <= A0B.Time.Clock then
+               if A0B.Time.Clock - Next_Tick > Tick_Duration then
+                  Console.Put ("-");
+               end if;
+
+               Next_Tick := A0B.Time.Clock + Tick_Duration;
+
+               if Movement_Enabled then
+                  Step;
+               end if;
             end if;
-         end if;
-      end loop;
-   end Thread;
+         end loop;
+      end;
+   end Task_Subprogram;
 
 end Hexapod.Movement;
