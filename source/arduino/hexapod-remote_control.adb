@@ -132,10 +132,9 @@ package body Hexapod.Remote_Control is
          Internals.Get_State (Receive_Buffer, State);
 
          if State.Triangle_Button /= 0 then
-            if not Hexapod.Movement.Movement_Enabled then
-               Hexapod.Console.Put_Line ("PS2C: activate movement");
-               Hexapod.Movement.Movement_Enabled := True;
-            end if;
+            Hexapod.Console.Put_Line ("PS2C: activate movement");
+            Hexapod.Hardware.Enable_Motors_Power;
+            Hexapod.Movement.Configure;
          end if;
 
          if State.Circle_Button /= 0 then

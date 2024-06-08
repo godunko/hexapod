@@ -180,6 +180,23 @@ package body Hexapod.Movement is
    --     RM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
    --     RH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0));
 
+   type States is (Initial, Configuration, Active);
+
+   State : States := Initial;
+
+   procedure Prepare;
+
+   ---------------
+   -- Configure --
+   ---------------
+
+   procedure Configure is
+   begin
+      if State = Initial then
+         State := Configuration;
+      end if;
+   end Configure;
+
    -----------
    -- Image --
    -----------
@@ -590,17 +607,28 @@ package body Hexapod.Movement is
 
       begin
          loop
-            if Next_Tick <= A0B.Time.Clock then
-               if A0B.Time.Clock - Next_Tick > Tick_Duration then
-                  Console.Put ("-");
-               end if;
+            case State is
+               when Initial =>
+                  null;
 
-               Next_Tick := A0B.Time.Clock + Tick_Duration;
+               when Configuration =>
+                  Prepare;
 
-               if Movement_Enabled then
+                  State     := Active;
+                  Next_Tick := A0B.Time.Clock;
+                  --  Restart tick start time, prepare requires move time than
+                  --  single tick.
+
+               when Active =>
+                  if A0B.Time.Clock - Next_Tick > Tick_Duration then
+                     Console.Put ("-");
+                  end if;
+
                   Step;
-               end if;
-            end if;
+            end case;
+
+            Next_Tick := @ + Tick_Duration;
+            A0B.Tasking.Delay_Until (Next_Tick);
          end loop;
       end;
    end Task_Subprogram;

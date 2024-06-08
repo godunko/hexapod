@@ -52,10 +52,7 @@ package body Hexapod.Command_Line is
 
             when 'U' | 'u' =>
                Hexapod.Hardware.Enable_Motors_Power;
-               Hexapod.Movement.Prepare;
-
-            when 'M' | 'm' =>
-               Hexapod.Movement.Movement_Enabled := not @;
+               Hexapod.Movement.Configure;
 
             when '-' | '_' =>
                if Gait /= Hexapod.Movement.Gait_Kind'First then
