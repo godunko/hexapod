@@ -18,11 +18,14 @@ with A0B.Types.GCC_Builtins;
 
 with BBF.Awaits;
 with Hexapod.Console;
+with Hexapod.Hardware;
+with Hexapod.Movement;
+with Hexapod.Remote_Control.Internals;
 with Hexapod.Remote_Control.PS2C;
 
 package body Hexapod.Remote_Control is
 
-   Polling_Rate : constant := 250;
+   Polling_Rate : constant := 100;
 
    package USART1_SPI is
      new A0B.ATSAM3X8E.USART.Generic_USART1_SPI
@@ -57,11 +60,26 @@ package body Hexapod.Remote_Control is
    procedure Task_Subprogram;
    --  Main subprogram of the remote controller handling task
 
-   --------------
-   -- Exchange --
-   --------------
+   ----------------
+   -- Initialize --
+   ----------------
 
-   procedure Exchange is
+   procedure Initialize is
+   begin
+      USART1_SPI.USART1_SPI.Configure;
+
+      --  Device.Configure;
+
+      Controller.Initialize;
+
+      ACQ.Configure_EXTI (A0B.ATSAM3X8E.PIO.Rising_Edge, Pullup => True);
+   end Initialize;
+
+   ----------
+   -- Poll --
+   ----------
+
+   procedure Poll is
       Await   : aliased BBF.Awaits.Await;
       Success : Boolean := True;
 
@@ -80,22 +98,7 @@ package body Hexapod.Remote_Control is
       end if;
 
       BBF.Awaits.Suspend_Till_Callback (Await);
-   end Exchange;
-
-   ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize is
-   begin
-      USART1_SPI.USART1_SPI.Configure;
-
-      --  Device.Configure;
-
-      Controller.Initialize;
-
-      ACQ.Configure_EXTI (A0B.ATSAM3X8E.PIO.Rising_Edge, Pullup => True);
-   end Initialize;
+   end Poll;
 
    -------------------
    -- Register_Task --
@@ -113,17 +116,55 @@ package body Hexapod.Remote_Control is
 
    procedure Task_Subprogram is
       use type A0B.Time.Monotonic_Time;
+      use type A0B.Types.Unsigned_8;
+      use type Hexapod.Movement.Gait_Kind;
 
       Next             : A0B.Time.Monotonic_Time := A0B.Time.Clock;
       Polling_Interval : constant A0B.Time.Time_Span :=
         A0B.Time.Milliseconds (1_000 / Polling_Rate);
+      State            : A0B.PlayStation2_Controllers.Controller_State;
+      Gait             : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
 
    begin
       loop
-         Next := Next + Polling_Interval;
+         Poll;
 
+         Internals.Get_State (Receive_Buffer, State);
+
+         if State.Triangle_Button /= 0 then
+            if not Hexapod.Movement.Movement_Enabled then
+               Hexapod.Console.Put_Line ("PS2C: activate movement");
+               Hexapod.Movement.Movement_Enabled := True;
+            end if;
+         end if;
+
+         if State.Circle_Button /= 0 then
+            Hexapod.Console.Put_Line ("PS2C: turn off motors");
+            Hexapod.Hardware.Disable_Motors_Power;
+            --  Hexapod.Movement.Movement_Enabled := False;
+         end if;
+
+         if State.Right_Joystick_Vertical = 16#80# then
+            if Gait /= Hexapod.Movement.Stop then
+               Gait := Hexapod.Movement.Stop;
+
+               Hexapod.Console.Put_Line ("PS2C: stop");
+               Hexapod.Movement.Set_Gait (Gait);
+            end if;
+
+         else
+            if Gait = Hexapod.Movement.Stop then
+               Gait := Hexapod.Movement.Wave;
+
+               Hexapod.Console.Put_Line ("PS2C: forward");
+               Hexapod.Movement.Set_Gait (Gait);
+            end if;
+         end if;
+
+         --  Delay till next polling
+
+         Next := Next + Polling_Interval;
          A0B.Tasking.Delay_Until (Next);
-         Exchange;
       end loop;
    end Task_Subprogram;
 
