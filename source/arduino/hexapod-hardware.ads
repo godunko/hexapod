@@ -99,6 +99,9 @@ package Hexapod.Hardware is
 
 private
 
+   PWM_Frequency : constant := 321;
+   --  Closest value for supported by PCA 9685 controller.
+
    Left_Servo_Controller  :
      constant not null access BBF.PCA9685.PCA9685_Controller'Class :=
        Left_PWM_Controller'Access;

@@ -51,7 +51,6 @@ package body Hexapod.Command_Line is
                Hexapod.Hardware.Disable_Motors_Power;
 
             when 'U' | 'u' =>
-               Hexapod.Hardware.Configure_Controllers;
                Hexapod.Hardware.Enable_Motors_Power;
                Hexapod.Movement.Prepare;
 

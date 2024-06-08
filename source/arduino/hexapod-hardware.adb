@@ -23,9 +23,6 @@ with Hexapod.Remote_Control;
 
 package body Hexapod.Hardware is
 
-   PWM_Frequency : constant := 321;
-   --  Closest value for supported by PCA 9685 controller.
-
    LED : A0B.ATSAM3X8E.PIO.ATSAM3X8E_Pin'Class renames BBF.Board.Pin_13_LED;
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
@@ -54,34 +51,7 @@ package body Hexapod.Hardware is
 
    procedure Configure_Controllers is
    begin
-      declare
-         Success : Boolean := True;
-
-      begin
-         Left_PWM_Controller.Configure
-           (Frequency => PWM_Frequency,
-            Success   => Success);
-
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Servo Motors Controller (Left): configuration failed.");
-         end if;
-      end;
-
-      declare
-         Success : Boolean := True;
-
-      begin
-         Right_PWM_Controller.Configure
-           (Frequency => PWM_Frequency,
-            Success   => Success);
-
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Servo Motors Controller (Right): configuration failed.");
-         end if;
-      end;
-
+      null;
       --  declare
       --     Success : Boolean := True;
 

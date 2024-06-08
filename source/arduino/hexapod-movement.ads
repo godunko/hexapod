@@ -15,7 +15,7 @@ package Hexapod.Movement is
    Cycle : constant := 0.5;
    --  Length of the cycle.
 
-   Ticks : constant := 50;
+   Ticks : constant := 100;
    --  Number of ticks per second.
 
    Movement_Enabled : Boolean := False;

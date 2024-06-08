@@ -23,7 +23,7 @@ with Trajectory.Steps.Planner;
 
 with Hexapod.Console;
 with Hexapod.Debug;
-with Hexapod.Hardware;
+with Hexapod.Hardware.Initialize_Servo_Controllers;
 
 package body Hexapod.Movement is
 
@@ -256,39 +256,6 @@ package body Hexapod.Movement is
          Ada.Numerics.Pi * 4.0 / 6.0);
       RH_Base := Kinematics.Forward.RH_E_Position (Posture);
    end Initialize;
-
-   -------------------------
-   -- Initialize_Hardware --
-   -------------------------
-
-   procedure Initialize_Hardware is
-   begin
-      --  Initiazlie PCA9685 PWM controllers
-
-      declare
-         Success : Boolean := True;
-
-      begin
-         Hexapod.Hardware.Left_PWM_Controller.Initialize (Success);
-
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Servo Motors Controller (Left): initialization failed.");
-         end if;
-      end;
-
-      declare
-         Success : Boolean := True;
-
-      begin
-         Hexapod.Hardware.Right_PWM_Controller.Initialize (Success);
-
-         if not Success then
-            Console.Put_Line
-              ("FAIL: Servo Motors Controller (Right): initialization failed.");
-         end if;
-      end;
-   end Initialize_Hardware;
 
    ----------
    -- Move --
@@ -608,7 +575,7 @@ package body Hexapod.Movement is
 
    procedure Task_Subprogram is
    begin
-      Initialize_Hardware;
+      Hexapod.Hardware.Initialize_Servo_Controllers;
       --  ??? It is unclear how to initialize hardware in tasking environment.
       --  Code was moved here just to avoid crash at startup and need to be
       --  reviewed.
