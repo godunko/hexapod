@@ -4,8 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with "../subprojects/b2f4a/gnat/bbf";
+with "../config/phoenix_hexapod_config.gpr";
 
+with "../subprojects/b2f4a/gnat/bbf";
 with "arduino_due_startup";
 
 with "kinematics";
