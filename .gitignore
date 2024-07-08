@@ -1,2 +1,5 @@
 .objs
+alire
+bin
+config
 subprojects
