@@ -30,6 +30,12 @@ Implemented Features
    * Numerical (Gradient Descent and Levenberg-Marquardt)
  * Gait transition (fixed step)
 
+Current Development
+-------------------
+
+ * Body trajectry control by the PlayStation/2 controller
+ * Use of Max-Plus linear system to implement free gait
+
 Notes
 -----
 
