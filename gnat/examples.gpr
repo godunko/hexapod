@@ -9,8 +9,9 @@ with "trajectory";
 
 project Examples is
 
-   for Object_Dir use "../.objs";
    for Source_Dirs use ("../examples");
+   for Object_Dir use "../.objs";
+   for Exec_Dir use "../bin";
    for Main use
      ("kinematics_inverse_algebraic.adb",
       "kinematics_inverse_geometric.adb",
