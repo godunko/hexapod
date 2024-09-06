@@ -12,3 +12,7 @@ break __gnat_last_chance_handler
 # execute single instruction to load stack pointer and program counter from
 # the interrupt table.
 stepi
+
+#break twi0_handler
+#break twi1_handler
+#break a0b.i2c.atsam3x8e_twi.on_interrupt

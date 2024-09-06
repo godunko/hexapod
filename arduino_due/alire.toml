@@ -1,0 +1,44 @@
+name = "phoenix_hexapod_arduino_due"
+description = "Phoenyx Hexapod"
+version = "0.1.0-dev"
+
+authors = ["Vadim Godunko"]
+maintainers = ["Vadim Godunko <vgodunko@gmail.com>"]
+maintainers-logins = ["godunko"]
+licenses = "Apache-2.0 WITH LLVM-exception"
+tags = ["embedded"]
+
+project-files = ["../gnat/arduino_due.gpr"]
+
+[configuration]
+generate_ada = false
+generate_c = false
+generate_gpr = true
+
+[[depends-on]]
+a0b_armv7m_systick_clock = "*"
+a0b_atsam3x8e_tc5_timer = "*"
+a0b_atsam3x8e_twi_i2c = "*"
+a0b_atsam3x8e_usart = "*"
+a0b_playstation2_controller = "*"
+a0b_tasking = "*"
+light_arduino_due = "*"
+
+[[pins]]
+a0b_armv7m = { path='../subprojects/a0b-armv7m' }
+#a0b_armv7m_systick_clock = { path='subprojects/a0b-armv7m-systick_clock' }
+a0b_atsam3x8e = { path='../subprojects/a0b-atsam3x8e' }
+a0b_atsam3x8e_gpio = { path='../subprojects/a0b-atsam3x8e-gpio' }
+#a0b_atsam3x8e_tc5_timer = { path='subprojects/a0b-atsam3x8e-tc5_timer' }
+a0b_atsam3x8e_twi_i2c = { path='../subprojects/a0b-atsam3x8e-twi-i2c' }
+a0b_atsam3x8e_usart = { path='../subprojects/a0b-atsam3x8e-usart' }
+a0b_base = { path='../subprojects/a0b-base' }
+a0b_callbacks = { path='../subprojects/a0b-callbacks' }
+a0b_exti = { path='../subprojects/a0b-exti' }
+a0b_gpio = { path='../subprojects/a0b-gpio' }
+a0b_i2c = { path='../subprojects/a0b-i2c' }
+a0b_playstation2_controller = { path='../subprojects/a0b-playstation2_controller' }
+a0b_spi = { path='../subprojects/a0b-spi' }
+a0b_tasking = { path='../subprojects/a0b-tasking' }
+a0b_time = { path='../subprojects/a0b-time' }
+a0b_timer = { path='../subprojects/a0b-timer' }

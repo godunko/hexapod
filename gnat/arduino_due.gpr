@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with "../config/phoenix_hexapod_config.gpr";
+with "../arduino_due/config/phoenix_hexapod_arduino_due_config.gpr";
 
 with "../subprojects/b2f4a/gnat/bbf";
 with "arduino_due_startup";
@@ -13,7 +13,7 @@ with "kinematics";
 with "phoenyx_common";
 with "trajectory";
 
-project Arduino is
+project Arduino_Due is
 
    for Target use Arduino_Due_Startup'Target;
    for Runtime use Arduino_Due_Startup'Runtime;
@@ -29,7 +29,7 @@ project Arduino is
       "../subprojects/b2f4a/source/sandbox");
 
    package Builder is
-      for Executable ("hexapod-driver.adb") use "arduino.elf";
+      for Executable ("hexapod-driver.adb") use "arduino_due.elf";
    end Builder;
 
    package Compiler renames Phoenyx_Common.Compiler;
@@ -40,4 +40,4 @@ project Arduino is
          & ("-Wl,--gc-sections");
    end Linker;
 
-end Arduino;
+end Arduino_Due;
