@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with System.Machine_Code;
-
 with A0B.ATSAM3X8E.PIO.PIOA;
 with A0B.ATSAM3X8E.PIO.PIOB;
 with A0B.ATSAM3X8E.USART.SPI;
