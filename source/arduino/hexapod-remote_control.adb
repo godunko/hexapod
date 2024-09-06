@@ -8,7 +8,7 @@ with System.Machine_Code;
 
 with A0B.ATSAM3X8E.PIO.PIOA;
 with A0B.ATSAM3X8E.PIO.PIOB;
-with A0B.ATSAM3X8E.USART.Generic_USART1_SPI;
+with A0B.ATSAM3X8E.USART.SPI;
 with A0B.Callbacks.Generic_Non_Dispatching;
 with A0B.PlayStation2_Controllers.Protocol;
 with A0B.Tasking;
@@ -27,23 +27,8 @@ package body Hexapod.Remote_Control is
 
    Polling_Rate : constant := 100;
 
-   package USART1_SPI is
-     new A0B.ATSAM3X8E.USART.Generic_USART1_SPI
-           (MISO =>
-              A0B.ATSAM3X8E.PIO.RXD1_Line'Class
-                (A0B.ATSAM3X8E.PIO.PIOA.PA12),
-            MOSI =>
-              A0B.ATSAM3X8E.PIO.TXD1_Line'Class
-                (A0B.ATSAM3X8E.PIO.PIOA.PA13),
-            SCK =>
-              A0B.ATSAM3X8E.PIO.SCK1_Line'Class
-                (A0B.ATSAM3X8E.PIO.PIOA.PA16),
-            NSS =>
-              A0B.ATSAM3X8E.PIO.RTS1_Line'Class
-                (A0B.ATSAM3X8E.PIO.PIOA.PA14));
-
    Device     : aliased A0B.ATSAM3X8E.USART.SPI_Slave_Device
-     (USART1_SPI.USART1_SPI'Access);
+     (A0B.ATSAM3X8E.USART.SPI.USART1_SPI'Access);
    ACQ        : A0B.ATSAM3X8E.PIO.ATSAM3X8E_Pin'Class
      renames A0B.ATSAM3X8E.PIO.ATSAM3X8E_Pin'Class
        (A0B.ATSAM3X8E.PIO.PIOB.PB26);
@@ -66,8 +51,7 @@ package body Hexapod.Remote_Control is
 
    procedure Initialize is
    begin
-      USART1_SPI.USART1_SPI.Configure;
-
+      A0B.ATSAM3X8E.USART.SPI.USART1_SPI.Configure;
       --  Device.Configure;
 
       Controller.Initialize;
