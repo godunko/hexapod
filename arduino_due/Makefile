@@ -13,7 +13,7 @@ clean:
 
 flash: build-arduino
 	$(BOSSAC) --port $(PORT) --arduino-erase
-	$(BOSSAC) --port $(PORT) --info --write --verify --boot bin/arduino_due.bin
+	$(BOSSAC) --port $(PORT) --info --write --verify --boot ../bin/arduino_due.bin
 
 ocd:
 	openocd -f interface/cmsis-dap.cfg -c 'cmsis_dap_backend hid' -f maintainers-tools/debug/arduino_due.cfg
