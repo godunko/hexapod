@@ -458,7 +458,8 @@ package body Hexapod.Movement is
       Standard.Legs.Workspace_Center (Legs (Right_Middle), RM_Center);
       Standard.Legs.Workspace_Center (Legs (Right_Rear),   RH_Center);
 
-      Trajectory.Steps.Planner.Compute_Step (0.070, 0.000, 0.030, Step_Plan);
+      Trajectory.Steps.Planner.Compute_Step
+        (0.070, 0.000, Step_Height, Step_Plan);
       Trajectory.Steps.Executor.Compute_Position
         (LF_Base     => LF_Center,
          LM_Base     => LM_Center,
@@ -622,7 +623,7 @@ package body Hexapod.Movement is
       if Cycle_Time >= Cycle then
          Cycle_Time := 0.0;
          Trajectory.Steps.Planner.Compute_Step
-           (0.070, 0.000, 0.030, Step_Plan);
+           (0.070, 0.000, Step_Height, Step_Plan);
 
          Put (Step_Plan);
          Hexapod.Console.New_Line;
