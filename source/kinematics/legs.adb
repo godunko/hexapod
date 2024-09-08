@@ -6,41 +6,38 @@
 
 pragma Restrictions (No_Elaboration_Code);
 
+with Kinematics.Configuration;
 with Kinematics.Inverse.Geometric;
 
 package body Legs is
 
-   -----------------------
-   -- Compute_Workspace --
-   -----------------------
+   type Leg_Base_Parameters is record
+      X     : Reals.Real;
+      Y     : Reals.Real;
+      Z     : Reals.Real;
+      Gamma : Reals.Real;
+   end record;
 
-   procedure Compute_Workspace
-     (Self        : in out Leg;
-      Body_Height : Reals.Real)
-   is
-      use type Reals.Real;
+   type Leg_Segment_Parameters is record
+      Alpha : Reals.Real;
+      D     : Reals.Real;
+      R     : Reals.Real;
+   end record;
 
-      L        : constant Reals.Real := Self.R_2 + Self.R_3;
-      H        : constant Reals.Real := Self.Z_0 + Body_Height;
-      Diameter : constant Reals.Real :=
-        Reals.Elementary_Functions.Sqrt (L * L - H * H);
-      Radius   : constant Reals.Real := Diameter / 2.0;
-      Offset   : constant Reals.Real := Radius + Self.R_1;
-
-   begin
-      Self.Workspace :=
-        (Center_X => Offset * Self.Cos_Gamma_0 + Self.X_0,
-         Center_Y => Offset * Self.Sin_Gamma_0 + Self.Y_0,
-         Center_Z => -Body_Height,
-         Radius   => Radius);
-   end Compute_Workspace;
+   procedure Initialize
+     (Self      : out Leg_Information;
+      Side      : Leg_Side;
+      Base      : Leg_Base_Parameters;
+      Segment_1 : Leg_Segment_Parameters;
+      Segment_2 : Leg_Segment_Parameters;
+      Segment_3 : Leg_Segment_Parameters);
 
    ----------------
    -- Initialize --
    ----------------
 
    procedure Initialize
-     (Self      : out Leg;
+     (Self      : out Leg_Information;
       Side      : Leg_Side;
       Base      : Leg_Base_Parameters;
       Segment_1 : Leg_Segment_Parameters;
@@ -64,12 +61,140 @@ package body Legs is
       Self.Sin_Gamma_0 := Reals.Elementary_Functions.Sin (Self.Gamma_0);
    end Initialize;
 
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize is
+   begin
+      Initialize
+        (Self      => Legs (Left_Front),
+         Side      => Standard.Legs.Left,
+         Base      =>
+           (X     => Kinematics.Configuration.LF_Base_X,
+            Y     => Kinematics.Configuration.LF_Base_Y,
+            Z     => Kinematics.Configuration.LF_Base_Z,
+            Gamma => Kinematics.Configuration.LF_Base_Gamma),
+         Segment_1 =>
+           (R     => Kinematics.Configuration.LF_DH_R1,
+            D     => Kinematics.Configuration.LF_DH_D1,
+            Alpha => Kinematics.Configuration.LF_DH_Alpha1),
+         Segment_2 =>
+           (R     => Kinematics.Configuration.LF_DH_R2,
+            D     => Kinematics.Configuration.LF_DH_D2,
+            Alpha => Kinematics.Configuration.LF_DH_Alpha2),
+         Segment_3 =>
+           (R     => Kinematics.Configuration.LF_DH_R2,
+            D     => Kinematics.Configuration.LF_DH_D2,
+            Alpha => Kinematics.Configuration.LF_DH_Alpha2));
+      Initialize
+        (Self      => Legs (Left_Middle),
+         Side      => Standard.Legs.Left,
+         Base      =>
+           (X     => Kinematics.Configuration.LM_Base_X,
+            Y     => Kinematics.Configuration.LM_Base_Y,
+            Z     => Kinematics.Configuration.LM_Base_Z,
+            Gamma => Kinematics.Configuration.LM_Base_Gamma),
+         Segment_1 =>
+           (R     => Kinematics.Configuration.LM_DH_R1,
+            D     => Kinematics.Configuration.LM_DH_D1,
+            Alpha => Kinematics.Configuration.LM_DH_Alpha1),
+         Segment_2 =>
+           (R     => Kinematics.Configuration.LM_DH_R2,
+            D     => Kinematics.Configuration.LM_DH_D2,
+            Alpha => Kinematics.Configuration.LM_DH_Alpha2),
+         Segment_3 =>
+           (R     => Kinematics.Configuration.LM_DH_R2,
+            D     => Kinematics.Configuration.LM_DH_D2,
+            Alpha => Kinematics.Configuration.LM_DH_Alpha2));
+      Initialize
+        (Self      => Legs (Left_Rear),
+         Side      => Standard.Legs.Left,
+         Base      =>
+           (X     => Kinematics.Configuration.LH_Base_X,
+            Y     => Kinematics.Configuration.LH_Base_Y,
+            Z     => Kinematics.Configuration.LH_Base_Z,
+            Gamma => Kinematics.Configuration.LH_Base_Gamma),
+         Segment_1 =>
+           (R     => Kinematics.Configuration.LH_DH_R1,
+            D     => Kinematics.Configuration.LH_DH_D1,
+            Alpha => Kinematics.Configuration.LH_DH_Alpha1),
+         Segment_2 =>
+           (R     => Kinematics.Configuration.LH_DH_R2,
+            D     => Kinematics.Configuration.LH_DH_D2,
+            Alpha => Kinematics.Configuration.LH_DH_Alpha2),
+         Segment_3 =>
+           (R     => Kinematics.Configuration.LH_DH_R2,
+            D     => Kinematics.Configuration.LH_DH_D2,
+            Alpha => Kinematics.Configuration.LH_DH_Alpha2));
+      Initialize
+        (Self      => Legs (Right_Front),
+         Side      => Standard.Legs.Right,
+         Base      =>
+           (X     => Kinematics.Configuration.RF_Base_X,
+            Y     => Kinematics.Configuration.RF_Base_Y,
+            Z     => Kinematics.Configuration.RF_Base_Z,
+            Gamma => Kinematics.Configuration.RF_Base_Gamma),
+         Segment_1 =>
+           (R     => Kinematics.Configuration.RF_DH_R1,
+            D     => Kinematics.Configuration.RF_DH_D1,
+            Alpha => Kinematics.Configuration.RF_DH_Alpha1),
+         Segment_2 =>
+           (R     => Kinematics.Configuration.RF_DH_R2,
+            D     => Kinematics.Configuration.RF_DH_D2,
+            Alpha => Kinematics.Configuration.RF_DH_Alpha2),
+         Segment_3 =>
+           (R     => Kinematics.Configuration.RF_DH_R2,
+            D     => Kinematics.Configuration.RF_DH_D2,
+            Alpha => Kinematics.Configuration.RF_DH_Alpha2));
+      Initialize
+        (Self      => Legs (Right_Middle),
+         Side      => Standard.Legs.Right,
+         Base      =>
+           (X     => Kinematics.Configuration.RM_Base_X,
+            Y     => Kinematics.Configuration.RM_Base_Y,
+            Z     => Kinematics.Configuration.RM_Base_Z,
+            Gamma => Kinematics.Configuration.RM_Base_Gamma),
+         Segment_1 =>
+           (R     => Kinematics.Configuration.RM_DH_R1,
+            D     => Kinematics.Configuration.RM_DH_D1,
+            Alpha => Kinematics.Configuration.RM_DH_Alpha1),
+         Segment_2 =>
+           (R     => Kinematics.Configuration.RM_DH_R2,
+            D     => Kinematics.Configuration.RM_DH_D2,
+            Alpha => Kinematics.Configuration.RM_DH_Alpha2),
+         Segment_3 =>
+           (R     => Kinematics.Configuration.RM_DH_R2,
+            D     => Kinematics.Configuration.RM_DH_D2,
+            Alpha => Kinematics.Configuration.RM_DH_Alpha2));
+      Initialize
+        (Self      => Legs (Right_Rear),
+         Side      => Standard.Legs.Right,
+         Base      =>
+           (X     => Kinematics.Configuration.RH_Base_X,
+            Y     => Kinematics.Configuration.RH_Base_Y,
+            Z     => Kinematics.Configuration.RH_Base_Z,
+            Gamma => Kinematics.Configuration.RH_Base_Gamma),
+         Segment_1 =>
+           (R     => Kinematics.Configuration.RH_DH_R1,
+            D     => Kinematics.Configuration.RH_DH_D1,
+            Alpha => Kinematics.Configuration.RH_DH_Alpha1),
+         Segment_2 =>
+           (R     => Kinematics.Configuration.RH_DH_R2,
+            D     => Kinematics.Configuration.RH_DH_D2,
+            Alpha => Kinematics.Configuration.RH_DH_Alpha2),
+         Segment_3 =>
+           (R     => Kinematics.Configuration.RH_DH_R2,
+            D     => Kinematics.Configuration.RH_DH_D2,
+            Alpha => Kinematics.Configuration.RH_DH_Alpha2));
+   end Initialize;
+
    ------------------------
    -- Inverse_Kinematics --
    ------------------------
 
    procedure Inverse_Kinematics
-     (Self             : Leg;
+     (Self             : Leg_Information;
       Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean) is
@@ -88,20 +213,5 @@ package body Legs is
          Found_Posture    => Found_Posture,
          Success          => Success);
    end Inverse_Kinematics;
-
-   ----------------------
-   -- Workspace_Center --
-   ----------------------
-
-   procedure Workspace_Center
-     (Self     : Leg;
-      Position : out Kinematics.Position) is
-   begin
-      Kinematics.Set
-        (Self => Position,
-         X    => Self.Workspace.Center_X,
-         Y    => Self.Workspace.Center_Y,
-         Z    => Self.Workspace.Center_Z);
-   end Workspace_Center;
 
 end Legs;

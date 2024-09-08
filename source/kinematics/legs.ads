@@ -10,20 +10,12 @@ with Kinematics;
 with Reals;
 
 package Legs
-  with Pure
+  with Preelaborate
 is
-
-   type Workspace is record
-      Center_X : Reals.Real;
-      Center_Y : Reals.Real;
-      Center_Z : Reals.Real;
-      Radius   : Reals.Real;
-   end record;
-   --  Leg's workspace at ground level.
 
    type Leg_Side is (Left, Right);
 
-   type Leg is record
+   type Leg_Information is record
       Side        : Leg_Side;
 
       X_0         : Reals.Real;
@@ -59,43 +51,21 @@ is
    --  LF_DH_Alpha3 : constant := 0.0;
    --  LF_DH_D3     : constant := 0.0;
 
-      Workspace   : Legs.Workspace;
+      --  Workspace   : Legs.Workspace;
    end record;
 
-   type Leg_Base_Parameters is record
-      X     : Reals.Real;
-      Y     : Reals.Real;
-      Z     : Reals.Real;
-      Gamma : Reals.Real;
-   end record;
+   type Leg_Index is
+     (Left_Front,  Left_Middle,  Left_Rear,
+      Right_Front, Right_Middle, Right_Rear);
 
-   type Leg_Segment_Parameters is record
-      Alpha : Reals.Real;
-      D     : Reals.Real;
-      R     : Reals.Real;
-   end record;
+   Legs : array (Leg_Index) of Leg_Information;
 
-   procedure Initialize
-     (Self      : out Leg;
-      Side      : Leg_Side;
-      Base      : Leg_Base_Parameters;
-      Segment_1 : Leg_Segment_Parameters;
-      Segment_2 : Leg_Segment_Parameters;
-      Segment_3 : Leg_Segment_Parameters);
-
-   procedure Compute_Workspace
-     (Self        : in out Leg;
-      Body_Height : Reals.Real);
+   procedure Initialize;
 
    procedure Inverse_Kinematics
-     (Self             : Leg;
+     (Self             : Leg_Information;
       Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean);
-
-   procedure Workspace_Center
-     (Self     : Leg;
-      Position : out Kinematics.Position);
-   --  Returns center of the workspace at ground level.
 
 end Legs;

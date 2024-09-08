@@ -19,7 +19,7 @@ with BBF.PCA9685;
 
 with Kinematics.Configuration;
 with Kinematics.Forward;
-with Legs;
+with Legs.Workspace;
 with Trajectory.Steps.Executor;
 with Trajectory.Steps.Planner;
 
@@ -43,12 +43,6 @@ package body Hexapod.Movement is
       Min_Angle : Reals.Real;
       Max_Angle : Reals.Real;
    end record;
-
-   type Leg_Index is
-     (Left_Front,  Left_Middle,  Left_Rear,
-      Right_Front, Right_Middle, Right_Rear);
-
-   Legs : array (Leg_Index) of Standard.Legs.Leg;
 
    LF_M_1 : constant Motor_Descriptor :=
      (Hexapod.Hardware.LF_Motor_1_Channel.all'Access,
@@ -233,133 +227,8 @@ package body Hexapod.Movement is
       Posture : Kinematics.Posture;
 
    begin
-      Standard.Legs.Initialize
-        (Self      => Legs (Left_Front),
-         Side      => Standard.Legs.Left,
-         Base      =>
-           (X     => Kinematics.Configuration.LF_Base_X,
-            Y     => Kinematics.Configuration.LF_Base_Y,
-            Z     => Kinematics.Configuration.LF_Base_Z,
-            Gamma => Kinematics.Configuration.LF_Base_Gamma),
-         Segment_1 =>
-           (R     => Kinematics.Configuration.LF_DH_R1,
-            D     => Kinematics.Configuration.LF_DH_D1,
-            Alpha => Kinematics.Configuration.LF_DH_Alpha1),
-         Segment_2 =>
-           (R     => Kinematics.Configuration.LF_DH_R2,
-            D     => Kinematics.Configuration.LF_DH_D2,
-            Alpha => Kinematics.Configuration.LF_DH_Alpha2),
-         Segment_3 =>
-           (R     => Kinematics.Configuration.LF_DH_R2,
-            D     => Kinematics.Configuration.LF_DH_D2,
-            Alpha => Kinematics.Configuration.LF_DH_Alpha2));
-      Standard.Legs.Initialize
-        (Self      => Legs (Left_Middle),
-         Side      => Standard.Legs.Left,
-         Base      =>
-           (X     => Kinematics.Configuration.LM_Base_X,
-            Y     => Kinematics.Configuration.LM_Base_Y,
-            Z     => Kinematics.Configuration.LM_Base_Z,
-            Gamma => Kinematics.Configuration.LM_Base_Gamma),
-         Segment_1 =>
-           (R     => Kinematics.Configuration.LM_DH_R1,
-            D     => Kinematics.Configuration.LM_DH_D1,
-            Alpha => Kinematics.Configuration.LM_DH_Alpha1),
-         Segment_2 =>
-           (R     => Kinematics.Configuration.LM_DH_R2,
-            D     => Kinematics.Configuration.LM_DH_D2,
-            Alpha => Kinematics.Configuration.LM_DH_Alpha2),
-         Segment_3 =>
-           (R     => Kinematics.Configuration.LM_DH_R2,
-            D     => Kinematics.Configuration.LM_DH_D2,
-            Alpha => Kinematics.Configuration.LM_DH_Alpha2));
-      Standard.Legs.Initialize
-        (Self      => Legs (Left_Rear),
-         Side      => Standard.Legs.Left,
-         Base      =>
-           (X     => Kinematics.Configuration.LH_Base_X,
-            Y     => Kinematics.Configuration.LH_Base_Y,
-            Z     => Kinematics.Configuration.LH_Base_Z,
-            Gamma => Kinematics.Configuration.LH_Base_Gamma),
-         Segment_1 =>
-           (R     => Kinematics.Configuration.LH_DH_R1,
-            D     => Kinematics.Configuration.LH_DH_D1,
-            Alpha => Kinematics.Configuration.LH_DH_Alpha1),
-         Segment_2 =>
-           (R     => Kinematics.Configuration.LH_DH_R2,
-            D     => Kinematics.Configuration.LH_DH_D2,
-            Alpha => Kinematics.Configuration.LH_DH_Alpha2),
-         Segment_3 =>
-           (R     => Kinematics.Configuration.LH_DH_R2,
-            D     => Kinematics.Configuration.LH_DH_D2,
-            Alpha => Kinematics.Configuration.LH_DH_Alpha2));
-      Standard.Legs.Initialize
-        (Self      => Legs (Right_Front),
-         Side      => Standard.Legs.Right,
-         Base      =>
-           (X     => Kinematics.Configuration.RF_Base_X,
-            Y     => Kinematics.Configuration.RF_Base_Y,
-            Z     => Kinematics.Configuration.RF_Base_Z,
-            Gamma => Kinematics.Configuration.RF_Base_Gamma),
-         Segment_1 =>
-           (R     => Kinematics.Configuration.RF_DH_R1,
-            D     => Kinematics.Configuration.RF_DH_D1,
-            Alpha => Kinematics.Configuration.RF_DH_Alpha1),
-         Segment_2 =>
-           (R     => Kinematics.Configuration.RF_DH_R2,
-            D     => Kinematics.Configuration.RF_DH_D2,
-            Alpha => Kinematics.Configuration.RF_DH_Alpha2),
-         Segment_3 =>
-           (R     => Kinematics.Configuration.RF_DH_R2,
-            D     => Kinematics.Configuration.RF_DH_D2,
-            Alpha => Kinematics.Configuration.RF_DH_Alpha2));
-      Standard.Legs.Initialize
-        (Self      => Legs (Right_Middle),
-         Side      => Standard.Legs.Right,
-         Base      =>
-           (X     => Kinematics.Configuration.RM_Base_X,
-            Y     => Kinematics.Configuration.RM_Base_Y,
-            Z     => Kinematics.Configuration.RM_Base_Z,
-            Gamma => Kinematics.Configuration.RM_Base_Gamma),
-         Segment_1 =>
-           (R     => Kinematics.Configuration.RM_DH_R1,
-            D     => Kinematics.Configuration.RM_DH_D1,
-            Alpha => Kinematics.Configuration.RM_DH_Alpha1),
-         Segment_2 =>
-           (R     => Kinematics.Configuration.RM_DH_R2,
-            D     => Kinematics.Configuration.RM_DH_D2,
-            Alpha => Kinematics.Configuration.RM_DH_Alpha2),
-         Segment_3 =>
-           (R     => Kinematics.Configuration.RM_DH_R2,
-            D     => Kinematics.Configuration.RM_DH_D2,
-            Alpha => Kinematics.Configuration.RM_DH_Alpha2));
-      Standard.Legs.Initialize
-        (Self      => Legs (Right_Rear),
-         Side      => Standard.Legs.Right,
-         Base      =>
-           (X     => Kinematics.Configuration.RH_Base_X,
-            Y     => Kinematics.Configuration.RH_Base_Y,
-            Z     => Kinematics.Configuration.RH_Base_Z,
-            Gamma => Kinematics.Configuration.RH_Base_Gamma),
-         Segment_1 =>
-           (R     => Kinematics.Configuration.RH_DH_R1,
-            D     => Kinematics.Configuration.RH_DH_D1,
-            Alpha => Kinematics.Configuration.RH_DH_Alpha1),
-         Segment_2 =>
-           (R     => Kinematics.Configuration.RH_DH_R2,
-            D     => Kinematics.Configuration.RH_DH_D2,
-            Alpha => Kinematics.Configuration.RH_DH_Alpha2),
-         Segment_3 =>
-           (R     => Kinematics.Configuration.RH_DH_R2,
-            D     => Kinematics.Configuration.RH_DH_D2,
-            Alpha => Kinematics.Configuration.RH_DH_Alpha2));
-
-      Standard.Legs.Compute_Workspace (Legs (Left_Front),   Height);
-      Standard.Legs.Compute_Workspace (Legs (Left_Middle),  Height);
-      Standard.Legs.Compute_Workspace (Legs (Left_Rear),    Height);
-      Standard.Legs.Compute_Workspace (Legs (Right_Front),  Height);
-      Standard.Legs.Compute_Workspace (Legs (Right_Middle), Height);
-      Standard.Legs.Compute_Workspace (Legs (Right_Rear),   Height);
+      Legs.Initialize;
+      Legs.Workspace.Compute (Height);
    end Initialize;
 
    ----------
@@ -451,12 +320,12 @@ package body Hexapod.Movement is
       Success     : Boolean;
 
    begin
-      Standard.Legs.Workspace_Center (Legs (Left_Front),   LF_Center);
-      Standard.Legs.Workspace_Center (Legs (Left_Middle),  LM_Center);
-      Standard.Legs.Workspace_Center (Legs (Left_Rear),    LH_Center);
-      Standard.Legs.Workspace_Center (Legs (Right_Front),  RF_Center);
-      Standard.Legs.Workspace_Center (Legs (Right_Middle), RM_Center);
-      Standard.Legs.Workspace_Center (Legs (Right_Rear),   RH_Center);
+      Legs.Workspace.Ground_Center (Legs.Left_Front,   LF_Center);
+      Legs.Workspace.Ground_Center (Legs.Left_Middle,  LM_Center);
+      Legs.Workspace.Ground_Center (Legs.Left_Rear,    LH_Center);
+      Legs.Workspace.Ground_Center (Legs.Right_Front,  RF_Center);
+      Legs.Workspace.Ground_Center (Legs.Right_Middle, RM_Center);
+      Legs.Workspace.Ground_Center (Legs.Right_Rear,   RH_Center);
 
       Trajectory.Steps.Planner.Compute_Step
         (0.070, 0.000, Step_Height, Step_Plan);
@@ -479,7 +348,7 @@ package body Hexapod.Movement is
       --  LF & RH
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Left_Front),
+        (Self             => Legs.Legs (Legs.Left_Front),
          Desired_Position => LF_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -492,7 +361,7 @@ package body Hexapod.Movement is
       end if;
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Right_Rear),
+        (Self             => Legs.Legs (Legs.Right_Rear),
          Desired_Position => RH_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -507,7 +376,7 @@ package body Hexapod.Movement is
       --  LM & RM
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Left_Middle),
+        (Self             => Legs.Legs (Legs.Left_Middle),
          Desired_Position => LM_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -520,7 +389,7 @@ package body Hexapod.Movement is
       end if;
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Right_Middle),
+        (Self             => Legs.Legs (Legs.Right_Middle),
          Desired_Position => RM_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -535,7 +404,7 @@ package body Hexapod.Movement is
       --  LH & RF
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Left_Rear),
+        (Self             => Legs.Legs (Legs.Left_Rear),
          Desired_Position => LH_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -548,7 +417,7 @@ package body Hexapod.Movement is
       end if;
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Right_Front),
+        (Self             => Legs.Legs (Legs.Right_Front),
          Desired_Position => RF_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -629,12 +498,12 @@ package body Hexapod.Movement is
          Hexapod.Console.New_Line;
       end if;
 
-      Standard.Legs.Workspace_Center (Legs (Left_Front),   LF_Center);
-      Standard.Legs.Workspace_Center (Legs (Left_Middle),  LM_Center);
-      Standard.Legs.Workspace_Center (Legs (Left_Rear),    LH_Center);
-      Standard.Legs.Workspace_Center (Legs (Right_Front),  RF_Center);
-      Standard.Legs.Workspace_Center (Legs (Right_Middle), RM_Center);
-      Standard.Legs.Workspace_Center (Legs (Right_Rear),   RH_Center);
+      Legs.Workspace.Ground_Center (Legs.Left_Front,   LF_Center);
+      Legs.Workspace.Ground_Center (Legs.Left_Middle,  LM_Center);
+      Legs.Workspace.Ground_Center (Legs.Left_Rear,    LH_Center);
+      Legs.Workspace.Ground_Center (Legs.Right_Front,  RF_Center);
+      Legs.Workspace.Ground_Center (Legs.Right_Middle, RM_Center);
+      Legs.Workspace.Ground_Center (Legs.Right_Rear,   RH_Center);
 
       Trajectory.Steps.Executor.Compute_Position
         (LF_Base     => LF_Center,
@@ -658,7 +527,7 @@ package body Hexapod.Movement is
       --  LF
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Left_Front),
+        (Self             => Legs.Legs (Legs.Left_Front),
          Desired_Position => LF_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -673,7 +542,7 @@ package body Hexapod.Movement is
       --  LM
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Left_Middle),
+        (Self             => Legs.Legs (Legs.Left_Middle),
          Desired_Position => LM_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -688,7 +557,7 @@ package body Hexapod.Movement is
       --  LH
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Left_Rear),
+        (Self             => Legs.Legs (Legs.Left_Rear),
          Desired_Position => LH_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -703,7 +572,7 @@ package body Hexapod.Movement is
       --  RF
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Right_Front),
+        (Self             => Legs.Legs (Legs.Right_Front),
          Desired_Position => RF_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -718,7 +587,7 @@ package body Hexapod.Movement is
       --  RM
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Right_Middle),
+        (Self             => Legs.Legs (Legs.Right_Middle),
          Desired_Position => RM_Position,
          Found_Posture    => Posture,
          Success          => Success);
@@ -733,7 +602,7 @@ package body Hexapod.Movement is
       --  RH
 
       Standard.Legs.Inverse_Kinematics
-        (Self             => Legs (Right_Rear),
+        (Self             => Legs.Legs (Legs.Right_Rear),
          Desired_Position => RH_Position,
          Found_Posture    => Posture,
          Success          => Success);
