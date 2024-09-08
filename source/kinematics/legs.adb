@@ -16,9 +16,23 @@ package body Legs is
 
    procedure Compute_Workspace
      (Self        : in out Leg;
-      Body_Height : Reals.Real) is
+      Body_Height : Reals.Real)
+   is
+      use type Reals.Real;
+
+      L        : constant Reals.Real := Self.R_2 + Self.R_3;
+      H        : constant Reals.Real := Self.Z_0 + Body_Height;
+      Diameter : constant Reals.Real :=
+        Reals.Elementary_Functions.Sqrt (L * L - H * H);
+      Radius   : constant Reals.Real := Diameter / 2.0;
+      Offset   : constant Reals.Real := Radius + Self.R_1;
+
    begin
-      null;
+      Self.Workspace :=
+        (Center_X => Offset * Self.Cos_Gamma_0 + Self.X_0,
+         Center_Y => Offset * Self.Sin_Gamma_0 + Self.Y_0,
+         Center_Z => -Body_Height,
+         Radius   => Radius);
    end Compute_Workspace;
 
    ----------------
@@ -74,5 +88,20 @@ package body Legs is
          Found_Posture    => Found_Posture,
          Success          => Success);
    end Inverse_Kinematics;
+
+   ----------------------
+   -- Workspace_Center --
+   ----------------------
+
+   procedure Workspace_Center
+     (Self     : Leg;
+      Position : out Kinematics.Position) is
+   begin
+      Kinematics.Set
+        (Self => Position,
+         X    => Self.Workspace.Center_X,
+         Y    => Self.Workspace.Center_Y,
+         Z    => Self.Workspace.Center_Z);
+   end Workspace_Center;
 
 end Legs;

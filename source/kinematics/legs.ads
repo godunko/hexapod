@@ -14,7 +14,10 @@ package Legs
 is
 
    type Workspace is record
-      null;
+      Center_X : Reals.Real;
+      Center_Y : Reals.Real;
+      Center_Z : Reals.Real;
+      Radius   : Reals.Real;
    end record;
    --  Leg's workspace at ground level.
 
@@ -37,14 +40,6 @@ is
 
       R_3         : Reals.Real;
 
-      --  Base_X     : constant := 0.074;
-      --  Base_Y     : constant := 0.048;
-      --  Base_Z     : constant := 0.0;
-      --  Base_Gamma : constant := Ada.Numerics.Pi / 6.0;
-      --  LF_Cos_Gamma_0 : constant := 0.866025404;
-      --  --  Cos (Kinematics.Configuration.LF_Base_Gamma);
-      --  LF_Sin_Gamma_0 : constant := 0.5;
-      --  --  Sin (Kinematics.Configuration.LF_Base_Gamma);
       --  LF_Cos_Alpha_1 : constant := 0.0;
       --  --  Cos (Kinematics.Configuration.LF_DH_Alpha1);
       --  LF_Sin_Alpha_1 : constant := 1.0;
@@ -59,15 +54,12 @@ is
       --  --  Sin (Kinematics.Configuration.LF_DH_Alpha3);
    --  LF_DH_Alpha1 : constant := Ada.Numerics.Pi / 2.0;
    --  LF_DH_D1     : constant := 0.0;
-   --  LF_DH_R1     : constant := 0.029;
    --  LF_DH_Alpha2 : constant := 0.0;
    --  LF_DH_D2     : constant := 0.0;
-   --  LF_DH_R2     : constant := 0.084;
    --  LF_DH_Alpha3 : constant := 0.0;
    --  LF_DH_D3     : constant := 0.0;
-   --  LF_DH_R3     : constant := 0.124;
 
-      Workspace : Legs.Workspace;
+      Workspace   : Legs.Workspace;
    end record;
 
    type Leg_Base_Parameters is record
@@ -91,14 +83,19 @@ is
       Segment_2 : Leg_Segment_Parameters;
       Segment_3 : Leg_Segment_Parameters);
 
+   procedure Compute_Workspace
+     (Self        : in out Leg;
+      Body_Height : Reals.Real);
+
    procedure Inverse_Kinematics
      (Self             : Leg;
       Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean);
 
-   procedure Compute_Workspace
-     (Self        : in out Leg;
-      Body_Height : Reals.Real);
+   procedure Workspace_Center
+     (Self     : Leg;
+      Position : out Kinematics.Position);
+   --  Returns center of the workspace at ground level.
 
 end Legs;
