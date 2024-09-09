@@ -19,6 +19,7 @@ with BBF.PCA9685;
 
 with Kinematics.Configuration;
 with Kinematics.Forward;
+with Legs.State;
 with Legs.Workspace;
 with Trajectory.Steps.Executor;
 with Trajectory.Steps.Planner;
@@ -30,6 +31,19 @@ with Hexapod.Hardware.Initialize_Servo_Controllers;
 package body Hexapod.Movement is
 
    use type Reals.Real;
+
+   LF_Position : Kinematics.Position
+     renames Legs.State.Position (Legs.Left_Front);
+   LM_Position : Kinematics.Position
+     renames Legs.State.Position (Legs.Left_Middle);
+   LH_Position : Kinematics.Position
+     renames Legs.State.Position (Legs.Left_Rear);
+   RF_Position : Kinematics.Position
+     renames Legs.State.Position (Legs.Right_Front);
+   RM_Position : Kinematics.Position
+     renames Legs.State.Position (Legs.Right_Middle);
+   RH_Position : Kinematics.Position
+     renames Legs.State.Position (Legs.Right_Rear);
 
    TCB : aliased A0B.Tasking.Task_Control_Block;
 
@@ -229,6 +243,10 @@ package body Hexapod.Movement is
    begin
       Legs.Initialize;
       Legs.Workspace.Compute (Height);
+
+      for J in Legs.Leg_Index loop
+         Legs.Workspace.Ground_Center (J, Legs.State.Position (J));
+      end loop;
    end Initialize;
 
    ----------
@@ -304,20 +322,14 @@ package body Hexapod.Movement is
    -------------
 
    procedure Prepare is
-      LF_Center   : Kinematics.Position;
-      LM_Center   : Kinematics.Position;
-      LH_Center   : Kinematics.Position;
-      RF_Center   : Kinematics.Position;
-      RM_Center   : Kinematics.Position;
-      RH_Center   : Kinematics.Position;
-      LF_Position : Kinematics.Position;
-      LM_Position : Kinematics.Position;
-      LH_Position : Kinematics.Position;
-      RF_Position : Kinematics.Position;
-      RM_Position : Kinematics.Position;
-      RH_Position : Kinematics.Position;
-      Posture     : Kinematics.Posture;
-      Success     : Boolean;
+      LF_Center : Kinematics.Position;
+      LM_Center : Kinematics.Position;
+      LH_Center : Kinematics.Position;
+      RF_Center : Kinematics.Position;
+      RM_Center : Kinematics.Position;
+      RH_Center : Kinematics.Position;
+      Posture   : Kinematics.Posture;
+      Success   : Boolean;
 
    begin
       Legs.Workspace.Ground_Center (Legs.Left_Front,   LF_Center);
@@ -469,20 +481,14 @@ package body Hexapod.Movement is
    ----------
 
    procedure Step is
-      LF_Center   : Kinematics.Position;
-      LM_Center   : Kinematics.Position;
-      LH_Center   : Kinematics.Position;
-      RF_Center   : Kinematics.Position;
-      RM_Center   : Kinematics.Position;
-      RH_Center   : Kinematics.Position;
-      LF_Position : Kinematics.Position;
-      LM_Position : Kinematics.Position;
-      LH_Position : Kinematics.Position;
-      RF_Position : Kinematics.Position;
-      RM_Position : Kinematics.Position;
-      RH_Position : Kinematics.Position;
-      Posture     : Kinematics.Posture;
-      Success     : Boolean;
+      LF_Center : Kinematics.Position;
+      LM_Center : Kinematics.Position;
+      LH_Center : Kinematics.Position;
+      RF_Center : Kinematics.Position;
+      RM_Center : Kinematics.Position;
+      RH_Center : Kinematics.Position;
+      Posture   : Kinematics.Posture;
+      Success   : Boolean;
 
    begin
       --  Hexapod.Console.Put ("*");

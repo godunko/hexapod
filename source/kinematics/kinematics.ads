@@ -37,7 +37,8 @@ package Kinematics is
       Orientation : Kinematics.Orientation;
    end record;
 
-   type Posture is private;
+   type Posture is private
+     with Preelaborable_Initialization;
    --  Container of joint variables and a set of internal information.
 
    function Theta_1 (Self : Posture) return Reals.Real with Inline;
@@ -65,8 +66,7 @@ private
    type Posture is record
       Theta : Reals.Vectors_3.Vector_3;
       --  Vector of the joint variables.
-   end record
-     with Preelaborable_Initialization;
+   end record;
 
    function Theta_1 (Self : Posture) return Reals.Real is (Self.Theta.M_1);
    function Theta_2 (Self : Posture) return Reals.Real is (Self.Theta.M_2);
