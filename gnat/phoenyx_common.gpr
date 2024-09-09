@@ -18,7 +18,8 @@ abstract project Phoenyx_Common is
          "-O1",
          "-ffunction-sections",
          "-fdata-sections",
-         "-flto");
+         "-flto",
+         "-gnatwu");  --  turn on warnings for unused entity
    end Compiler;
 
 end Phoenyx_Common;

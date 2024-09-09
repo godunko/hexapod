@@ -17,8 +17,7 @@ with A0B.Types;
 with BBF.Delays;
 with BBF.PCA9685;
 
-with Kinematics.Configuration;
-with Kinematics.Forward;
+with Kinematics;
 with Legs.State;
 with Legs.Workspace;
 with Trajectory.Steps.Executor;
@@ -176,8 +175,6 @@ package body Hexapod.Movement is
 
    Cycle_Time    : Reals.Real := 0.0;
 
-   Step_Length_X : Reals.Real := 0.000;
-   Step_Length_Y : Reals.Real := 0.000;
    Step_Height   : constant := 0.020;
 
    Step_Plan : Trajectory.Steps.Step_Plan_Descriptor := (others => <>);
@@ -244,7 +241,6 @@ package body Hexapod.Movement is
 
    procedure Initialize is
       Height  : constant := 0.050;
-      Posture : Kinematics.Posture;
 
    begin
       Legs.Initialize;
@@ -280,11 +276,7 @@ package body Hexapod.Movement is
       is
          use type BBF.PCA9685.Value_Type;
 
-         Angle_Middle : constant Reals.Real :=
-           (Descriptor.Min_Angle + Descriptor.Max_Angle) / 2.0;
-         Angle_Range  : constant Reals.Real :=
-           Descriptor.Max_Angle - Descriptor.Min_Angle;
-         PWM_Range    : constant Reals.Real :=
+         PWM_Range : constant Reals.Real :=
            Reals.Real (Descriptor.Max_PWM - Descriptor.Min_PWM);
 
       begin
