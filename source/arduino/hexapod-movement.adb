@@ -223,7 +223,7 @@ package body Hexapod.Movement is
    ----------------
 
    procedure Initialize is
-      Height  : constant := 0.030;
+      Height  : constant := 0.050;
       Posture : Kinematics.Posture;
 
    begin
