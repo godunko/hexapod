@@ -114,10 +114,10 @@ package body Hexapod.Remote_Control is
       function Map (Value : A0B.Types.Unsigned_8) return Reals.Real is
       begin
          if Value <= 16#80# then
-            return -1.0 + (1.0 / 128.0) * Reals.Real (Value);
+            return 1.0 - (1.0 / 128.0) * Reals.Real (Value);
 
          else
-            return (1.0 / 127.0) * Reals.Real (Value - 16#80#);
+            return -(1.0 / 127.0) * Reals.Real (Value - 16#80#);
          end if;
       end Map;
 
