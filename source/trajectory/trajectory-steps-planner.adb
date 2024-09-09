@@ -332,6 +332,8 @@ package body Trajectory.Steps.Planner is
    procedure Compute_Step
      (Length_X : Reals.Real;
       Length_Y : Reals.Real;
+      V_X      : Reals.Real;
+      V_Y      : Reals.Real;
       Height_Z : Reals.Real;
       Result   : out Step_Plan_Descriptor)
    is
@@ -367,19 +369,15 @@ package body Trajectory.Steps.Planner is
 
          else
             Result :=
-              (Stage          => Stance,
-               Length_X       => Length_X,
-               Length_Y       => Length_Y,
-               Start_Position =>
-                 Reals.Real (Previous) / Reals.Real (Support_Ticks),
-               End_Position   =>
-                 Reals.Real (Current) / Reals.Real (Support_Ticks));
+              (Stage => Strait,
+               D_X   => V_X,
+               D_Y   => V_Y);
          end if;
       end Compute;
 
       Success       : Boolean := True;
       Swing         : Mask_Type;
-      Stance_Factor : Reals.Real := 1.0;
+      Stance_Factor : constant Reals.Real := 1.0;
 
    begin
       Previous_Configuration := Current_Configuration;

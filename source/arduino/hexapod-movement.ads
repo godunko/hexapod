@@ -28,6 +28,10 @@ package Hexapod.Movement is
 
    procedure Set_Gait (Gait : Gait_Kind);
 
+   procedure Set_Relative_Velocity
+     (V_X : Reals.Real;
+      V_Y : Reals.Real);
+
    procedure Register_Task;
    --  Register task
 

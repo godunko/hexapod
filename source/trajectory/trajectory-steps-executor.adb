@@ -13,7 +13,7 @@ package body Trajectory.Steps.Executor is
       Plan     : Leg_Step_Plan_Descriptor;
       Ratio    : Reals.Real;
       Fase     : Reals.Real;
-      Position : out Kinematics.Position);
+      Position : in out Kinematics.Position);
    --  Compute position of the leg.
 
    -------------
@@ -25,11 +25,11 @@ package body Trajectory.Steps.Executor is
       Plan     : Leg_Step_Plan_Descriptor;
       Ratio    : Reals.Real;
       Fase     : Reals.Real;
-      Position : out Kinematics.Position)
+      Position : in out Kinematics.Position)
    is
-      X : Reals.Real;
-      Y : Reals.Real;
-      Z : Reals.Real;
+      X : Reals.Real := Kinematics.X (Position);
+      Y : Reals.Real := Kinematics.Y (Position);
+      Z : Reals.Real := Kinematics.Z (Position);
 
    begin
       Trajectory.Steps.Leg.Position_XYZ
@@ -59,12 +59,12 @@ package body Trajectory.Steps.Executor is
       RH_Base     : Kinematics.Position;
       Plan        : Step_Plan_Descriptor;
       Fase        : Step_Fase;
-      LF_Position : out Kinematics.Position;
-      LM_Position : out Kinematics.Position;
-      LH_Position : out Kinematics.Position;
-      RF_Position : out Kinematics.Position;
-      RM_Position : out Kinematics.Position;
-      RH_Position : out Kinematics.Position) is
+      LF_Position : in out Kinematics.Position;
+      LM_Position : in out Kinematics.Position;
+      LH_Position : in out Kinematics.Position;
+      RF_Position : in out Kinematics.Position;
+      RM_Position : in out Kinematics.Position;
+      RH_Position : in out Kinematics.Position) is
    begin
       Compute
         (Base     => LF_Base,

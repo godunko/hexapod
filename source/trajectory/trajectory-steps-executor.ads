@@ -19,12 +19,12 @@ package Trajectory.Steps.Executor is
       RH_Base     : Kinematics.Position;
       Plan        : Step_Plan_Descriptor;
       Fase        : Step_Fase;
-      LF_Position : out Kinematics.Position;
-      LM_Position : out Kinematics.Position;
-      LH_Position : out Kinematics.Position;
-      RF_Position : out Kinematics.Position;
-      RM_Position : out Kinematics.Position;
-      RH_Position : out Kinematics.Position);
+      LF_Position : in out Kinematics.Position;
+      LM_Position : in out Kinematics.Position;
+      LH_Position : in out Kinematics.Position;
+      RF_Position : in out Kinematics.Position;
+      RM_Position : in out Kinematics.Position;
+      RH_Position : in out Kinematics.Position);
 
 end Trajectory.Steps.Executor;
 

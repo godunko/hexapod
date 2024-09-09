@@ -131,6 +131,7 @@ package body Hexapod.Remote_Control is
 
                Hexapod.Console.Put_Line ("PS2C: stop");
                Hexapod.Movement.Set_Gait (Gait);
+               Hexapod.Movement.Set_Relative_Velocity (0.0, 0.0);
             end if;
 
          else
@@ -139,6 +140,7 @@ package body Hexapod.Remote_Control is
 
                Hexapod.Console.Put_Line ("PS2C: forward");
                Hexapod.Movement.Set_Gait (Gait);
+               Hexapod.Movement.Set_Relative_Velocity (1.0, 0.0);
             end if;
          end if;
 

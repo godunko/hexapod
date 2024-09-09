@@ -30,30 +30,44 @@ package body Trajectory.Steps.Leg is
       Plan   : Leg_Step_Plan_Descriptor;
       Ratio  : Reals.Real;
       Fase   : Step_Fase;
-      X      : out Reals.Real;
-      Y      : out Reals.Real;
-      Z      : out Reals.Real)
+      X      : in out Reals.Real;
+      Y      : in out Reals.Real;
+      Z      : in out Reals.Real)
    is
-      T_XY : constant Reals.Real :=
-        (case Plan.Stage is
-           when Stance => T_XY_Stance (Fase),
-           when Swing  => T_XY_Swing (Ratio, Fase));
-      C_XY : constant Reals.Real :=
-        Reals.Utilities.Map
-         (T_XY, -0.5, 0.5, Plan.Start_Position, Plan.End_Position);
-      T_Z  : constant Reals.Real :=
-        (case Plan.Stage is
-           when Stance => 0.0,
-           when Swing  => T_Z_Swing (Fase));
-
    begin
-      X := Base_X + Plan.Length_X * C_XY;
-      Y := Base_Y + Plan.Length_Y * C_XY;
-      Z :=
-        Base_Z
-          + (case Plan.Stage is
-               when Stance => 0.0,
-               when Swing  => Plan.Height_Z * T_Z_Swing (Fase));
+      if Plan.Stage = Strait then
+         --  Strait line in the XY plane
+
+         X := @ + Plan.D_X;
+         Y := @ + Plan.D_Y;
+
+      else
+         declare
+            T_XY : constant Reals.Real :=
+              (case Plan.Stage is
+                 when Strait => 0.0,
+                 when Stance => T_XY_Stance (Fase),
+                 when Swing  => T_XY_Swing (Ratio, Fase));
+            C_XY : constant Reals.Real :=
+              Reals.Utilities.Map
+                (T_XY, -0.5, 0.5, Plan.Start_Position, Plan.End_Position);
+            T_Z  : constant Reals.Real :=
+              (case Plan.Stage is
+                 when Strait => 0.0,
+                 when Stance => 0.0,
+                 when Swing  => T_Z_Swing (Fase));
+
+         begin
+            X := Base_X + Plan.Length_X * C_XY;
+            Y := Base_Y + Plan.Length_Y * C_XY;
+            Z :=
+              Base_Z
+                + (case Plan.Stage is
+                     when Strait => 0.0,
+                     when Stance => 0.0,
+                     when Swing  => Plan.Height_Z * T_Z_Swing (Fase));
+         end;
+      end if;
    end Position_XYZ;
 
    -----------------

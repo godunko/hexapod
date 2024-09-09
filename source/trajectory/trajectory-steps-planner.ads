@@ -20,6 +20,8 @@ package Trajectory.Steps.Planner is
    procedure Compute_Step
      (Length_X : Reals.Real;
       Length_Y : Reals.Real;
+      V_X      : Reals.Real;
+      V_Y      : Reals.Real;
       Height_Z : Reals.Real;
       Result   : out Step_Plan_Descriptor);
 

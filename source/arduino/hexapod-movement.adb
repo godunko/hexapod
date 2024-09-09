@@ -189,6 +189,9 @@ package body Hexapod.Movement is
    --     RM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
    --     RH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0));
 
+   Body_Velocity_X : Reals.Real := 0.0;
+   Body_Velocity_Y : Reals.Real := 0.0;
+
    type States is (Initial, Configuration, Active);
 
    State : States := Initial;
@@ -216,8 +219,10 @@ package body Hexapod.Movement is
    begin
       return
         (if Item.Stage = Trajectory.Steps.Stance then "  _ " else "  ^ ")
-           & Hexapod.Debug.Parametric_Image (Item.Start_Position, 1)
-           & Hexapod.Debug.Parametric_Image (Item.End_Position, 1);
+         & (if Item.Stage /= Trajectory.Steps.Strait then
+               Hexapod.Debug.Parametric_Image (Item.Start_Position, 1)
+            & Hexapod.Debug.Parametric_Image (Item.End_Position, 1)
+            else "");
    end Image;
 
    --  function Image (Item : Trajectory.Steps.Step_Plan_Descriptor) return String is
@@ -340,7 +345,7 @@ package body Hexapod.Movement is
       Legs.Workspace.Ground_Center (Legs.Right_Rear,   RH_Center);
 
       Trajectory.Steps.Planner.Compute_Step
-        (0.070, 0.000, Step_Height, Step_Plan);
+        (0.070, 0.000, 0.0, 0.0, Step_Height, Step_Plan);
       Trajectory.Steps.Executor.Compute_Position
         (LF_Base     => LF_Center,
          LM_Base     => LM_Center,
@@ -476,6 +481,18 @@ package body Hexapod.Movement is
       end case;
    end Set_Gait;
 
+   ---------------------------
+   -- Set_Relative_Velocity --
+   ---------------------------
+
+   procedure Set_Relative_Velocity
+     (V_X : Reals.Real;
+      V_Y : Reals.Real) is
+   begin
+      Body_Velocity_X := V_X * (0.070 / 0.5) / 5.0;
+      Body_Velocity_Y := 0.0;
+   end Set_Relative_Velocity;
+
    ----------
    -- Step --
    ----------
@@ -498,7 +515,10 @@ package body Hexapod.Movement is
       if Cycle_Time >= Cycle then
          Cycle_Time := 0.0;
          Trajectory.Steps.Planner.Compute_Step
-           (0.070, 0.000, Step_Height, Step_Plan);
+           (0.070, 0.000,
+            - Body_Velocity_X / Reals.Real (Ticks),
+            - Body_Velocity_Y / Reals.Real (Ticks),
+            Step_Height, Step_Plan);
 
          Put (Step_Plan);
          Hexapod.Console.New_Line;

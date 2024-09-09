@@ -23,7 +23,7 @@ package Trajectory.Steps is
 
    use type Reals.Real;
 
-   type Stage_Kind is (Stance, Swing);
+   type Stage_Kind is (Strait, Stance, Swing);
 
    subtype Step_Fase is Reals.Real range 0.0 .. 1.0;
 --
@@ -36,21 +36,31 @@ package Trajectory.Steps is
    subtype Trajectory_Position is Reals.Real range -0.5 .. 0.5;
 
    type Leg_Step_Plan_Descriptor (Stage : Stage_Kind := Stance) is record
-      Length_X       : Reals.Real;
-      Length_Y       : Reals.Real;
-      --  Projection of the stance trajectory on X and Y axes.
-
-      Start_Position : Trajectory_Position;
-      End_Position   : Trajectory_Position;
-      --  Start position and end positions of the step on the trajectory.
-
       case Stage is
-         when Stance =>
-            null;
+         when Strait =>
+            D_X : Reals.Real;
+            D_Y : Reals.Real;
 
-         when Swing =>
-            Height_Z : Reals.Real;
-            --  Height of the swing.
+         when Stance | Swing =>
+            Length_X       : Reals.Real;
+            Length_Y       : Reals.Real;
+            --  Projection of the stance trajectory on X and Y axes.
+
+            Start_Position : Trajectory_Position;
+            End_Position   : Trajectory_Position;
+            --  Start position and end positions of the step on the trajectory.
+
+            case Stage is
+               when Strait =>
+                  null;
+
+               when Stance =>
+                  null;
+
+               when Swing =>
+                  Height_Z : Reals.Real;
+                  --  Height of the swing.
+            end case;
       end case;
    end record;
 
