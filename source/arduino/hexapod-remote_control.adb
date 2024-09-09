@@ -15,6 +15,9 @@ with A0B.Timer;
 with A0B.Types.GCC_Builtins;
 
 with BBF.Awaits;
+
+with Reals;
+
 with Hexapod.Console;
 with Hexapod.Hardware;
 with Hexapod.Movement;
@@ -100,12 +103,32 @@ package body Hexapod.Remote_Control is
       use type A0B.Time.Monotonic_Time;
       use type A0B.Types.Unsigned_8;
       use type Hexapod.Movement.Gait_Kind;
+      use type Reals.Real;
+
+      function Map (Value : A0B.Types.Unsigned_8) return Reals.Real;
+
+      ---------
+      -- Map --
+      ---------
+
+      function Map (Value : A0B.Types.Unsigned_8) return Reals.Real is
+      begin
+         if Value <= 16#80# then
+            return -1.0 + (1.0 / 128.0) * Reals.Real (Value);
+
+         else
+            return (1.0 / 127.0) * Reals.Real (Value - 16#80#);
+         end if;
+      end Map;
 
       Next             : A0B.Time.Monotonic_Time := A0B.Time.Clock;
       Polling_Interval : constant A0B.Time.Time_Span :=
         A0B.Time.Milliseconds (1_000 / Polling_Rate);
       State            : A0B.PlayStation2_Controllers.Controller_State;
       Gait             : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
+
+      V_X              : Reals.Real;
+      V_Y              : Reals.Real;
 
    begin
       loop
@@ -125,13 +148,15 @@ package body Hexapod.Remote_Control is
             --  Hexapod.Movement.Movement_Enabled := False;
          end if;
 
-         if State.Right_Joystick_Vertical = 16#80# then
+         V_X := Map (State.Right_Joystick_Vertical);
+         V_Y := Map (State.Right_Joystick_Horizontal);
+
+         if V_X = 0.0 and V_Y = 0.0 then
             if Gait /= Hexapod.Movement.Stop then
                Gait := Hexapod.Movement.Stop;
 
                Hexapod.Console.Put_Line ("PS2C: stop");
                Hexapod.Movement.Set_Gait (Gait);
-               Hexapod.Movement.Set_Relative_Velocity (0.0, 0.0);
             end if;
 
          else
@@ -140,9 +165,12 @@ package body Hexapod.Remote_Control is
 
                Hexapod.Console.Put_Line ("PS2C: forward");
                Hexapod.Movement.Set_Gait (Gait);
-               Hexapod.Movement.Set_Relative_Velocity (1.0, 0.0);
+
+               Hexapod.Console.Put_Line (Reals.Real'Image (V_X) & Reals.Real'Image (V_Y));
             end if;
          end if;
+
+         Hexapod.Movement.Set_Relative_Velocity (V_X, V_Y);
 
          --  Delay till next polling
 

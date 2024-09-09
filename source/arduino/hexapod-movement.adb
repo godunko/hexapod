@@ -480,10 +480,16 @@ package body Hexapod.Movement is
 
    procedure Set_Relative_Velocity
      (V_X : Reals.Real;
-      V_Y : Reals.Real) is
+      V_Y : Reals.Real)
+   is
+      L  : constant Reals.Real :=
+        Reals.Elementary_Functions.Sqrt (V_X * V_X + V_Y * V_Y);
+      NX : constant Reals.Real := (if L = 0.0 then 0.0 else V_X / L);
+      NY : constant Reals.Real := (if L = 0.0 then 0.0 else V_Y / L);
+
    begin
-      Body_Velocity_X := V_X * (0.070 / 0.5) / 5.0;
-      Body_Velocity_Y := 0.0;
+      Body_Velocity_X := V_X * NX * (0.070 / 0.5) / 5.0;
+      Body_Velocity_Y := V_Y * NY * (0.070 / 0.5) / 5.0;
    end Set_Relative_Velocity;
 
    ----------
