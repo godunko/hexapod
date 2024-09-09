@@ -6,8 +6,6 @@
 
 with Ada.Numerics;
 
-with Reals.Utilities;
-
 package body Trajectory.Steps.Leg is
 
    function T_XY_Swing
@@ -22,9 +20,7 @@ package body Trajectory.Steps.Leg is
    ------------------
 
    procedure Position_XYZ
-     (Base_X : Reals.Real;
-      Base_Y : Reals.Real;
-      Base_Z : Reals.Real;
+     (Base_Z : Reals.Real;
       Plan   : Leg_Step_Plan_Descriptor;
       Ratio  : Reals.Real;
       Fase   : Step_Fase;

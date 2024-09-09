@@ -9,9 +9,7 @@ package Trajectory.Steps.Leg is
    pragma Pure;
 
    procedure Position_XYZ
-     (Base_X : Reals.Real;
-      Base_Y : Reals.Real;
-      Base_Z : Reals.Real;
+     (Base_Z : Reals.Real;
       Plan   : Leg_Step_Plan_Descriptor;
       Ratio  : Reals.Real;
       Fase   : Step_Fase;

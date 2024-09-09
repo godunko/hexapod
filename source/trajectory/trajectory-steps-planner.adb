@@ -343,24 +343,20 @@ package body Trajectory.Steps.Planner is
    is
 
       procedure Compute
-        (Leg           : Legs.Leg_Index;
-         Result        : out Leg_Step_Plan_Descriptor;
-         Stance_Factor : Reals.Real;
-         Is_Swing      : Boolean;
-         Previous      : Integer;
-         Current       : Integer);
+        (Leg      : Legs.Leg_Index;
+         Result   : out Leg_Step_Plan_Descriptor;
+         Is_Swing : Boolean;
+         Current  : Integer);
 
       -------------
       -- Compute --
       -------------
 
       procedure Compute
-        (Leg           : Legs.Leg_Index;
-         Result        : out Leg_Step_Plan_Descriptor;
-         Stance_Factor : Reals.Real;
-         Is_Swing      : Boolean;
-         Previous      : Integer;
-         Current       : Integer) is
+        (Leg      : Legs.Leg_Index;
+         Result   : out Leg_Step_Plan_Descriptor;
+         Is_Swing : Boolean;
+         Current  : Integer) is
       begin
          if Is_Swing then
             declare
@@ -386,13 +382,7 @@ package body Trajectory.Steps.Planner is
                   PEP_Y    => Kinematics.Y (Legs.State.Position (Leg)),
                   AEP_X    => AEP_X,
                   AEP_Y    => AEP_Y,
-                  --  Length_X       => Length_X,
-                  --  Length_Y       => Length_Y,
                   Height_Z => Height_Z);
-                  --  Start_Position =>
-                  --    Reals.Real (Previous) / Reals.Real (Support_Ticks),
-                  --  End_Position   =>
-                  --    Reals.Real (Current) / Reals.Real (Support_Ticks));
             end;
 
          else
@@ -403,9 +393,8 @@ package body Trajectory.Steps.Planner is
          end if;
       end Compute;
 
-      Success       : Boolean := True;
-      Swing         : Mask_Type;
-      Stance_Factor : constant Reals.Real := 1.0;
+      Success : Boolean := True;
+      Swing   : Mask_Type;
 
    begin
       Previous_Configuration := Current_Configuration;
@@ -441,128 +430,35 @@ package body Trajectory.Steps.Planner is
           (Previous_Configuration, Current_Configuration, Current_Step_Ticks);
 
       Compute
-        (Leg           => Legs.Left_Front,
-         Result        => Result.LF,
-         Stance_Factor => Stance_Factor,
-         Is_Swing      => Swing.L_1,
-         Previous      => Previous_Configuration.L_1,
-         Current       => Current_Configuration.L_1);
+        (Leg      => Legs.Left_Front,
+         Result   => Result.LF,
+         Is_Swing => Swing.L_1,
+         Current  => Current_Configuration.L_1);
       Compute
-        (Leg           => Legs.Right_Front,
-         Result        => Result.RF,
-         Stance_Factor => Stance_Factor,
-         Is_Swing      => Swing.L_2,
-         Previous      => Previous_Configuration.L_2,
-         Current       => Current_Configuration.L_2);
+        (Leg      => Legs.Right_Front,
+         Result   => Result.RF,
+         Is_Swing => Swing.L_2,
+         Current  => Current_Configuration.L_2);
       Compute
-        (Leg           => Legs.Left_Middle,
-         Result        => Result.LM,
-         Stance_Factor => Stance_Factor,
-         Is_Swing      => Swing.L_3,
-         Previous      => Previous_Configuration.L_3,
-         Current       => Current_Configuration.L_3);
+        (Leg      => Legs.Left_Middle,
+         Result   => Result.LM,
+         Is_Swing => Swing.L_3,
+         Current  => Current_Configuration.L_3);
       Compute
-        (Leg           => Legs.Right_Middle,
-         Result        => Result.RM,
-         Stance_Factor => Stance_Factor,
-         Is_Swing      => Swing.L_4,
-         Previous      => Previous_Configuration.L_4,
-         Current       => Current_Configuration.L_4);
+        (Leg      => Legs.Right_Middle,
+         Result   => Result.RM,
+         Is_Swing => Swing.L_4,
+         Current  => Current_Configuration.L_4);
       Compute
-        (Leg           => Legs.Left_Rear,
-         Result        => Result.LH,
-         Stance_Factor => Stance_Factor,
-         Is_Swing      => Swing.L_5,
-         Previous      => Previous_Configuration.L_5,
-         Current       => Current_Configuration.L_5);
+        (Leg      => Legs.Left_Rear,
+         Result   => Result.LH,
+         Is_Swing => Swing.L_5,
+         Current  => Current_Configuration.L_5);
       Compute
-        (Leg           => Legs.Right_Rear,
-         Result        => Result.RH,
-         Stance_Factor => Stance_Factor,
-         Is_Swing      => Swing.L_6,
-         Previous      => Previous_Configuration.L_6,
-         Current       => Current_Configuration.L_6);
-
-      --  if Swing.L_1 then
-      --     LF :=
-      --       (Support     => False,
-      --        Start_Fase  =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Previous_Configuration.L_1)
-      --            / Reals.Real (Support_Ticks),
-      --        End_Fase    =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Current_Configuration.L_1)
-      --            / Reals.Real (Support_Ticks),
-      --        Swing_Begin =>
-      --          Reals.Real (Previous_Configuration.L_1)
-      --            / Reals.Real (Support_Ticks),
-      --        Swing_End   =>
-      --          Reals.Real (Current_Configuration.L_1)
-      --            / Reals.Real (Support_Ticks));
-      --
-      --  else
-      --     LF :=
-      --       (Support    => True,
-      --        Start_Fase =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Previous_Configuration.L_1)
-      --            / Reals.Real (Support_Ticks),
-      --        End_Fase   =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Current_Configuration.L_1)
-      --            / Reals.Real (Support_Ticks));
-      --  end if;
-      --
-      --  if Swing.L_2 then
-      --     RF :=
-      --       (Support           => False,
-      --        Stance_Start_Fase =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Current_Configuration.L_2) / 10.0);
-      --  else
-      --     RF:= (Support => True);
-      --  end if;
-      --
-      --  if Swing.L_3 then
-      --     LM :=
-      --       (Support           => False,
-      --        Stance_Start_Fase =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Current_Configuration.L_3) / 10.0);
-      --  else
-      --     LM:= (Support => True);
-      --  end if;
-      --
-      --  if Swing.L_4 then
-      --     RM :=
-      --       (Support           => False,
-      --        Stance_Start_Fase =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Current_Configuration.L_4) / 10.0);
-      --  else
-      --     RM:= (Support => True);
-      --  end if;
-      --
-      --  if Swing.L_5 then
-      --     LH :=
-      --       (Support           => False,
-      --        Stance_Start_Fase =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Current_Configuration.L_5) / 10.0);
-      --  else
-      --     LH:= (Support => True);
-      --  end if;
-      --
-      --  if Swing.L_6 then
-      --     RH :=
-      --       (Support           => False,
-      --        Stance_Start_Fase =>
-      --          Stance_Factor
-      --            * Reals.Real (5 - Current_Configuration.L_6) / 10.0);
-      --  else
-      --     RH:= (Support => True);
-      --  end if;
+        (Leg      => Legs.Right_Rear,
+         Result   => Result.RH,
+         Is_Swing => Swing.L_6,
+         Current  => Current_Configuration.L_6);
    end Compute_Step;
 
    ---------------

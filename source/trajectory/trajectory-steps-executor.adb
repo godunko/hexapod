@@ -33,9 +33,7 @@ package body Trajectory.Steps.Executor is
 
    begin
       Trajectory.Steps.Leg.Position_XYZ
-        (Base_X => Kinematics.X (Base),
-         Base_Y => Kinematics.Y (Base),
-         Base_Z => Kinematics.Z (Base),
+        (Base_Z => Kinematics.Z (Base),
          Plan   => Plan,
          Ratio  => Ratio,
          Fase   => Fase,
