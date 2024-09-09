@@ -216,16 +216,20 @@ package body Hexapod.Movement is
    begin
       return
         (if Item.Stage = Trajectory.Steps.Strait then "  _ " else "  ^ ")
-           & (if Item.Stage = Trajectory.Steps.Strait
-                then "              "
-                else
-                  Hexapod.Debug.Parametric_Image (Item.Start_Position, 1)
-                    & Hexapod.Debug.Parametric_Image (Item.End_Position, 1));
+        & (if Item.Stage = Trajectory.Steps.Swing then
+              Hexapod.Debug.Coordinate_Image (Item.AEP_X)
+              & Hexapod.Debug.Coordinate_Image (Item.AEP_Y)
+              & Hexapod.Debug.Coordinate_Image (Item.PEP_X)
+              & Hexapod.Debug.Coordinate_Image (Item.PEP_Y)
+           else "");
    end Image;
 
    --  function Image (Item : Trajectory.Steps.Step_Plan_Descriptor) return String is
    procedure Put (Item : Trajectory.Steps.Step_Plan_Descriptor) is
    begin
+      Hexapod.Console.Put_Line
+        (Hexapod.Debug.Coordinate_Image (Body_Velocity_X)
+         & Hexapod.Debug.Coordinate_Image (Body_Velocity_Y));
       Hexapod.Console.Put (Hexapod.Debug.Parametric_Image (Item.Ratio));
       Hexapod.Console.Put (Image (Item.LF));
       Hexapod.Console.Put (Image (Item.LM));
