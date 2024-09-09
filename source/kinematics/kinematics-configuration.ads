@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -30,7 +30,7 @@ package Kinematics.Configuration is
    LM_Base_Gamma : constant := Ada.Numerics.Pi / 2.0;
 
    LH_Base_X     : constant := -0.074;
-   LH_Base_Y     : constant := -0.048;
+   LH_Base_Y     : constant := 0.048;
    LH_Base_Z     : constant := 0.0;
    LH_Base_Gamma : constant := Ada.Numerics.Pi * 5.0 / 6.0;
 
