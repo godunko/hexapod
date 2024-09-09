@@ -10,8 +10,6 @@ with Reals.Utilities;
 
 package body Trajectory.Steps.Leg is
 
-   function T_XY_Stance (T : Step_Fase) return Trajectory_Position;
-
    function T_XY_Swing
      (Ratio : Reals.Real;
       T     : Step_Fase) return Reals.Real
@@ -46,16 +44,10 @@ package body Trajectory.Steps.Leg is
             T_XY : constant Reals.Real :=
               (case Plan.Stage is
                  when Strait => 0.0,
-                 when Stance => T_XY_Stance (Fase),
                  when Swing  => T_XY_Swing (Ratio, Fase));
             C_XY : constant Reals.Real :=
               Reals.Utilities.Map
                 (T_XY, -0.5, 0.5, Plan.Start_Position, Plan.End_Position);
-            T_Z  : constant Reals.Real :=
-              (case Plan.Stage is
-                 when Strait => 0.0,
-                 when Stance => 0.0,
-                 when Swing  => T_Z_Swing (Fase));
 
          begin
             X := Base_X + Plan.Length_X * C_XY;
@@ -64,20 +56,10 @@ package body Trajectory.Steps.Leg is
               Base_Z
                 + (case Plan.Stage is
                      when Strait => 0.0,
-                     when Stance => 0.0,
                      when Swing  => Plan.Height_Z * T_Z_Swing (Fase));
          end;
       end if;
    end Position_XYZ;
-
-   -----------------
-   -- T_XY_Stance --
-   -----------------
-
-   function T_XY_Stance (T : Step_Fase) return Trajectory_Position is
-   begin
-      return T - 0.5;
-   end T_XY_Stance;
 
    ----------------
    -- T_XY_Swing --

@@ -11,7 +11,7 @@
 --
 --  Step planner compute step parameters according to state, and step
 --  executor computes coordinates of the legs using fase parameter in range
---  [0 .. 1].
+--  [0 .. 1] at subseqent control ticks.
 
 pragma Restrictions (No_Elaboration_Code);
 
@@ -23,10 +23,10 @@ package Trajectory.Steps is
 
    use type Reals.Real;
 
-   type Stage_Kind is (Strait, Stance, Swing);
+   type Stage_Kind is (Strait, Swing);
 
    subtype Step_Fase is Reals.Real range 0.0 .. 1.0;
---
+
 --     subtype Stage_Fase is Reals.Real range 0.0 .. 1.0;
 --
 --     subtype Stance_Fase is Stage_Fase;
@@ -35,13 +35,14 @@ package Trajectory.Steps is
 
    subtype Trajectory_Position is Reals.Real range -0.5 .. 0.5;
 
-   type Leg_Step_Plan_Descriptor (Stage : Stage_Kind := Stance) is record
+   type Leg_Step_Plan_Descriptor (Stage : Stage_Kind := Strait) is record
       case Stage is
          when Strait =>
             D_X : Reals.Real;
             D_Y : Reals.Real;
+            --  Leg's trajectory delta at each control tick.
 
-         when Stance | Swing =>
+         when Swing =>
             Length_X       : Reals.Real;
             Length_Y       : Reals.Real;
             --  Projection of the stance trajectory on X and Y axes.
@@ -50,28 +51,19 @@ package Trajectory.Steps is
             End_Position   : Trajectory_Position;
             --  Start position and end positions of the step on the trajectory.
 
-            case Stage is
-               when Strait =>
-                  null;
-
-               when Stance =>
-                  null;
-
-               when Swing =>
-                  Height_Z : Reals.Real;
-                  --  Height of the swing.
-            end case;
+            Height_Z : Reals.Real;
+            --  Height of the swing.
       end case;
    end record;
 
    type Step_Plan_Descriptor is record
       Ratio : Reals.Real               := 0.0;
-      LF    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
-      LM    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
-      LH    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
-      RF    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
-      RM    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
-      RH    : Leg_Step_Plan_Descriptor := (Stance, 0.0, 0.0, 0.0, 0.0);
+      LF    : Leg_Step_Plan_Descriptor := (Strait, 0.0, 0.0);
+      LM    : Leg_Step_Plan_Descriptor := (Strait, 0.0, 0.0);
+      LH    : Leg_Step_Plan_Descriptor := (Strait, 0.0, 0.0);
+      RF    : Leg_Step_Plan_Descriptor := (Strait, 0.0, 0.0);
+      RM    : Leg_Step_Plan_Descriptor := (Strait, 0.0, 0.0);
+      RH    : Leg_Step_Plan_Descriptor := (Strait, 0.0, 0.0);
    end record;
 
 end Trajectory.Steps;

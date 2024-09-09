@@ -218,11 +218,12 @@ package body Hexapod.Movement is
 
    begin
       return
-        (if Item.Stage = Trajectory.Steps.Stance then "  _ " else "  ^ ")
-         & (if Item.Stage /= Trajectory.Steps.Strait then
-               Hexapod.Debug.Parametric_Image (Item.Start_Position, 1)
-            & Hexapod.Debug.Parametric_Image (Item.End_Position, 1)
-            else "");
+        (if Item.Stage = Trajectory.Steps.Strait then "  _ " else "  ^ ")
+           & (if Item.Stage = Trajectory.Steps.Strait
+                then "              "
+                else
+                  Hexapod.Debug.Parametric_Image (Item.Start_Position, 1)
+                    & Hexapod.Debug.Parametric_Image (Item.End_Position, 1));
    end Image;
 
    --  function Image (Item : Trajectory.Steps.Step_Plan_Descriptor) return String is
