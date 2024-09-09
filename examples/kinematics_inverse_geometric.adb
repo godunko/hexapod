@@ -81,10 +81,10 @@ begin
       Put (Desired_Position);
       Put (": ");
 
-      Kinematics.Inverse.Geometric.RF_Solve
-        (Desired_Position,
-         Found_Posture,
-         Success);
+      --  Kinematics.Inverse.Geometric.RF_Solve
+      --    (Desired_Position,
+      --     Found_Posture,
+      --     Success);
 
       if Success then
          Put (Found_Posture);
