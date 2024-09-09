@@ -84,9 +84,9 @@ package body Legs is
             D     => Kinematics.Configuration.LF_DH_D2,
             Alpha => Kinematics.Configuration.LF_DH_Alpha2),
          Segment_3 =>
-           (R     => Kinematics.Configuration.LF_DH_R2,
-            D     => Kinematics.Configuration.LF_DH_D2,
-            Alpha => Kinematics.Configuration.LF_DH_Alpha2));
+           (R     => Kinematics.Configuration.LF_DH_R3,
+            D     => Kinematics.Configuration.LF_DH_D3,
+            Alpha => Kinematics.Configuration.LF_DH_Alpha3));
       Initialize
         (Self      => Legs (Left_Middle),
          Side      => Standard.Legs.Left,
@@ -104,9 +104,9 @@ package body Legs is
             D     => Kinematics.Configuration.LM_DH_D2,
             Alpha => Kinematics.Configuration.LM_DH_Alpha2),
          Segment_3 =>
-           (R     => Kinematics.Configuration.LM_DH_R2,
-            D     => Kinematics.Configuration.LM_DH_D2,
-            Alpha => Kinematics.Configuration.LM_DH_Alpha2));
+           (R     => Kinematics.Configuration.LM_DH_R3,
+            D     => Kinematics.Configuration.LM_DH_D3,
+            Alpha => Kinematics.Configuration.LM_DH_Alpha3));
       Initialize
         (Self      => Legs (Left_Rear),
          Side      => Standard.Legs.Left,
@@ -124,9 +124,9 @@ package body Legs is
             D     => Kinematics.Configuration.LH_DH_D2,
             Alpha => Kinematics.Configuration.LH_DH_Alpha2),
          Segment_3 =>
-           (R     => Kinematics.Configuration.LH_DH_R2,
-            D     => Kinematics.Configuration.LH_DH_D2,
-            Alpha => Kinematics.Configuration.LH_DH_Alpha2));
+           (R     => Kinematics.Configuration.LH_DH_R3,
+            D     => Kinematics.Configuration.LH_DH_D3,
+            Alpha => Kinematics.Configuration.LH_DH_Alpha3));
       Initialize
         (Self      => Legs (Right_Front),
          Side      => Standard.Legs.Right,
@@ -144,9 +144,9 @@ package body Legs is
             D     => Kinematics.Configuration.RF_DH_D2,
             Alpha => Kinematics.Configuration.RF_DH_Alpha2),
          Segment_3 =>
-           (R     => Kinematics.Configuration.RF_DH_R2,
-            D     => Kinematics.Configuration.RF_DH_D2,
-            Alpha => Kinematics.Configuration.RF_DH_Alpha2));
+           (R     => Kinematics.Configuration.RF_DH_R3,
+            D     => Kinematics.Configuration.RF_DH_D3,
+            Alpha => Kinematics.Configuration.RF_DH_Alpha3));
       Initialize
         (Self      => Legs (Right_Middle),
          Side      => Standard.Legs.Right,
@@ -164,9 +164,9 @@ package body Legs is
             D     => Kinematics.Configuration.RM_DH_D2,
             Alpha => Kinematics.Configuration.RM_DH_Alpha2),
          Segment_3 =>
-           (R     => Kinematics.Configuration.RM_DH_R2,
-            D     => Kinematics.Configuration.RM_DH_D2,
-            Alpha => Kinematics.Configuration.RM_DH_Alpha2));
+           (R     => Kinematics.Configuration.RM_DH_R3,
+            D     => Kinematics.Configuration.RM_DH_D3,
+            Alpha => Kinematics.Configuration.RM_DH_Alpha3));
       Initialize
         (Self      => Legs (Right_Rear),
          Side      => Standard.Legs.Right,
@@ -184,9 +184,9 @@ package body Legs is
             D     => Kinematics.Configuration.RH_DH_D2,
             Alpha => Kinematics.Configuration.RH_DH_Alpha2),
          Segment_3 =>
-           (R     => Kinematics.Configuration.RH_DH_R2,
-            D     => Kinematics.Configuration.RH_DH_D2,
-            Alpha => Kinematics.Configuration.RH_DH_Alpha2));
+           (R     => Kinematics.Configuration.RH_DH_R3,
+            D     => Kinematics.Configuration.RH_DH_D3,
+            Alpha => Kinematics.Configuration.RH_DH_Alpha3));
    end Initialize;
 
    ------------------------
