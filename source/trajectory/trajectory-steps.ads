@@ -43,13 +43,12 @@ package Trajectory.Steps is
             --  Leg's trajectory delta at each control tick.
 
          when Swing =>
-            Length_X       : Reals.Real;
-            Length_Y       : Reals.Real;
-            --  Projection of the stance trajectory on X and Y axes.
-
-            Start_Position : Trajectory_Position;
-            End_Position   : Trajectory_Position;
-            --  Start position and end positions of the step on the trajectory.
+            PEP_X    : Reals.Real;
+            PEP_Y    : Reals.Real;
+            --  Posterior extreme position: lift-off point
+            AEP_X    : Reals.Real;
+            AEP_Y    : Reals.Real;
+            --  anterior extreme position: touch-down point
 
             Height_Z : Reals.Real;
             --  Height of the swing.

@@ -40,18 +40,17 @@ package body Trajectory.Steps.Leg is
          Y := @ + Plan.D_Y;
 
       else
+         --  Swing of the leg
+
          declare
             T_XY : constant Reals.Real :=
               (case Plan.Stage is
                  when Strait => 0.0,
                  when Swing  => T_XY_Swing (Ratio, Fase));
-            C_XY : constant Reals.Real :=
-              Reals.Utilities.Map
-                (T_XY, -0.5, 0.5, Plan.Start_Position, Plan.End_Position);
 
          begin
-            X := Base_X + Plan.Length_X * C_XY;
-            Y := Base_Y + Plan.Length_Y * C_XY;
+            X := Plan.PEP_X + (Plan.AEP_X - Plan.PEP_X) * (T_XY + 0.5);
+            Y := Plan.PEP_Y + (Plan.AEP_Y - Plan.PEP_Y) * (T_XY + 0.5);
             Z :=
               Base_Z
                 + (case Plan.Stage is

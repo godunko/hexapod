@@ -4,6 +4,10 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with Kinematics;
+with Legs.State;
+with Legs.Workspace;
+
 package body Trajectory.Steps.Planner is
 
    type Mask_Type is record
@@ -339,7 +343,8 @@ package body Trajectory.Steps.Planner is
    is
 
       procedure Compute
-        (Result        : out Leg_Step_Plan_Descriptor;
+        (Leg           : Legs.Leg_Index;
+         Result        : out Leg_Step_Plan_Descriptor;
          Stance_Factor : Reals.Real;
          Is_Swing      : Boolean;
          Previous      : Integer;
@@ -350,22 +355,45 @@ package body Trajectory.Steps.Planner is
       -------------
 
       procedure Compute
-        (Result        : out Leg_Step_Plan_Descriptor;
+        (Leg           : Legs.Leg_Index;
+         Result        : out Leg_Step_Plan_Descriptor;
          Stance_Factor : Reals.Real;
          Is_Swing      : Boolean;
          Previous      : Integer;
          Current       : Integer) is
       begin
          if Is_Swing then
-            Result :=
-              (Stage          => Swing,
-               Length_X       => Length_X,
-               Length_Y       => Length_Y,
-               Height_Z       => Height_Z,
-               Start_Position =>
-                 Reals.Real (Previous) / Reals.Real (Support_Ticks),
-               End_Position   =>
-                 Reals.Real (Current) / Reals.Real (Support_Ticks));
+            declare
+               Center       : Kinematics.Position;
+               Center_X     : Reals.Real;
+               Center_Y     : Reals.Real;
+               AEP_X        : Reals.Real;
+               AEP_Y        : Reals.Real;
+               End_Position : Reals.Real :=
+                 Reals.Real (Current) / Reals.Real (Support_Ticks);
+
+            begin
+               Legs.Workspace.Ground_Center (Leg, Center);
+               Center_X := Kinematics.X (Center);
+               Center_Y := Kinematics.Y (Center);
+
+               AEP_X := End_Position * Length_X + Center_X;
+               AEP_Y := End_Position * Length_Y + Center_Y;
+
+               Result :=
+                 (Stage    => Swing,
+                  PEP_X    => Kinematics.X (Legs.State.Position (Leg)),
+                  PEP_Y    => Kinematics.Y (Legs.State.Position (Leg)),
+                  AEP_X    => AEP_X,
+                  AEP_Y    => AEP_Y,
+                  --  Length_X       => Length_X,
+                  --  Length_Y       => Length_Y,
+                  Height_Z => Height_Z);
+                  --  Start_Position =>
+                  --    Reals.Real (Previous) / Reals.Real (Support_Ticks),
+                  --  End_Position   =>
+                  --    Reals.Real (Current) / Reals.Real (Support_Ticks));
+            end;
 
          else
             Result :=
@@ -413,37 +441,43 @@ package body Trajectory.Steps.Planner is
           (Previous_Configuration, Current_Configuration, Current_Step_Ticks);
 
       Compute
-        (Result        => Result.LF,
+        (Leg           => Legs.Left_Front,
+         Result        => Result.LF,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_1,
          Previous      => Previous_Configuration.L_1,
          Current       => Current_Configuration.L_1);
       Compute
-        (Result        => Result.RF,
+        (Leg           => Legs.Right_Front,
+         Result        => Result.RF,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_2,
          Previous      => Previous_Configuration.L_2,
          Current       => Current_Configuration.L_2);
       Compute
-        (Result        => Result.LM,
+        (Leg           => Legs.Left_Middle,
+         Result        => Result.LM,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_3,
          Previous      => Previous_Configuration.L_3,
          Current       => Current_Configuration.L_3);
       Compute
-        (Result        => Result.RM,
+        (Leg           => Legs.Right_Middle,
+         Result        => Result.RM,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_4,
          Previous      => Previous_Configuration.L_4,
          Current       => Current_Configuration.L_4);
       Compute
-        (Result        => Result.LH,
+        (Leg           => Legs.Left_Rear,
+         Result        => Result.LH,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_5,
          Previous      => Previous_Configuration.L_5,
          Current       => Current_Configuration.L_5);
       Compute
-        (Result        => Result.RH,
+        (Leg           => Legs.Right_Rear,
+         Result        => Result.RH,
          Stance_Factor => Stance_Factor,
          Is_Swing      => Swing.L_6,
          Previous      => Previous_Configuration.L_6,
