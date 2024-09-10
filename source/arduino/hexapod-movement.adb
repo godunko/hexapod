@@ -173,21 +173,17 @@ package body Hexapod.Movement is
 
    Tick_Duration : constant := 1.0 / Ticks;
 
-   Cycle_Time    : Reals.Real := 0.0;
+   Cycle_Time  : Reals.Real := 0.0;
 
-   Step_Height   : constant := 0.020;
+   Step_Height : constant := 0.030;
+   Body_Height : constant := 0.070;
 
-   Step_Plan : Trajectory.Steps.Step_Plan_Descriptor := (others => <>);
-   --    (Ratio => 0.0,
-   --     LF    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
-   --     LM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
-   --     LH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
-   --     RF    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
-   --     RM    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0),
-   --     RH    => (Trajectory.Steps.Stance, 0.0, 0.0, 0.0, 0.0));
+   Step_Plan   : Trajectory.Steps.Step_Plan_Descriptor := (others => <>);
 
    Body_Velocity_X : Reals.Real := 0.0;
    Body_Velocity_Y : Reals.Real := 0.0;
+   Length_X        : Reals.Real := 0.0;
+   Length_Y        : Reals.Real := 0.0;
 
    type States is (Initial, Configuration, Active);
 
@@ -244,11 +240,9 @@ package body Hexapod.Movement is
    ----------------
 
    procedure Initialize is
-      Height  : constant := 0.050;
-
    begin
       Legs.Initialize;
-      Legs.Workspace.Compute (Height);
+      Legs.Workspace.Compute (Body_Height);
 
       for J in Legs.Leg_Index loop
          Legs.Workspace.Ground_Center (J, Legs.State.Position (J));
@@ -342,7 +336,7 @@ package body Hexapod.Movement is
       Legs.Workspace.Ground_Center (Legs.Right_Rear,   RH_Center);
 
       Trajectory.Steps.Planner.Compute_Step
-        (0.070, 0.000, 0.0, 0.0, Step_Height, Step_Plan);
+        (Length_X, Length_Y, 0.0, 0.0, Step_Height, Step_Plan);
       Trajectory.Steps.Executor.Compute_Position
         (LF_Base     => LF_Center,
          LM_Base     => LM_Center,
@@ -486,14 +480,20 @@ package body Hexapod.Movement is
      (V_X : Reals.Real;
       V_Y : Reals.Real)
    is
+      R  : constant Reals.Real := 0.050;
+      --  Radius of the workspace, safe value. Need to be computed.
+
       L  : constant Reals.Real :=
         Reals.Elementary_Functions.Sqrt (V_X * V_X + V_Y * V_Y);
       NX : constant Reals.Real := (if L = 0.0 then 0.0 else V_X / L);
       NY : constant Reals.Real := (if L = 0.0 then 0.0 else V_Y / L);
 
    begin
-      Body_Velocity_X := V_X * NX * (0.070 / 0.5) / 5.0;
-      Body_Velocity_Y := V_Y * NY * (0.070 / 0.5) / 5.0;
+      Body_Velocity_X := V_X * NX * (2.0 * R / 0.5) / 5.0;
+      Body_Velocity_Y := V_Y * NY * (2.0 * R / 0.5) / 5.0;
+
+      Length_X := 2.0 * R * NX;
+      Length_Y := 2.0 * R * NY;
    end Set_Relative_Velocity;
 
    ----------
@@ -518,7 +518,7 @@ package body Hexapod.Movement is
       if Cycle_Time >= Cycle then
          Cycle_Time := 0.0;
          Trajectory.Steps.Planner.Compute_Step
-           (0.070, 0.000,
+           (Length_X, Length_Y,
             - Body_Velocity_X / Reals.Real (Ticks),
             - Body_Velocity_Y / Reals.Real (Ticks),
             Step_Height, Step_Plan);
