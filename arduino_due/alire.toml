@@ -15,6 +15,9 @@ generate_ada = false
 generate_c = false
 generate_gpr = true
 
+[configuration.values]
+cgk.Float_Size = "32"
+
 [[depends-on]]
 a0b_armv7m_systick_clock = "*"
 a0b_atsam3x8e_tc5_timer = "*"
@@ -22,6 +25,7 @@ a0b_atsam3x8e_twi_i2c = "*"
 a0b_atsam3x8e_usart = "*"
 a0b_playstation2_controller = "*"
 a0b_tasking = "*"
+cgk = "*"
 light_arduino_due = "*"
 
 [[pins]]
@@ -42,3 +46,4 @@ a0b_spi = { path='../subprojects/a0b-spi' }
 a0b_tasking = { path='../subprojects/a0b-tasking' }
 a0b_time = { path='../subprojects/a0b-time' }
 a0b_timer = { path='../subprojects/a0b-timer' }
+cgk = { path='../subprojects/cgk' }
