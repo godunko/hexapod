@@ -1,0 +1,22 @@
+name = "phoenix_hexapod_examples"
+description = "Phoenyx Hexapod"
+version = "0.1.0-dev"
+
+authors = ["Vadim Godunko"]
+maintainers = ["Vadim Godunko <vgodunko@gmail.com>"]
+maintainers-logins = ["godunko"]
+licenses = "Apache-2.0 WITH LLVM-exception"
+tags = []
+
+project-files = ["../gnat/examples.gpr"]
+
+[configuration]
+generate_ada = false
+generate_c = false
+generate_gpr = true
+
+[[depends-on]]
+cgk = "*"
+
+[[pins]]
+cgk = { path='../subprojects/cgk' }
