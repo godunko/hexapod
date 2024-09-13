@@ -13,13 +13,14 @@ project Examples is
    for Object_Dir use "../.objs";
    for Exec_Dir use "../bin";
    for Main use
-     ("kinematics_inverse_algebraic.adb",
+     ("free_gait_linear.adb",
+      "kinematics_inverse_algebraic.adb",
       "kinematics_inverse_geometric.adb",
       "kinematics_inverse_gradient_descent.adb",
       "kinematics_inverse_levenberg_marquardt.adb",
       "max_plus_test.adb",
       "trajectory_path.adb",
-      "trajectory_steps.adb",
+      --  "trajectory_steps.adb",
       "trajectory_wave_gait.adb");
 
    package Compiler is
