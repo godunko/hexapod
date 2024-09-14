@@ -19,8 +19,8 @@ with BBF.PCA9685;
 
 with Kinematics;
 with Legs.State;
+with Legs.Trajectory_Generator;
 with Legs.Workspace;
-with Trajectory.Steps.Executor;
 with Trajectory.Steps.Planner;
 
 with Hexapod.Console;
@@ -31,23 +31,27 @@ package body Hexapod.Movement is
 
    use type Reals.Real;
 
-   LF_Position : Kinematics.Position
-     renames Legs.State.Position (Legs.Left_Front);
-   LM_Position : Kinematics.Position
-     renames Legs.State.Position (Legs.Left_Middle);
-   LH_Position : Kinematics.Position
-     renames Legs.State.Position (Legs.Left_Rear);
-   RF_Position : Kinematics.Position
-     renames Legs.State.Position (Legs.Right_Front);
-   RM_Position : Kinematics.Position
-     renames Legs.State.Position (Legs.Right_Middle);
-   RH_Position : Kinematics.Position
-     renames Legs.State.Position (Legs.Right_Rear);
+   LF_Posture  : Kinematics.Posture
+     renames Legs.State.Posture (Legs.Left_Front);
+   LM_Posture  : Kinematics.Posture
+     renames Legs.State.Posture (Legs.Left_Middle);
+   LH_Posture  : Kinematics.Posture
+     renames Legs.State.Posture (Legs.Left_Rear);
+   RF_Posture  : Kinematics.Posture
+     renames Legs.State.Posture (Legs.Right_Front);
+   RM_Posture  : Kinematics.Posture
+     renames Legs.State.Posture (Legs.Right_Middle);
+   RH_Posture  : Kinematics.Posture
+     renames Legs.State.Posture (Legs.Right_Rear);
 
    TCB : aliased A0B.Tasking.Task_Control_Block;
 
    procedure Task_Subprogram;
    --  Task thread subprogram.
+
+   procedure Update_Plan
+     (Leg   : Legs.Leg_Index;
+      Plan  : Trajectory.Steps.Leg_Step_Plan_Descriptor);
 
    type Motor_Descriptor is record
       Channel   : not null access BBF.PCA9685.PCA9685_Channel'Class;
@@ -243,10 +247,7 @@ package body Hexapod.Movement is
    begin
       Legs.Initialize;
       Legs.Workspace.Compute (Body_Height);
-
-      for J in Legs.Leg_Index loop
-         Legs.Workspace.Ground_Center (J, Legs.State.Position (J));
-      end loop;
+      Legs.Trajectory_Generator.Initialize;
    end Initialize;
 
    ----------
@@ -318,124 +319,31 @@ package body Hexapod.Movement is
    -------------
 
    procedure Prepare is
-      LF_Center : Kinematics.Position;
-      LM_Center : Kinematics.Position;
-      LH_Center : Kinematics.Position;
-      RF_Center : Kinematics.Position;
-      RM_Center : Kinematics.Position;
-      RH_Center : Kinematics.Position;
-      Posture   : Kinematics.Posture;
-      Success   : Boolean;
-
    begin
-      Legs.Workspace.Ground_Center (Legs.Left_Front,   LF_Center);
-      Legs.Workspace.Ground_Center (Legs.Left_Middle,  LM_Center);
-      Legs.Workspace.Ground_Center (Legs.Left_Rear,    LH_Center);
-      Legs.Workspace.Ground_Center (Legs.Right_Front,  RF_Center);
-      Legs.Workspace.Ground_Center (Legs.Right_Middle, RM_Center);
-      Legs.Workspace.Ground_Center (Legs.Right_Rear,   RH_Center);
-
       Trajectory.Steps.Planner.Compute_Step
         (Length_X, Length_Y, 0.0, 0.0, Step_Height, Step_Plan);
-      Trajectory.Steps.Executor.Compute_Position
-        (LF_Base     => LF_Center,
-         LM_Base     => LM_Center,
-         LH_Base     => LH_Center,
-         RF_Base     => RF_Center,
-         RM_Base     => RM_Center,
-         RH_Base     => RH_Center,
-         Plan        => Step_Plan,
-         Fase        => 1.0,
-         LF_Position => LF_Position,
-         LM_Position => LM_Position,
-         LH_Position => LH_Position,
-         RF_Position => RF_Position,
-         RM_Position => RM_Position,
-         RH_Position => RH_Position);
+
+      Update_Plan (Legs.Left_Front,   Step_Plan.LF);
+      Update_Plan (Legs.Left_Middle,  Step_Plan.LM);
+      Update_Plan (Legs.Left_Rear,    Step_Plan.LH);
+      Update_Plan (Legs.Right_Front,  Step_Plan.RF);
+      Update_Plan (Legs.Right_Middle, Step_Plan.RM);
+      Update_Plan (Legs.Right_Rear,   Step_Plan.RH);
 
       --  LF & RH
 
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Left_Front),
-         Desired_Position => LF_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, LF_M_1, LF_M_2, LF_M_3, 50);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Right_Rear),
-         Desired_Position => RH_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, RH_M_1, RH_M_2, RH_M_3, 50);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
+      Move (LF_Posture, LF_M_1, LF_M_2, LF_M_3, 50);
+      Move (RH_Posture, RH_M_1, RH_M_2, RH_M_3, 50);
 
       --  LM & RM
 
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Left_Middle),
-         Desired_Position => LM_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, LM_M_1, LM_M_2, LM_M_3, 50);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Right_Middle),
-         Desired_Position => RM_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, RM_M_1, RM_M_2, RM_M_3, 50);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
+      Move (LM_Posture, LM_M_1, LM_M_2, LM_M_3, 50);
+      Move (RM_Posture, RM_M_1, RM_M_2, RM_M_3, 50);
 
       --  LH & RF
 
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Left_Rear),
-         Desired_Position => LH_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, LH_M_1, LH_M_2, LH_M_3, 50);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Right_Front),
-         Desired_Position => RF_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, RF_M_1, RF_M_2, RF_M_3, 50);
-
-      else
-         Console.Put (" NO SOLUTION");
-      end if;
+      Move (LH_Posture, LH_M_1, LH_M_2, LH_M_3, 50);
+      Move (RF_Posture, RF_M_1, RF_M_2, RF_M_3, 50);
    end Prepare;
 
    -------------------
@@ -501,15 +409,6 @@ package body Hexapod.Movement is
    ----------
 
    procedure Step is
-      LF_Center : Kinematics.Position;
-      LM_Center : Kinematics.Position;
-      LH_Center : Kinematics.Position;
-      RF_Center : Kinematics.Position;
-      RM_Center : Kinematics.Position;
-      RH_Center : Kinematics.Position;
-      Posture   : Kinematics.Posture;
-      Success   : Boolean;
-
    begin
       --  Hexapod.Console.Put ("*");
 
@@ -525,123 +424,26 @@ package body Hexapod.Movement is
 
          Put (Step_Plan);
          Hexapod.Console.New_Line;
+
+         Update_Plan (Legs.Left_Front,   Step_Plan.LF);
+         Update_Plan (Legs.Left_Middle,  Step_Plan.LM);
+         Update_Plan (Legs.Left_Rear,    Step_Plan.LH);
+         Update_Plan (Legs.Right_Front,  Step_Plan.RF);
+         Update_Plan (Legs.Right_Middle, Step_Plan.RM);
+         Update_Plan (Legs.Right_Rear,   Step_Plan.RH);
       end if;
 
-      Legs.Workspace.Ground_Center (Legs.Left_Front,   LF_Center);
-      Legs.Workspace.Ground_Center (Legs.Left_Middle,  LM_Center);
-      Legs.Workspace.Ground_Center (Legs.Left_Rear,    LH_Center);
-      Legs.Workspace.Ground_Center (Legs.Right_Front,  RF_Center);
-      Legs.Workspace.Ground_Center (Legs.Right_Middle, RM_Center);
-      Legs.Workspace.Ground_Center (Legs.Right_Rear,   RH_Center);
-
-      Trajectory.Steps.Executor.Compute_Position
-        (LF_Base     => LF_Center,
-         LM_Base     => LM_Center,
-         LH_Base     => LH_Center,
-         RF_Base     => RF_Center,
-         RM_Base     => RM_Center,
-         RH_Base     => RH_Center,
-         Plan        => Step_Plan,
-         Fase        => Cycle_Time / Cycle,
-         LF_Position => LF_Position,
-         LM_Position => LM_Position,
-         LH_Position => LH_Position,
-         RF_Position => RF_Position,
-         RM_Position => RM_Position,
-         RH_Position => RH_Position);
+      Legs.Trajectory_Generator.Tick;
 
       Hexapod.Hardware.Left_Servo_Controller.Start_Transaction;
       Hexapod.Hardware.Right_Servo_Controller.Start_Transaction;
 
-      --  LF
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Left_Front),
-         Desired_Position => LF_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, LF_M_1, LF_M_2, LF_M_3, 0);
-
-      --  else
-      --     Console.Put_Line ("NO SOLUTION");
-      end if;
-
-      --  LM
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Left_Middle),
-         Desired_Position => LM_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, LM_M_1, LM_M_2, LM_M_3, 0);
-
-      --  else
-      --     Console.Put_Line ("NO SOLUTION");
-      end if;
-
-      --  LH
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Left_Rear),
-         Desired_Position => LH_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, LH_M_1, LH_M_2, LH_M_3, 0);
-
-      --  else
-      --     Console.Put_Line ("NO SOLUTION");
-      end if;
-
-      --  RF
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Right_Front),
-         Desired_Position => RF_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, RF_M_1, RF_M_2, RF_M_3, 0);
-
-      --  else
-      --     Console.Put_Line ("NO SOLUTION");
-      end if;
-
-      --  RM
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Right_Middle),
-         Desired_Position => RM_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, RM_M_1, RM_M_2, RM_M_3, 0);
-
-      --  else
-      --     Console.Put_Line ("NO SOLUTION");
-      end if;
-
-      --  RH
-
-      Standard.Legs.Inverse_Kinematics
-        (Self             => Legs.Legs (Legs.Right_Rear),
-         Desired_Position => RH_Position,
-         Found_Posture    => Posture,
-         Success          => Success);
-
-      if Success then
-         Move (Posture, RH_M_1, RH_M_2, RH_M_3, 0);
-
-      --  else
-      --     Console.Put_Line ("NO SOLUTION");
-      end if;
+      Move (LF_Posture, LF_M_1, LF_M_2, LF_M_3, 0);
+      Move (LM_Posture, LM_M_1, LM_M_2, LM_M_3, 0);
+      Move (LH_Posture, LH_M_1, LH_M_2, LH_M_3, 0);
+      Move (RF_Posture, RF_M_1, RF_M_2, RF_M_3, 0);
+      Move (RM_Posture, RM_M_1, RM_M_2, RM_M_3, 0);
+      Move (RH_Posture, RH_M_1, RH_M_2, RH_M_3, 0);
 
       Hexapod.Hardware.Left_Servo_Controller.Commit_Transaction;
       Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction;
@@ -654,7 +456,6 @@ package body Hexapod.Movement is
    Cur_Cycles : A0B.Types.Unsigned_32 := 0 with Volatile;
    Max_Cycles : A0B.Types.Unsigned_32 := 0 with Volatile;
    Min_Cycles : A0B.Types.Unsigned_32 := A0B.Types.Unsigned_32'Last with Volatile;
-
 
    procedure Task_Subprogram is
    begin
@@ -705,5 +506,23 @@ package body Hexapod.Movement is
          end loop;
       end;
    end Task_Subprogram;
+
+   -----------------
+   -- Update_Plan --
+   -----------------
+
+   procedure Update_Plan
+     (Leg   : Legs.Leg_Index;
+      Plan  : Trajectory.Steps.Leg_Step_Plan_Descriptor) is
+   begin
+      case Plan.Stage is
+         when Trajectory.Steps.Strait =>
+            Legs.Trajectory_Generator.Set_Linear (Leg, Plan.D_X, Plan.D_Y);
+
+         when Trajectory.Steps.Swing =>
+            Legs.Trajectory_Generator.Set_Swing
+              (Leg, Plan.AEP_X, Plan.AEP_Y, Plan.Height_Z);
+      end case;
+   end Update_Plan;
 
 end Hexapod.Movement;

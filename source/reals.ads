@@ -1,11 +1,12 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 with Ada.Numerics.Generic_Elementary_Functions;
-with Interfaces;
+
+with CGK.Reals;
 
 with Mathematics.Generic_Matricies_3x3;
 with Mathematics.Generic_Transformations_3D.Generic_HD_Constructors;
@@ -16,7 +17,7 @@ package Reals is
 
    pragma Pure;
 
-   type Real is new Interfaces.IEEE_Float_32;
+   subtype Real is CGK.Reals.Real;
 
    package Elementary_Functions is
      new Ada.Numerics.Generic_Elementary_Functions (Real);

@@ -5,6 +5,7 @@
 --
 
 with "phoenyx_common.gpr";
+with "cgk_primitives.gpr";
 
 project Mathematics is
 

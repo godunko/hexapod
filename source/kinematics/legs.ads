@@ -55,8 +55,12 @@ is
    end record;
 
    type Leg_Index is
-     (Left_Front,  Left_Middle,  Left_Rear,
-      Right_Front, Right_Middle, Right_Rear);
+     (Right_Rear, Right_Middle, Right_Front,
+      Left_Front, Left_Middle, Left_Rear);
+   --  Leg's indicies.
+   --
+   --  Legs are listed in counter-clockwise order to avoid use of the mapping
+   --  by the free gait generator.
 
    Legs : array (Leg_Index) of Leg_Information;
 
