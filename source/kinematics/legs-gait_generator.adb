@@ -202,7 +202,9 @@ package body Legs.Gait_Generator is
             PEP_Tick => Current_Tick + T);
       end Update_State;
 
-      Current       : Point_2D;
+      Current       : constant Point_2D :=
+        Create_Point_2D
+          (Kinematics.X (Position (Leg)), Kinematics.Y (Position (Leg)));
       Path          : Line_2D;
       Workspace     : Circle_2D;
       Intersections : Analytical_Intersection_2D;
@@ -214,21 +216,33 @@ package body Legs.Gait_Generator is
       Length_2      : Real;
 
    begin
-      if Velocity_X = 0.0 and Velocity_Y = 0.0 then
-         return;
-      end if;
-
       --  Compute bounded workspace.
 
       Standard.Legs.Workspace.Get_Bounding_Shape (Leg, Workspace);
       Workspace :=
         Create_Circle_2D (Center (Workspace), Radius (Workspace) / 2.0);
 
+      --  Special case to shutdown on stop
+
+      if Velocity_X = 0.0 and Velocity_Y = 0.0 then
+         Standard.Legs.Trajectory_Generator.Set_Linear (Leg, 0.0, 0.0);
+
+         if Current = Center (Workspace) then
+            State (Leg) :=
+              (Kind     => Stance,
+               PEP_Tick => Natural'Last);
+
+         else
+            State (Leg) :=
+              (Kind     => Stance,
+               PEP_Tick => Current_Tick);
+         end if;
+
+         return;
+      end if;
+
       --  Compute path line
 
-      Current :=
-        Create_Point_2D
-          (Kinematics.X (Position (Leg)), Kinematics.Y (Position (Leg)));
       Path := Create_Line_2D (Current, Velocity_Direction);
 
       --  Compute intersections of path line with workspace circle
@@ -264,7 +278,7 @@ package body Legs.Gait_Generator is
             Update_State (Length_1);
 
          elsif Forward_2 then
-            raise Program_Error;
+            Update_State (Length_2);
 
          else
             --  Close to workspace edge, but outside of it.
@@ -317,20 +331,25 @@ package body Legs.Gait_Generator is
       Length_2         : Real;
 
    begin
-      if Velocity_X = 0.0 and Velocity_Y = 0.0 then
-         raise Program_Error;
-      end if;
-
       --  Compute bounded workspace.
 
       Standard.Legs.Workspace.Get_Bounding_Shape (Leg, Workspace);
-      Workspace :=
+      Workspace        :=
         Create_Circle_2D (Center (Workspace), Radius (Workspace) / 2.0);
+      Workspace_Center := Center (Workspace);
+
+      --  Special case to shutdown on stop
+
+      if Velocity_X = 0.0 and Velocity_Y = 0.0 then
+         Standard.Legs.Trajectory_Generator.Set_Linear (Leg, 0.0, 0.0);
+         AEP := Workspace_Center;
+
+         return;
+      end if;
 
       --  Compute path line
 
-      Workspace_Center := Center (Workspace);
-      Path             := Create_Line_2D (Workspace_Center, Velocity_Direction);
+      Path := Create_Line_2D (Workspace_Center, Velocity_Direction);
 
       --  Compute intersections of path line with workspace circle
 
