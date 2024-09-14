@@ -6,6 +6,8 @@
 
 pragma Restrictions (No_Elaboration_Code);
 
+with CGK.Reals;
+
 package body Legs.Workspace is
 
    type Workspace is record
@@ -59,6 +61,35 @@ package body Legs.Workspace is
          Center_Z => -Body_Height,
          Radius   => Radius);
    end Compute_Workspace;
+
+   ------------------------
+   -- Get_Bounding_Shape --
+   ------------------------
+
+   procedure Get_Bounding_Shape
+     (Index  : Leg_Index;
+      Result : out CGK.Primitives.Circles_2D.Circle_2D) is
+   begin
+      Result :=
+        CGK.Primitives.Circles_2D.Create_Circle_2D
+          (X      => CGK.Reals.Real (Workspaces (Index).Center_X),
+           Y      => CGK.Reals.Real (Workspaces (Index).Center_Y),
+           Radius => CGK.Reals.Real (Workspaces (Index).Radius));
+   end Get_Bounding_Shape;
+
+   ------------------------
+   -- Get_Bounding_Shape --
+   ------------------------
+
+   function Get_Bounding_Shape
+     (Index  : Leg_Index) return CGK.Primitives.Circles_2D.Circle_2D is
+   begin
+      return
+        CGK.Primitives.Circles_2D.Create_Circle_2D
+          (X      => CGK.Reals.Real (Workspaces (Index).Center_X),
+           Y      => CGK.Reals.Real (Workspaces (Index).Center_Y),
+           Radius => CGK.Reals.Real (Workspaces (Index).Radius));
+   end Get_Bounding_Shape;
 
    -------------------
    -- Ground_Center --
