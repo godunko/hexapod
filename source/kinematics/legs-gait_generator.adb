@@ -57,12 +57,20 @@ package body Legs.Gait_Generator is
    Current_Tick : Natural := 0;
    --  Number of the current tick.
 
-   Velocity_X         : CGK.Reals.Real := 0.0;
-   Velocity_Y         : CGK.Reals.Real := 0.0;
-   Velocity_Direction : CGK.Primitives.Directions_2D.Direction_2D;
-   Velocity_Vector    : CGK.Primitives.Vectors_2D.Vector_2D;
-   Velocity_Changed   : Boolean        := False;
-   --  Velocity of the body
+   type Velocity_Information is record
+      X         : CGK.Reals.Real := 0.0;
+      Y         : CGK.Reals.Real := 0.0;
+      Direction : CGK.Primitives.Directions_2D.Direction_2D;
+      Vector    : CGK.Primitives.Vectors_2D.Vector_2D;
+   end record;
+
+   Velocity           : array (Boolean) of Velocity_Information;
+   Velocity_Bank      : Boolean := False;
+   Velocity_Changed   : Boolean := False;
+   --  Velocity of the body.
+   --
+   --  XXX Two banks of parameters are used to minimize probability of race
+   --  condition, need to be rewritten.
 
    State : array (Leg_Index) of Leg_State;
 
@@ -76,17 +84,17 @@ package body Legs.Gait_Generator is
 
    procedure Initialize is
    begin
-      Current_Tick     := 0;
-      Velocity_X       := 0.0;
-      Velocity_Y       := 0.0;
-      Velocity_Changed := False;
+      Current_Tick               := 0;
+
+      Velocity_Bank              := False;
+      Velocity (Velocity_Bank).X := 0.0;
+      Velocity (Velocity_Bank).Y := 0.0;
+      Velocity_Changed           := False;
 
       for Leg in Leg_Index loop
          State (Leg) :=
            (Kind     => Stance,
             PEP_Tick => Natural'Last);
-            --  Path_AEP => <>,
-            --  Path_PEP => <>);
       end loop;
    end Initialize;
 
@@ -147,7 +155,10 @@ package body Legs.Gait_Generator is
       Build (Builder, Current, Point);
 
       return
-        Is_Equal (Velocity_Direction, Direction (Builder), Angular_Tolerance);
+        Is_Equal
+          (Velocity (Velocity_Bank).Direction,
+           Direction (Builder),
+           Angular_Tolerance);
    end Is_Forward;
 
    ------------------
@@ -161,16 +172,24 @@ package body Legs.Gait_Generator is
       Builder : Direction_2D_Builder;
 
    begin
-      if VX /= Velocity_X or VY /= Velocity_Y then
-         Velocity_X       := -VX;
-         Velocity_Y       := -VY;
-         Velocity_Vector  := Create_Vector_2D (-VX, -VY);
-         Velocity_Changed := True;
+      if VX /= Velocity (Velocity_Bank).X
+        or VY /= Velocity (Velocity_Bank).Y
+      then
+         Velocity (not Velocity_Bank).X      := -VX;
+         Velocity (not Velocity_Bank).Y      := -VY;
+         Velocity (not Velocity_Bank).Vector := Create_Vector_2D (-VX, -VY);
 
-         if Velocity_X /= 0.0 or Velocity_Y /= 0.0 then
-            Build (Builder, Velocity_X, Velocity_Y);
-            Velocity_Direction := Direction (Builder);
+         if Velocity (not Velocity_Bank).X /= 0.0
+           or Velocity (not Velocity_Bank).Y /= 0.0
+         then
+            Build
+              (Builder,
+               Velocity (not Velocity_Bank).X,
+               Velocity (not Velocity_Bank).Y);
+            Velocity (not Velocity_Bank).Direction := Direction (Builder);
          end if;
+
+         Velocity_Changed := True;
       end if;
    end Set_Velocity;
 
@@ -189,14 +208,14 @@ package body Legs.Gait_Generator is
 
       procedure Update_State (Length  : CGK.Reals.Real) is
          DL       : constant Reals.Real :=
-           Magnitude (Velocity_Vector) * Control_Tick_Duration;
+           Magnitude (Velocity (Velocity_Bank).Vector) * Control_Tick_Duration;
          T        : constant Natural := Natural (Real'Floor (Length / DL));
 
       begin
          Standard.Legs.Trajectory_Generator.Set_Linear
            (Leg,
-            Velocity_X * Control_Tick_Duration,
-            Velocity_Y * Control_Tick_Duration);
+            Velocity (Velocity_Bank).X * Control_Tick_Duration,
+            Velocity (Velocity_Bank).Y * Control_Tick_Duration);
          State (Leg) :=
            (Kind     => Stance,
             PEP_Tick => Current_Tick + T);
@@ -224,7 +243,9 @@ package body Legs.Gait_Generator is
 
       --  Special case to shutdown on stop
 
-      if Velocity_X = 0.0 and Velocity_Y = 0.0 then
+      if Velocity (Velocity_Bank).X = 0.0
+        and Velocity (Velocity_Bank).Y = 0.0
+      then
          Standard.Legs.Trajectory_Generator.Set_Linear (Leg, 0.0, 0.0);
 
          if Current = Center (Workspace) then
@@ -243,7 +264,7 @@ package body Legs.Gait_Generator is
 
       --  Compute path line
 
-      Path := Create_Line_2D (Current, Velocity_Direction);
+      Path := Create_Line_2D (Current, Velocity (Velocity_Bank).Direction);
 
       --  Compute intersections of path line with workspace circle
 
@@ -255,8 +276,8 @@ package body Legs.Gait_Generator is
 
          Standard.Legs.Trajectory_Generator.Set_Linear
            (Leg,
-            Velocity_X * Control_Tick_Duration,
-            Velocity_Y * Control_Tick_Duration);
+            Velocity (Velocity_Bank).X * Control_Tick_Duration,
+            Velocity (Velocity_Bank).Y * Control_Tick_Duration);
          State (Leg) :=
            (Kind     => Stance,
             PEP_Tick => Current_Tick);
@@ -291,8 +312,8 @@ package body Legs.Gait_Generator is
 
             Standard.Legs.Trajectory_Generator.Set_Linear
               (Leg,
-               Velocity_X * Control_Tick_Duration,
-               Velocity_Y * Control_Tick_Duration);
+               Velocity (Velocity_Bank).X * Control_Tick_Duration,
+               Velocity (Velocity_Bank).Y * Control_Tick_Duration);
             State (Leg) :=
               (Kind     => Stance,
                PEP_Tick => Current_Tick);
@@ -346,7 +367,9 @@ package body Legs.Gait_Generator is
 
       --  Special case to shutdown on stop
 
-      if Velocity_X = 0.0 and Velocity_Y = 0.0 then
+      if Velocity (Velocity_Bank).X = 0.0
+        and Velocity (Velocity_Bank).Y = 0.0
+      then
          Standard.Legs.Trajectory_Generator.Set_Linear (Leg, 0.0, 0.0);
          AEP := Workspace_Center;
 
@@ -355,7 +378,8 @@ package body Legs.Gait_Generator is
 
       --  Compute path line
 
-      Path := Create_Line_2D (Workspace_Center, Velocity_Direction);
+      Path :=
+        Create_Line_2D (Workspace_Center, Velocity (Velocity_Bank).Direction);
 
       --  Compute intersections of path line with workspace circle
 
@@ -414,6 +438,8 @@ package body Legs.Gait_Generator is
 
       if Velocity_Changed then
          --  Velocity has been changed, recompute path of legs in stance.
+
+         Velocity_Bank := not Velocity_Bank;
 
          for Leg in Leg_Index loop
             if State (Leg).Kind = Stance then
