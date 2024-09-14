@@ -369,8 +369,8 @@ package body Hexapod.Movement is
 
       L  : constant Reals.Real :=
         Reals.Elementary_Functions.Sqrt (V_X * V_X + V_Y * V_Y);
-      NX : constant Reals.Real := (if L = 0.0 then 0.0 else V_X / L);
-      NY : constant Reals.Real := (if L = 0.0 then 0.0 else V_Y / L);
+      NX : constant Reals.Real := (if L = 0.0 then 0.0 else abs V_X / L);
+      NY : constant Reals.Real := (if L = 0.0 then 0.0 else abs V_Y / L);
 
    begin
       Legs.Gait_Generator.Set_Velocity
