@@ -21,9 +21,17 @@ with Legs.Workspace;
 
 package body Legs.Gait_Generator is
 
+   use CGK.Primitives.Analytical_Intersections_2D;
+   use CGK.Primitives.Circles_2D;
+   use CGK.Primitives.Directions_2D;
+   use CGK.Primitives.Directions_2D.Builders;
+   use CGK.Primitives.Lines_2D;
    use CGK.Primitives.Points_2D;
+   use CGK.Primitives.Vectors_2D;
    use CGK.Reals;
    use Standard.Legs.State;
+
+   use type CGK.Primitives.Points_2D.Containers.Point_2D_Array_Count;
 
    Control_Loop_Frequency : constant := 100.0;
    Control_Tick_Duration  : constant := 1.0 / Control_Loop_Frequency;
@@ -34,9 +42,6 @@ package body Legs.Gait_Generator is
    type Leg_State_Kind is (Stance, Swing);
 
    type Leg_State (Kind : Leg_State_Kind := Stance) is record
-      Path_AEP : CGK.Primitives.Points_2D.Point_2D;
-      Path_PEP : CGK.Primitives.Points_2D.Point_2D;
-
       case Kind is
          when Stance =>
             PEP_Tick : Natural;
@@ -46,7 +51,7 @@ package body Legs.Gait_Generator is
       end case;
    end record;
 
-   Linear_Tolerance  : constant := 0.0001;
+   --  Linear_Tolerance  : constant := 0.0001;
    Angular_Tolerance : constant := Ada.Numerics.Pi / 512.0;
 
    Current_Tick : Natural := 0;
@@ -60,6 +65,10 @@ package body Legs.Gait_Generator is
    --  Velocity of the body
 
    State : array (Leg_Index) of Leg_State;
+
+   function Is_Forward
+     (Current : Point_2D;
+      Point   : Point_2D) return Boolean;
 
    ----------------
    -- Initialize --
@@ -75,9 +84,9 @@ package body Legs.Gait_Generator is
       for Leg in Leg_Index loop
          State (Leg) :=
            (Kind     => Stance,
-            PEP_Tick => Natural'Last,
-            Path_AEP => <>,
-            Path_PEP => <>);
+            PEP_Tick => Natural'Last);
+            --  Path_AEP => <>,
+            --  Path_PEP => <>);
       end loop;
    end Initialize;
 
@@ -124,6 +133,23 @@ package body Legs.Gait_Generator is
       return False;
    end Is_Ahead;
 
+   ----------------
+   -- Is_Forward --
+   ----------------
+
+   function Is_Forward
+     (Current : Point_2D;
+      Point   : Point_2D) return Boolean
+   is
+      Builder : Direction_2D_Builder;
+
+   begin
+      Build (Builder, Current, Point);
+
+      return
+        Is_Equal (Velocity_Direction, Direction (Builder), Angular_Tolerance);
+   end Is_Forward;
+
    ------------------
    -- Set_Velocity --
    ------------------
@@ -132,16 +158,13 @@ package body Legs.Gait_Generator is
      (VX : CGK.Reals.Real;
       VY : CGK.Reals.Real)
    is
-      use CGK.Primitives.Directions_2D.Builders;
-      use CGK.Primitives.Vectors_2D;
-
       Builder : Direction_2D_Builder;
 
    begin
       if VX /= Velocity_X or VY /= Velocity_Y then
-         Velocity_X       := VX;
-         Velocity_Y       := VY;
-         Velocity_Vector  := Create_Vector_2D (VX, VY);
+         Velocity_X       := -VX;
+         Velocity_Y       := -VY;
+         Velocity_Vector  := Create_Vector_2D (-VX, -VY);
          Velocity_Changed := True;
 
          if Velocity_X /= 0.0 or Velocity_Y /= 0.0 then
@@ -158,51 +181,16 @@ package body Legs.Gait_Generator is
    procedure Compute_Linear
      (Leg : Leg_Index)
    is
-      use CGK.Primitives.Analytical_Intersections_2D;
-      use CGK.Primitives.Circles_2D;
-      use CGK.Primitives.Directions_2D;
-      use CGK.Primitives.Directions_2D.Builders;
-      use CGK.Primitives.Lines_2D;
-      use CGK.Primitives.Vectors_2D;
-
-      use type CGK.Primitives.Points_2D.Containers.Point_2D_Array_Count;
-
-      function Is_Forward
-        (Current : Point_2D;
-         Point   : Point_2D) return Boolean;
-
-      ----------------
-      -- Is_Forward --
-      ----------------
-
-      function Is_Forward
-        (Current : Point_2D;
-         Point   : Point_2D) return Boolean
-      is
-         Builder : Direction_2D_Builder;
-
-      begin
-         Build (Builder, Current, Point);
-
-         return
-           Is_Equal
-             (Velocity_Direction, Direction (Builder), Angular_Tolerance);
-      end Is_Forward;
+      procedure Update_State (Length  : CGK.Reals.Real);
 
       ------------------
       -- Update_State --
       ------------------
 
-      procedure Update_State
-        (Current  : Point_2D;
-         Path_PEP : Point_2D;
-         Path_AEP : Point_2D)
-      is
-            L        : constant Reals.Real :=
-              Magnitude (Create_Vector_2D (Current, Path_PEP));
-            DL       : constant Reals.Real :=
-              Magnitude (Velocity_Vector) * Control_Tick_Duration;
-            T        : constant Natural := Natural (Real'Floor (L / DL));
+      procedure Update_State (Length  : CGK.Reals.Real) is
+         DL       : constant Reals.Real :=
+           Magnitude (Velocity_Vector) * Control_Tick_Duration;
+         T        : constant Natural := Natural (Real'Floor (Length / DL));
 
       begin
          Standard.Legs.Trajectory_Generator.Set_Linear
@@ -211,15 +199,19 @@ package body Legs.Gait_Generator is
             Velocity_Y * Control_Tick_Duration);
          State (Leg) :=
            (Kind     => Stance,
-            PEP_Tick => Current_Tick + T,
-            Path_AEP => Path_AEP,
-            Path_PEP => Path_PEP);
+            PEP_Tick => Current_Tick + T);
       end Update_State;
 
       Current       : Point_2D;
       Path          : Line_2D;
       Workspace     : Circle_2D;
       Intersections : Analytical_Intersection_2D;
+      Point_1       : Point_2D;
+      Point_2       : Point_2D;
+      Forward_1     : Boolean;
+      Forward_2     : Boolean;
+      Length_1      : Real;
+      Length_2      : Real;
 
    begin
       if Velocity_X = 0.0 and Velocity_Y = 0.0 then
@@ -244,29 +236,47 @@ package body Legs.Gait_Generator is
       Intersect (Intersections, Path, Workspace);
 
       if Length (Intersections) /= 2 then
-         raise Program_Error;
-      end if;
+         --  Path from the current position doesn't intersects with workspace
+         --  area.
 
-      if Is_Equal (Current, Point (Intersections, 1), Linear_Tolerance) then
-         raise Program_Error;
-
-      elsif Is_Equal (Current, Point (Intersections, 2), Linear_Tolerance) then
-         Update_State
-           (Current  => Current,
-            Path_AEP => Point (Intersections, 2),
-            Path_PEP => Point (Intersections, 1));
-
-      elsif Is_Forward (Current, Point (Intersections, 1)) then
-         Update_State
-           (Current  => Current,
-            Path_AEP => Point (Intersections, 2),
-            Path_PEP => Point (Intersections, 1));
-
-      elsif Is_Forward (Current, Point (Intersections, 2)) then
          raise Program_Error;
 
       else
-         raise Program_Error;
+         Point_1   := Point (Intersections, 1);
+         Point_2   := Point (Intersections, 2);
+         Forward_1 := Is_Forward (Current, Point_1);
+         Forward_2 := Is_Forward (Current, Point_2);
+         Length_1  := Magnitude (Create_Vector_2D (Current, Point_1));
+         Length_2  := Magnitude (Create_Vector_2D (Current, Point_2));
+
+         if Forward_1 and Forward_2 then
+            --  There are two intersections of the path with workspace are.
+            --  Current position is outside of the workspace are.
+
+            if Length_1 > Length_2 then
+               Update_State (Length_1);
+
+            else
+               raise Program_Error;
+            end if;
+
+         elsif Forward_1 then
+            Update_State (Length_1);
+
+         elsif Forward_2 then
+            raise Program_Error;
+
+         else
+            --  Close to workspace edge, but outside of it.
+
+            Standard.Legs.Trajectory_Generator.Set_Linear
+              (Leg,
+               Velocity_X * Control_Tick_Duration,
+               Velocity_Y * Control_Tick_Duration);
+            State (Leg) :=
+              (Kind     => Stance,
+               PEP_Tick => Current_Tick);
+         end if;
       end if;
    end Compute_Linear;
 
@@ -286,6 +296,80 @@ package body Legs.Gait_Generator is
           or else State (Prev).PEP_Tick <= Current_Tick + Swing_Ticks
           or else State (Next).PEP_Tick <= Current_Tick + Swing_Ticks;
    end Start_Swing;
+
+   -------------------------------
+   -- Compute_Extreme_Positions --
+   -------------------------------
+
+   procedure Compute_Extreme_Positions
+     (Leg : Leg_Index;
+      AEP : out CGK.Primitives.Points_2D.Point_2D)
+   is
+      Path             : Line_2D;
+      Workspace        : Circle_2D;
+      Workspace_Center : Point_2D;
+      Intersections    : Analytical_Intersection_2D;
+      Point_1          : Point_2D;
+      Point_2          : Point_2D;
+      Forward_1        : Boolean;
+      Forward_2        : Boolean;
+      Length_1         : Real;
+      Length_2         : Real;
+
+   begin
+      if Velocity_X = 0.0 and Velocity_Y = 0.0 then
+         raise Program_Error;
+      end if;
+
+      --  Compute bounded workspace.
+
+      Standard.Legs.Workspace.Get_Bounding_Shape (Leg, Workspace);
+      Workspace :=
+        Create_Circle_2D (Center (Workspace), Radius (Workspace) / 2.0);
+
+      --  Compute path line
+
+      Workspace_Center := Center (Workspace);
+      Path             := Create_Line_2D (Workspace_Center, Velocity_Direction);
+
+      --  Compute intersections of path line with workspace circle
+
+      Intersect (Intersections, Path, Workspace);
+
+      if Length (Intersections) /= 2 then
+
+         raise Program_Error;
+
+      else
+         Point_1   := Point (Intersections, 1);
+         Point_2   := Point (Intersections, 2);
+         Forward_1 := Is_Forward (Workspace_Center, Point_1);
+         Forward_2 := Is_Forward (Workspace_Center, Point_2);
+         Length_1  := Magnitude (Create_Vector_2D (Workspace_Center, Point_1));
+         Length_2  := Magnitude (Create_Vector_2D (Workspace_Center, Point_2));
+
+         if Forward_1 and Forward_2 then
+            --  There are two intersections of the path with workspace are.
+            --  Current position is outside of the workspace are.
+
+            if Length_1 > Length_2 then
+               raise Program_Error;
+
+            else
+               raise Program_Error;
+            end if;
+
+         elsif Forward_1 then
+            AEP := Point_2;
+
+         elsif Forward_2 then
+            raise Program_Error;
+
+         else
+            raise Program_Error;
+         end if;
+      end if;
+   end Compute_Extreme_Positions;
 
    ----------
    -- Tick --
@@ -319,16 +403,21 @@ package body Legs.Gait_Generator is
          if Is_Ahead (Leg) then
             if State (Leg).Kind = Stance then
                if Start_Swing (Leg) then
-                  Standard.Legs.Trajectory_Generator.Set_Swing
-                    (Leg    => Leg,
-                     AEP_X  => X (State (Leg).Path_AEP),
-                     AEP_Y  => Y (State (Leg).Path_AEP),
-                     Height => 0.030);
-                  State (Leg) :=
-                    (Kind     => Swing,
-                     Path_AEP => State (Leg).Path_AEP,
-                     Path_PEP => State (Leg).Path_PEP,
-                     AEP_Tick => Current_Tick + Swing_Ticks);
+                  declare
+                     AEP : Point_2D;
+
+                  begin
+                     Compute_Extreme_Positions (Leg, AEP);
+
+                     Standard.Legs.Trajectory_Generator.Set_Swing
+                       (Leg    => Leg,
+                        AEP_X  => X (AEP),
+                        AEP_Y  => Y (AEP),
+                        Height => 0.030);
+                     State (Leg) :=
+                       (Kind     => Swing,
+                        AEP_Tick => Current_Tick + Swing_Ticks);
+                  end;
                end if;
 
             else
