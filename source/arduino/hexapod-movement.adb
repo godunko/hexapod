@@ -19,12 +19,13 @@ with BBF.PCA9685;
 
 with Kinematics;
 with Legs.State;
+with Legs.Gait_Generator;
 with Legs.Trajectory_Generator;
 with Legs.Workspace;
 with Trajectory.Steps.Planner;
 
 with Hexapod.Console;
-with Hexapod.Debug;
+--  with Hexapod.Debug;
 with Hexapod.Hardware.Initialize_Servo_Controllers;
 
 package body Hexapod.Movement is
@@ -48,10 +49,6 @@ package body Hexapod.Movement is
 
    procedure Task_Subprogram;
    --  Task thread subprogram.
-
-   procedure Update_Plan
-     (Leg   : Legs.Leg_Index;
-      Plan  : Trajectory.Steps.Leg_Step_Plan_Descriptor);
 
    type Motor_Descriptor is record
       Channel   : not null access BBF.PCA9685.PCA9685_Channel'Class;
@@ -175,19 +172,7 @@ package body Hexapod.Movement is
       -Ada.Numerics.Pi + 0.16,
       Ada.Numerics.Pi / 2.0 + 0.32);
 
-   Tick_Duration : constant := 1.0 / Ticks;
-
-   Cycle_Time  : Reals.Real := 0.0;
-
-   Step_Height : constant := 0.030;
    Body_Height : constant := 0.070;
-
-   Step_Plan   : Trajectory.Steps.Step_Plan_Descriptor := (others => <>);
-
-   Body_Velocity_X : Reals.Real := 0.0;
-   Body_Velocity_Y : Reals.Real := 0.0;
-   Length_X        : Reals.Real := 0.0;
-   Length_Y        : Reals.Real := 0.0;
 
    type States is (Initial, Configuration, Active);
 
@@ -210,34 +195,34 @@ package body Hexapod.Movement is
    -- Image --
    -----------
 
-   function Image (Item : Trajectory.Steps.Leg_Step_Plan_Descriptor) return String is
-      use type Trajectory.Steps.Stage_Kind;
-
-   begin
-      return
-        (if Item.Stage = Trajectory.Steps.Strait then "  _ " else "  ^ ")
-        & (if Item.Stage = Trajectory.Steps.Swing then
-              Hexapod.Debug.Coordinate_Image (Item.AEP_X)
-              & Hexapod.Debug.Coordinate_Image (Item.AEP_Y)
-              & Hexapod.Debug.Coordinate_Image (Item.PEP_X)
-              & Hexapod.Debug.Coordinate_Image (Item.PEP_Y)
-           else "");
-   end Image;
+   --  function Image (Item : Trajectory.Steps.Leg_Step_Plan_Descriptor) return String is
+   --     use type Trajectory.Steps.Stage_Kind;
+   --
+   --  begin
+   --     return
+   --       (if Item.Stage = Trajectory.Steps.Strait then "  _ " else "  ^ ")
+   --       & (if Item.Stage = Trajectory.Steps.Swing then
+   --             Hexapod.Debug.Coordinate_Image (Item.AEP_X)
+   --             & Hexapod.Debug.Coordinate_Image (Item.AEP_Y)
+   --             & Hexapod.Debug.Coordinate_Image (Item.PEP_X)
+   --             & Hexapod.Debug.Coordinate_Image (Item.PEP_Y)
+   --          else "");
+   --  end Image;
 
    --  function Image (Item : Trajectory.Steps.Step_Plan_Descriptor) return String is
-   procedure Put (Item : Trajectory.Steps.Step_Plan_Descriptor) is
-   begin
-      Hexapod.Console.Put_Line
-        (Hexapod.Debug.Coordinate_Image (Body_Velocity_X)
-         & Hexapod.Debug.Coordinate_Image (Body_Velocity_Y));
-      Hexapod.Console.Put (Hexapod.Debug.Parametric_Image (Item.Ratio));
-      Hexapod.Console.Put (Image (Item.LF));
-      Hexapod.Console.Put (Image (Item.LM));
-      Hexapod.Console.Put (Image (Item.LH));
-      Hexapod.Console.Put (Image (Item.RF));
-      Hexapod.Console.Put (Image (Item.RM));
-      Hexapod.Console.Put (Image (Item.RH));
-   end Put;
+   --  procedure Put (Item : Trajectory.Steps.Step_Plan_Descriptor) is
+   --  begin
+   --     Hexapod.Console.Put_Line
+   --       (Hexapod.Debug.Coordinate_Image (Body_Velocity_X)
+   --        & Hexapod.Debug.Coordinate_Image (Body_Velocity_Y));
+   --     Hexapod.Console.Put (Hexapod.Debug.Parametric_Image (Item.Ratio));
+   --     Hexapod.Console.Put (Image (Item.LF));
+   --     Hexapod.Console.Put (Image (Item.LM));
+   --     Hexapod.Console.Put (Image (Item.LH));
+   --     Hexapod.Console.Put (Image (Item.RF));
+   --     Hexapod.Console.Put (Image (Item.RM));
+   --     Hexapod.Console.Put (Image (Item.RH));
+   --  end Put;
 
    ----------------
    -- Initialize --
@@ -248,6 +233,7 @@ package body Hexapod.Movement is
       Legs.Initialize;
       Legs.Workspace.Compute (Body_Height);
       Legs.Trajectory_Generator.Initialize;
+      Legs.Gait_Generator.Initialize;
    end Initialize;
 
    ----------
@@ -320,16 +306,6 @@ package body Hexapod.Movement is
 
    procedure Prepare is
    begin
-      Trajectory.Steps.Planner.Compute_Step
-        (Length_X, Length_Y, 0.0, 0.0, Step_Height, Step_Plan);
-
-      Update_Plan (Legs.Left_Front,   Step_Plan.LF);
-      Update_Plan (Legs.Left_Middle,  Step_Plan.LM);
-      Update_Plan (Legs.Left_Rear,    Step_Plan.LH);
-      Update_Plan (Legs.Right_Front,  Step_Plan.RF);
-      Update_Plan (Legs.Right_Middle, Step_Plan.RM);
-      Update_Plan (Legs.Right_Rear,   Step_Plan.RH);
-
       --  LF & RH
 
       Move (LF_Posture, LF_M_1, LF_M_2, LF_M_3, 50);
@@ -397,11 +373,9 @@ package body Hexapod.Movement is
       NY : constant Reals.Real := (if L = 0.0 then 0.0 else V_Y / L);
 
    begin
-      Body_Velocity_X := V_X * NX * (2.0 * R / 0.5) / 5.0;
-      Body_Velocity_Y := V_Y * NY * (2.0 * R / 0.5) / 5.0;
-
-      Length_X := 2.0 * R * NX;
-      Length_Y := 2.0 * R * NY;
+      Legs.Gait_Generator.Set_Velocity
+        (V_X * NX * (2.0 * R / 0.5) / 5.0,
+         V_Y * NY * (2.0 * R / 0.5) / 5.0);
    end Set_Relative_Velocity;
 
    ----------
@@ -410,28 +384,7 @@ package body Hexapod.Movement is
 
    procedure Step is
    begin
-      --  Hexapod.Console.Put ("*");
-
-      Cycle_Time := @ + Tick_Duration;
-
-      if Cycle_Time >= Cycle then
-         Cycle_Time := 0.0;
-         Trajectory.Steps.Planner.Compute_Step
-           (Length_X, Length_Y,
-            - Body_Velocity_X / Reals.Real (Ticks),
-            - Body_Velocity_Y / Reals.Real (Ticks),
-            Step_Height, Step_Plan);
-
-         Put (Step_Plan);
-         Hexapod.Console.New_Line;
-
-         Update_Plan (Legs.Left_Front,   Step_Plan.LF);
-         Update_Plan (Legs.Left_Middle,  Step_Plan.LM);
-         Update_Plan (Legs.Left_Rear,    Step_Plan.LH);
-         Update_Plan (Legs.Right_Front,  Step_Plan.RF);
-         Update_Plan (Legs.Right_Middle, Step_Plan.RM);
-         Update_Plan (Legs.Right_Rear,   Step_Plan.RH);
-      end if;
+      --  Update desired legs posture.
 
       Legs.Trajectory_Generator.Tick;
 
@@ -447,6 +400,10 @@ package body Hexapod.Movement is
 
       Hexapod.Hardware.Left_Servo_Controller.Commit_Transaction;
       Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction;
+
+      --  Compute gait.
+
+      Legs.Gait_Generator.Tick;
    end Step;
 
    ---------------------
@@ -506,23 +463,5 @@ package body Hexapod.Movement is
          end loop;
       end;
    end Task_Subprogram;
-
-   -----------------
-   -- Update_Plan --
-   -----------------
-
-   procedure Update_Plan
-     (Leg   : Legs.Leg_Index;
-      Plan  : Trajectory.Steps.Leg_Step_Plan_Descriptor) is
-   begin
-      case Plan.Stage is
-         when Trajectory.Steps.Strait =>
-            Legs.Trajectory_Generator.Set_Linear (Leg, Plan.D_X, Plan.D_Y);
-
-         when Trajectory.Steps.Swing =>
-            Legs.Trajectory_Generator.Set_Swing
-              (Leg, Plan.AEP_X, Plan.AEP_Y, Plan.Height_Z);
-      end case;
-   end Update_Plan;
 
 end Hexapod.Movement;
