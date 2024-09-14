@@ -374,8 +374,8 @@ package body Hexapod.Movement is
 
    begin
       Legs.Gait_Generator.Set_Velocity
-        (V_X * NX * (2.0 * R / 0.5) / 5.0,
-         V_Y * NY * (2.0 * R / 0.5) / 5.0);
+        (V_X * NX * (2.0 * R / 0.5) / 2.0,
+         V_Y * NY * (2.0 * R / 0.5) / 2.0);
    end Set_Relative_Velocity;
 
    ----------
