@@ -253,7 +253,13 @@ package body Legs.Gait_Generator is
          --  Path from the current position doesn't intersects with workspace
          --  area.
 
-         raise Program_Error;
+         Standard.Legs.Trajectory_Generator.Set_Linear
+           (Leg,
+            Velocity_X * Control_Tick_Duration,
+            Velocity_Y * Control_Tick_Duration);
+         State (Leg) :=
+           (Kind     => Stance,
+            PEP_Tick => Current_Tick);
 
       else
          Point_1   := Point (Intersections, 1);
