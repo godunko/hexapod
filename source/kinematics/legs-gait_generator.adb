@@ -275,7 +275,10 @@ package body Legs.Gait_Generator is
             Velocity (Velocity_Bank).Y * Control_Tick_Duration);
          State (Leg) :=
            (Kind     => Stance,
-            PEP_Tick => Current_Tick);
+            PEP_Tick =>
+              (if State (Leg).Kind = Stance
+                 then State (Leg).PEP_Tick
+                 else Current_Tick));
 
       else
          Point_1   := Point (Intersections, 1);
@@ -311,7 +314,11 @@ package body Legs.Gait_Generator is
                Velocity (Velocity_Bank).Y * Control_Tick_Duration);
             State (Leg) :=
               (Kind     => Stance,
-               PEP_Tick => Current_Tick);
+               --  PEP_Tick => Current_Tick);
+               PEP_Tick =>
+                 (if State (Leg).Kind = Stance
+                    then State (Leg).PEP_Tick
+                    else Current_Tick));
          end if;
       end if;
    end Compute_Linear;
