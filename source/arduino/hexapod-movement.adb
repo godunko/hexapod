@@ -24,7 +24,6 @@ with Legs.State;
 with Legs.Gait_Generator;
 with Legs.Trajectory_Generator;
 with Legs.Workspace;
-with Trajectory.Steps.Planner;
 
 with Hexapod.Console;
 --  with Hexapod.Debug;
@@ -339,23 +338,7 @@ package body Hexapod.Movement is
 
    procedure Set_Gait (Gait : Gait_Kind) is
    begin
-      case Gait is
-         when Stop   =>
-            Trajectory.Steps.Planner.Transition
-              (Trajectory.Steps.Planner.Stop_Gait);
-
-         when Wave   =>
-            Trajectory.Steps.Planner.Transition
-              (Trajectory.Steps.Planner.Wave_Gait);
-
-         when Quadro =>
-            Trajectory.Steps.Planner.Transition
-              (Trajectory.Steps.Planner.Quadro_Gait);
-
-         when Tripod =>
-            Trajectory.Steps.Planner.Transition
-              (Trajectory.Steps.Planner.Tripod_Gait);
-      end case;
+      null;
    end Set_Gait;
 
    ---------------------------
