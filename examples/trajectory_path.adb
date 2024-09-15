@@ -28,7 +28,6 @@ procedure Trajectory_Path is
    Direction_Builder :
      CGK.Primitives.Directions_2D.Builders.Direction_2D_Builder;
 
-   Boundary      : CGK.Primitives.Circles_2D.Circle_2D;
    Restricted    : CGK.Primitives.Circles_2D.Circle_2D;
    Direction     : CGK.Primitives.Directions_2D.Direction_2D;
    Path          : CGK.Primitives.Lines_2D.Line_2D;
@@ -43,13 +42,7 @@ begin
    Legs.Initialize;
    Legs.Workspace.Compute (0.030);
 
-   Legs.Workspace.Get_Bounding_Shape
-     (Legs.Left_Front, Boundary);
-
-   Restricted :=
-     CGK.Primitives.Circles_2D.Create_Circle_2D
-       (Center => CGK.Primitives.Circles_2D.Center (Boundary),
-        Radius => CGK.Primitives.Circles_2D.Radius (Boundary) / 2.0);
+   Restricted := Legs.Workspace.Get_Bounded_Circle (Legs.Left_Front);
 
    Direction := CGK.Primitives.Directions_2D.Create_Direction_2D (1.0, 1.0);
 
