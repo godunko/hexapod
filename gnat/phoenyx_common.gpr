@@ -19,6 +19,7 @@ abstract project Phoenyx_Common is
          "-ffunction-sections",
          "-fdata-sections",
          "-flto",
+	 "-gnatyo",   --  check subprogram bodies in alphabetical order
          "-gnatwu");  --  turn on warnings for unused entity
    end Compiler;
 
