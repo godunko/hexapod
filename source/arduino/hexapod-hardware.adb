@@ -10,7 +10,6 @@ pragma Warnings (Off, """System.Semihosting"" is an internal GNAT unit");
 with System.Semihosting;
 
 with A0B.ARMv7M.System_Control_Block;
-with A0B.ARMv7M.CMSIS;
 with A0B.Types;
 
 with BBF.HPL;
@@ -24,6 +23,10 @@ with Hexapod.Remote_Control;
 package body Hexapod.Hardware is
 
    LED : A0B.ATSAM3X8E.PIO.ATSAM3X8E_Pin'Class renames BBF.Board.Pin_13_LED;
+
+   procedure Report_Failure_State (Msg : System.Address; Line : Integer)
+     with Export, Link_Name => "__hexapod_report_failure_state";
+   --  Export failure state report to attach debugger to it.
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
@@ -285,6 +288,31 @@ package body Hexapod.Hardware is
    -------------------------
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
+   begin
+      --  First, turn off motors for safety.
+
+      Disable_Motors_Power;
+
+      --  And report failure state.
+
+      Report_Failure_State (Msg, Line);
+
+      --  Blink LED
+
+      loop
+         LED.Set (False);
+         --  BBF.Board.Delay_Controller.Delay_Milliseconds (500);
+
+         LED.Set (True);
+         --  BBF.Board.Delay_Controller.Delay_Milliseconds (500);
+      end loop;
+   end Last_Chance_Handler;
+
+   --------------------------
+   -- Report_Failure_State --
+   --------------------------
+
+   procedure Report_Failure_State (Msg : System.Address; Line : Integer) is
 
       function Message return String;
       --  Returns message. It might be file:line information or text message.
@@ -359,14 +387,6 @@ package body Hexapod.Hardware is
          Console.Put
            (ASCII.CR & ASCII.LF & "ADA: " & Message & ASCII.CR & ASCII.LF);
       end if;
-
-      loop
-         LED.Set (False);
-         --  BBF.Board.Delay_Controller.Delay_Milliseconds (500);
-
-         LED.Set (True);
-         --  BBF.Board.Delay_Controller.Delay_Milliseconds (500);
-      end loop;
-   end Last_Chance_Handler;
+   end Report_Failure_State;
 
 end Hexapod.Hardware;

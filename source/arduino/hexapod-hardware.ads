@@ -6,7 +6,6 @@
 
 --  Hardware configuration and initialization.
 
-with A0B.GPIO;
 with A0B.ATSAM3X8E.PIO;
 
 with A0B.I2C.ATSAM3X8E_TWI.TWI0;
