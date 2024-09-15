@@ -6,14 +6,13 @@
 
 --  pragma Restrictions (No_Elaboration_Code);
 
-with Ada.Numerics;
-
 with CGK.Primitives.Analytical_Intersections_2D;
 with CGK.Primitives.Circles_2D;
 with CGK.Primitives.Directions_2D.Builders;
 with CGK.Primitives.Points_2D.Containers;
 with CGK.Primitives.Lines_2D;
 with CGK.Primitives.Vectors_2D;
+with CGK.Primitives.XYs;
 
 with Legs.State;
 with Legs.Trajectory_Generator;
@@ -51,9 +50,6 @@ package body Legs.Gait_Generator is
       end case;
    end record;
 
-   --  Linear_Tolerance  : constant := 0.0001;
-   Angular_Tolerance : constant := Ada.Numerics.Pi / 512.0;
-
    Current_Tick : Natural := 0;
    --  Number of the current tick.
 
@@ -75,8 +71,8 @@ package body Legs.Gait_Generator is
    State : array (Leg_Index) of Leg_State;
 
    function Is_Forward
-     (Current : Point_2D;
-      Point   : Point_2D) return Boolean;
+     (Path  : Line_2D;
+      Point : Point_2D) return Boolean;
 
    -------------------------------
    -- Compute_Extreme_Positions --
@@ -126,8 +122,8 @@ package body Legs.Gait_Generator is
       else
          Point_1   := Point (Intersections, 1);
          Point_2   := Point (Intersections, 2);
-         Forward_1 := Is_Forward (Workspace_Center, Point_1);
-         Forward_2 := Is_Forward (Workspace_Center, Point_2);
+         Forward_1 := Is_Forward (Path, Point_1);
+         Forward_2 := Is_Forward (Path, Point_2);
          Length_1  := Magnitude (Create_Vector_2D (Workspace_Center, Point_1));
          Length_2  := Magnitude (Create_Vector_2D (Workspace_Center, Point_2));
 
@@ -244,8 +240,8 @@ package body Legs.Gait_Generator is
       else
          Point_1   := Point (Intersections, 1);
          Point_2   := Point (Intersections, 2);
-         Forward_1 := Is_Forward (Current, Point_1);
-         Forward_2 := Is_Forward (Current, Point_2);
+         Forward_1 := Is_Forward (Path, Point_1);
+         Forward_2 := Is_Forward (Path, Point_2);
          Length_1  := Magnitude (Create_Vector_2D (Current, Point_1));
          Length_2  := Magnitude (Create_Vector_2D (Current, Point_2));
 
@@ -352,19 +348,15 @@ package body Legs.Gait_Generator is
    ----------------
 
    function Is_Forward
-     (Current : Point_2D;
-      Point   : Point_2D) return Boolean
+     (Path  : Line_2D;
+      Point : Point_2D) return Boolean
    is
-      Builder : Direction_2D_Builder;
+      use type CGK.Primitives.XYs.XY;
+
+      C : CGK.Primitives.XYs.XY := XY (Point) - XY (Location (Path));
 
    begin
-      Build (Builder, Current, Point);
-
-      return
-        Is_Equal
-          (Velocity (Velocity_Bank).Direction,
-           Direction (Builder),
-           Angular_Tolerance);
+      return CGK.Primitives.XYs.Dot_Product (C, XY (Direction (Path))) >= 0.0;
    end Is_Forward;
 
    ------------------
