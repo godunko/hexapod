@@ -14,6 +14,8 @@ with A0B.Tasking;
 with A0B.Time.Clock;
 with A0B.Types;
 
+with CGK.Primitives.Circles_2D;
+
 with BBF.Delays;
 with BBF.PCA9685;
 
@@ -364,8 +366,13 @@ package body Hexapod.Movement is
      (V_X : Reals.Real;
       V_Y : Reals.Real)
    is
-      R  : constant Reals.Real := 0.050;
-      --  Radius of the workspace, safe value. Need to be computed.
+      Workspace : constant CGK.Primitives.Circles_2D.Circle_2D :=
+        Standard.Legs.Workspace.Get_Bounded_Circle (Legs.Left_Front);
+      Diameter  : constant Reals.Real :=
+        2.0 * CGK.Primitives.Circles_2D.Radius (Workspace);
+      --  Radius of the workspace, all legs has same radius.
+
+      Max_Speed : constant Reals.Real := Diameter / (Cycle + 0.1);
 
       L  : constant Reals.Real :=
         Reals.Elementary_Functions.Sqrt (V_X * V_X + V_Y * V_Y);
@@ -374,8 +381,8 @@ package body Hexapod.Movement is
 
    begin
       Legs.Gait_Generator.Set_Velocity
-        (V_X * NX * (2.0 * R / 0.5) / 2.0,
-         V_Y * NY * (2.0 * R / 0.5) / 2.0);
+        (VX => V_X * NX * Max_Speed,
+         VY => V_Y * NY * Max_Speed);
    end Set_Relative_Velocity;
 
    ----------

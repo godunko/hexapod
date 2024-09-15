@@ -225,7 +225,8 @@ package body Legs.Gait_Generator is
         Create_Point_2D
           (Kinematics.X (Position (Leg)), Kinematics.Y (Position (Leg)));
       Path          : Line_2D;
-      Workspace     : Circle_2D;
+      Workspace     : Circle_2D :=
+        Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
       Intersections : Analytical_Intersection_2D;
       Point_1       : Point_2D;
       Point_2       : Point_2D;
@@ -235,12 +236,6 @@ package body Legs.Gait_Generator is
       Length_2      : Real;
 
    begin
-      --  Compute bounded workspace.
-
-      Standard.Legs.Workspace.Get_Bounding_Shape (Leg, Workspace);
-      Workspace :=
-        Create_Circle_2D (Center (Workspace), Radius (Workspace) / 2.0);
-
       --  Special case to shutdown on stop
 
       if Velocity (Velocity_Bank).X = 0.0
@@ -346,9 +341,10 @@ package body Legs.Gait_Generator is
      (Leg : Leg_Index;
       AEP : out CGK.Primitives.Points_2D.Point_2D)
    is
+      Workspace        : constant Circle_2D :=
+        Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
+      Workspace_Center : constant Point_2D := Center (Workspace);
       Path             : Line_2D;
-      Workspace        : Circle_2D;
-      Workspace_Center : Point_2D;
       Intersections    : Analytical_Intersection_2D;
       Point_1          : Point_2D;
       Point_2          : Point_2D;
@@ -358,13 +354,6 @@ package body Legs.Gait_Generator is
       Length_2         : Real;
 
    begin
-      --  Compute bounded workspace.
-
-      Standard.Legs.Workspace.Get_Bounding_Shape (Leg, Workspace);
-      Workspace        :=
-        Create_Circle_2D (Center (Workspace), Radius (Workspace) / 2.0);
-      Workspace_Center := Center (Workspace);
-
       --  Special case to shutdown on stop
 
       if Velocity (Velocity_Bank).X = 0.0

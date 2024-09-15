@@ -10,6 +10,8 @@ with CGK.Reals;
 
 package body Legs.Workspace is
 
+   use type CGK.Reals.Real;
+
    type Workspace is record
       Center_X : Reals.Real;
       Center_Y : Reals.Real;
@@ -45,8 +47,6 @@ package body Legs.Workspace is
       Self        : in out Workspace;
       Body_Height : Reals.Real)
    is
-      use type Reals.Real;
-
       L        : constant Reals.Real := Leg.R_2 + Leg.R_3;
       H        : constant Reals.Real := Leg.Z_0 + Body_Height;
       Diameter : constant Reals.Real :=
@@ -63,33 +63,46 @@ package body Legs.Workspace is
    end Compute_Workspace;
 
    ------------------------
+   -- Get_Bounded_Circle --
+   ------------------------
+
+   function Get_Bounded_Circle
+     (Leg : Leg_Index) return CGK.Primitives.Circles_2D.Circle_2D is
+   begin
+      return CGK.Primitives.Circles_2D.Create_Circle_2D
+        (X      => Workspaces (Leg).Center_X,
+         Y      => Workspaces (Leg).Center_Y,
+         Radius => Workspaces (Leg).Radius * 0.4);
+   end Get_Bounded_Circle;
+
+   ------------------------
    -- Get_Bounding_Shape --
    ------------------------
 
-   procedure Get_Bounding_Shape
-     (Index  : Leg_Index;
-      Result : out CGK.Primitives.Circles_2D.Circle_2D) is
-   begin
-      Result :=
-        CGK.Primitives.Circles_2D.Create_Circle_2D
-          (X      => CGK.Reals.Real (Workspaces (Index).Center_X),
-           Y      => CGK.Reals.Real (Workspaces (Index).Center_Y),
-           Radius => CGK.Reals.Real (Workspaces (Index).Radius));
-   end Get_Bounding_Shape;
+   --  procedure Get_Bounding_Shape
+   --    (Index  : Leg_Index;
+   --     Result : out CGK.Primitives.Circles_2D.Circle_2D) is
+   --  begin
+   --     Result :=
+   --       CGK.Primitives.Circles_2D.Create_Circle_2D
+   --         (X      => CGK.Reals.Real (Workspaces (Index).Center_X),
+   --          Y      => CGK.Reals.Real (Workspaces (Index).Center_Y),
+   --          Radius => CGK.Reals.Real (Workspaces (Index).Radius));
+   --  end Get_Bounding_Shape;
 
    ------------------------
    -- Get_Bounding_Shape --
    ------------------------
 
-   function Get_Bounding_Shape
-     (Index  : Leg_Index) return CGK.Primitives.Circles_2D.Circle_2D is
-   begin
-      return
-        CGK.Primitives.Circles_2D.Create_Circle_2D
-          (X      => CGK.Reals.Real (Workspaces (Index).Center_X),
-           Y      => CGK.Reals.Real (Workspaces (Index).Center_Y),
-           Radius => CGK.Reals.Real (Workspaces (Index).Radius));
-   end Get_Bounding_Shape;
+   --  function Get_Bounding_Shape
+   --    (Index  : Leg_Index) return CGK.Primitives.Circles_2D.Circle_2D is
+   --  begin
+   --     return
+   --       CGK.Primitives.Circles_2D.Create_Circle_2D
+   --         (X      => CGK.Reals.Real (Workspaces (Index).Center_X),
+   --          Y      => CGK.Reals.Real (Workspaces (Index).Center_Y),
+   --          Radius => CGK.Reals.Real (Workspaces (Index).Radius));
+   --  end Get_Bounding_Shape;
 
    -------------------
    -- Ground_Center --
