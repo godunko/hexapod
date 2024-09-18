@@ -55,8 +55,8 @@ is
    end record;
 
    type Leg_Index is
-     (Right_Rear, Right_Middle, Right_Front,
-      Left_Front, Left_Middle, Left_Rear);
+     (Right_Front, Right_Middle, Right_Rear,
+      Left_Rear, Left_Middle, Left_Front);
    --  Leg's indicies.
    --
    --  Legs are listed in counter-clockwise order to avoid use of the mapping
