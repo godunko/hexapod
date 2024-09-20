@@ -17,6 +17,7 @@ generate_gpr = true
 
 [configuration.values]
 cgk.Float_Size = "32"
+cgk.SIMD = "nosimd"
 
 [[depends-on]]
 a0b_armv7m_systick_clock = "*"
