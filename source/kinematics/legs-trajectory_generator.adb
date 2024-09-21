@@ -26,9 +26,7 @@ package body Legs.Trajectory_Generator is
    type Trajectory_State (Kind : Trajectory_Kind := Linear) is record
       case Kind is
          when Linear =>
-            D_X : Reals.Real;
-            D_Y : Reals.Real;
-            --  Leg's trajectory delta at each control tick.
+            null;
 
          when Swing =>
             PEP_X  : Reals.Real;
@@ -148,7 +146,7 @@ package body Legs.Trajectory_Generator is
 
    begin
       for Leg in Leg_Index loop
-         State (Leg) := (Kind => Linear, D_X => 0.0, D_Y => 0.0);
+         State (Leg) := (Kind => Linear);
 
          Standard.Legs.Workspace.Ground_Center (Leg, Position (Leg));
 
@@ -173,10 +171,7 @@ package body Legs.Trajectory_Generator is
       DX  : CGK.Reals.Real;
       DY  : CGK.Reals.Real) is
    begin
-      State (Leg) :=
-        (Kind => Linear,
-         D_X  => DX,
-         D_Y  => DY);
+      State (Leg) := (Kind => Linear);
       null;
    end Set_Linear;
 
