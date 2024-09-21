@@ -56,7 +56,6 @@ package body Legs.Gait_Generator is
       X          : CGK.Reals.Real := 0.0;
       Y          : CGK.Reals.Real := 0.0;
       Direction  : CGK.Primitives.Directions_2D.Direction_2D;
-      Vector     : CGK.Primitives.Vectors_2D.Vector_2D;
 
       Trajectory : aliased Standard.Legs.Trajectory.Trajectory_Information;
    end record;
@@ -306,9 +305,8 @@ package body Legs.Gait_Generator is
       if VX /= Velocity (Velocity_Bank).X
         or VY /= Velocity (Velocity_Bank).Y
       then
-         Velocity (not Velocity_Bank).X      := -VX;
-         Velocity (not Velocity_Bank).Y      := -VY;
-         Velocity (not Velocity_Bank).Vector := Create_Vector_2D (-VX, -VY);
+         Velocity (not Velocity_Bank).X := -VX;
+         Velocity (not Velocity_Bank).Y := -VY;
 
          if Velocity (not Velocity_Bank).X /= 0.0
            or Velocity (not Velocity_Bank).Y /= 0.0
