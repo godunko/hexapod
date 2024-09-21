@@ -20,6 +20,7 @@ project Examples is
       "kinematics_inverse_levenberg_marquardt.adb",
       "max_plus_test.adb",
       "trajectory_path.adb",
+      "trajectory_path_circle.adb",
       --  "trajectory_steps.adb",
       "trajectory_wave_gait.adb");
 
