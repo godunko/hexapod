@@ -10,6 +10,8 @@
 
 with CGK.Reals;
 
+with Legs.Trajectory;
+
 package Legs.Trajectory_Generator
   with Preelaborate
 is
@@ -40,6 +42,9 @@ is
    --  Posture  : array (Leg_Index) of Kinematics.Posture;
 
    --  procedure Set_Plan (Plan : Leg_Trajectory_Plan);
+
+
+   Trajectory : access Standard.Legs.Trajectory.Trajectory_Information;
 
    procedure Initialize;
 

@@ -22,6 +22,7 @@ with BBF.PCA9685;
 with Kinematics;
 with Legs.State;
 with Legs.Gait_Generator;
+with Legs.Trajectory;
 with Legs.Trajectory_Generator;
 with Legs.Workspace;
 
@@ -233,6 +234,7 @@ package body Hexapod.Movement is
    begin
       Legs.Initialize;
       Legs.Workspace.Compute (Body_Height);
+      Legs.Trajectory.Initialize;
       Legs.Trajectory_Generator.Initialize;
       Legs.Gait_Generator.Initialize;
    end Initialize;
@@ -364,8 +366,10 @@ package body Hexapod.Movement is
 
    begin
       Legs.Gait_Generator.Set_Velocity
-        (VX => V_X * NX * Max_Speed,
-         VY => V_Y * NY * Max_Speed);
+        (VX  => V_X * NX * Max_Speed,
+         VY  => V_Y * NY * Max_Speed,
+         RVX => V_X,
+         RVY => V_Y);
    end Set_Relative_Velocity;
 
    ----------

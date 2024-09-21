@@ -15,6 +15,7 @@ with CGK.Primitives.Vectors_2D;
 with CGK.Primitives.XYs;
 
 with Legs.State;
+with Legs.Trajectory;
 with Legs.Trajectory_Generator;
 with Legs.Workspace;
 
@@ -54,10 +55,12 @@ package body Legs.Gait_Generator is
    --  Number of the current tick.
 
    type Velocity_Information is record
-      X         : CGK.Reals.Real := 0.0;
-      Y         : CGK.Reals.Real := 0.0;
-      Direction : CGK.Primitives.Directions_2D.Direction_2D;
-      Vector    : CGK.Primitives.Vectors_2D.Vector_2D;
+      X          : CGK.Reals.Real := 0.0;
+      Y          : CGK.Reals.Real := 0.0;
+      Direction  : CGK.Primitives.Directions_2D.Direction_2D;
+      Vector     : CGK.Primitives.Vectors_2D.Vector_2D;
+
+      Trajectory : aliased Standard.Legs.Trajectory.Trajectory_Information;
    end record;
 
    Velocity           : array (Boolean) of Velocity_Information;
@@ -298,6 +301,9 @@ package body Legs.Gait_Generator is
            (Kind     => Stance,
             PEP_Tick => Natural'Last);
       end loop;
+
+      Trajectory_Generator.Trajectory :=
+        Velocity (Velocity_Bank).Trajectory'Access;
    end Initialize;
 
    --------------
@@ -364,8 +370,10 @@ package body Legs.Gait_Generator is
    ------------------
 
    procedure Set_Velocity
-     (VX : CGK.Reals.Real;
-      VY : CGK.Reals.Real)
+     (VX  : CGK.Reals.Real;
+      VY  : CGK.Reals.Real;
+      RVX : CGK.Reals.Real;
+      RVY : CGK.Reals.Real)
    is
       Builder : Direction_2D_Builder;
 
@@ -386,6 +394,12 @@ package body Legs.Gait_Generator is
                Velocity (not Velocity_Bank).Y);
             Velocity (not Velocity_Bank).Direction := Direction (Builder);
          end if;
+
+         Standard.Legs.Trajectory.Set_Relative_Velocity
+           (Velocity (not Velocity_Bank).Trajectory,
+            RVX,
+            RVY,
+            0.0);
 
          Velocity_Changed := True;
       end if;
@@ -434,6 +448,9 @@ package body Legs.Gait_Generator is
                Compute_Linear (Leg);
             end if;
          end loop;
+
+         Trajectory_Generator.Trajectory :=
+           Velocity (Velocity_Bank).Trajectory'Access;
 
          Velocity_Changed := False;
       end if;

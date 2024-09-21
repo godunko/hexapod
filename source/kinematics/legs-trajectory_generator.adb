@@ -8,12 +8,15 @@
 
 with Ada.Numerics;
 
+with CGK.Primitives.Points_2D;
+
 with Legs.State;
 with Legs.Workspace;
 
 package body Legs.Trajectory_Generator is
 
    use Standard.Legs.State;
+   use Standard.Legs.Trajectory;
    use CGK.Reals;
 
    subtype Step_Fase is CGK.Reals.Real range 0.0 .. 1.0;
@@ -47,11 +50,12 @@ package body Legs.Trajectory_Generator is
    State : array (Leg_Index) of Trajectory_State;
 
    procedure Position_XYZ
-     (Plan   : Trajectory_State;
-      Ratio  : CGK.Reals.Real;
-      X      : in out Reals.Real;
-      Y      : in out Reals.Real;
-      Z      : in out Reals.Real);
+     (Plan       : Trajectory_State;
+      Trajectory : Trajectory_Information;
+      Ratio      : CGK.Reals.Real;
+      X          : in out Reals.Real;
+      Y          : in out Reals.Real;
+      Z          : in out Reals.Real);
    --  Compute coordinates of the leg from base base location, step
    --  description and fase of the step oscillator.
    --
@@ -69,17 +73,27 @@ package body Legs.Trajectory_Generator is
    ------------------
 
    procedure Position_XYZ
-     (Plan   : Trajectory_State;
-      Ratio  : Reals.Real;
-      X      : in out Reals.Real;
-      Y      : in out Reals.Real;
-      Z      : in out Reals.Real) is
+     (Plan       : Trajectory_State;
+      Trajectory : Trajectory_Information;
+      Ratio      : CGK.Reals.Real;
+      X          : in out Reals.Real;
+      Y          : in out Reals.Real;
+      Z          : in out Reals.Real)
+   is
+      Point : CGK.Primitives.Points_2D.Point_2D;
+
    begin
       if Plan.Kind = Linear then
          --  Strait line in the XY plane
 
-         X := @ + Plan.D_X;
-         Y := @ + Plan.D_Y;
+         --  X := @ + Plan.D_X;
+         --  Y := @ + Plan.D_Y;
+
+         Point := CGK.Primitives.Points_2D.Create_Point_2D (X, Y);
+         Transform (Trajectory, Point);
+         X := CGK.Primitives.Points_2D.X (Point);
+         Y := CGK.Primitives.Points_2D.Y (Point);
+
 
       else
          --  Swing of the leg
@@ -192,7 +206,9 @@ package body Legs.Trajectory_Generator is
    -- Tick --
    ----------
 
-   procedure Tick is
+   procedure Tick
+     --  (Trajectory : Standard.Legs.Trajectory.Trajectory_Information)
+   is
       X, Y, Z : Real;
       Success : Boolean;
 
@@ -208,7 +224,7 @@ package body Legs.Trajectory_Generator is
          Y := Kinematics.Y (Position (Leg));
          Z := Kinematics.Z (Position (Leg));
 
-         Position_XYZ (State (Leg), 1.0, X, Y, Z);
+         Position_XYZ (State (Leg), Trajectory.all, 1.0, X, Y, Z);
 
          Kinematics.Set (Position (Leg), X, Y, Z);
 
