@@ -8,6 +8,7 @@
 
 --  pragma Restrictions (No_Elaboration_Code);
 
+with CGK.Primitives.Circles_2D;
 with CGK.Primitives.Points_2D;
 private with CGK.Primitives.Transformations_2D;
 with CGK.Reals;
@@ -44,6 +45,13 @@ is
    procedure Transform
      (Self  : Trajectory_Information;
       Point : in out CGK.Primitives.Points_2D.Point_2D);
+
+   function Remaining_Ticks
+     (Self      : Trajectory_Information;
+      Workspace : CGK.Primitives.Circles_2D.Circle_2D;
+      Position  : CGK.Primitives.Points_2D.Point_2D) return Natural;
+   --  Returns a number of the control loop cycle ticks, that is necessary to
+   --  reach boundary of the workspace from the given point.
 
    procedure Set_Relative_Velocity
      (Self       : out Trajectory_Information;

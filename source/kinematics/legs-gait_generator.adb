@@ -33,8 +33,6 @@ package body Legs.Gait_Generator is
 
    use type CGK.Primitives.Points_2D.Containers.Point_2D_Array_Count;
 
-   Control_Loop_Frequency : constant := 100.0;
-   Control_Tick_Duration  : constant := 1.0 / Control_Loop_Frequency;
    Swing_Ticks            : constant := 50;
    --  Parameters of the control loop.
    --  XXX Must be shared between all modules.
@@ -160,37 +158,12 @@ package body Legs.Gait_Generator is
    procedure Compute_Linear
      (Leg : Leg_Index)
    is
-      procedure Update_State (Length  : CGK.Reals.Real);
-
-      ------------------
-      -- Update_State --
-      ------------------
-
-      procedure Update_State (Length  : CGK.Reals.Real) is
-         DL       : constant Reals.Real :=
-           Magnitude (Velocity (Velocity_Bank).Vector) * Control_Tick_Duration;
-         T        : constant Natural := Natural (Real'Floor (Length / DL));
-
-      begin
-         Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
-         State (Leg) :=
-           (Kind     => Stance,
-            PEP_Tick => Current_Tick + T);
-      end Update_State;
-
       Current       : constant Point_2D :=
         Create_Point_2D
           (Kinematics.X (Position (Leg)), Kinematics.Y (Position (Leg)));
-      Path          : Line_2D;
-      Workspace     : Circle_2D :=
+      Workspace     : constant Circle_2D :=
         Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
-      Intersections : Analytical_Intersection_2D;
-      Point_1       : Point_2D;
-      Point_2       : Point_2D;
-      Forward_1     : Boolean;
-      Forward_2     : Boolean;
-      Length_1      : Real;
-      Length_2      : Real;
+      Ticks         : Natural;
 
    begin
       --  Special case to shutdown on stop
@@ -214,19 +187,13 @@ package body Legs.Gait_Generator is
          return;
       end if;
 
-      --  Compute path line
+      Ticks :=
+        Trajectory.Remaining_Ticks
+          (Velocity (Velocity_Bank).Trajectory, Workspace, Current);
 
-      Path := Create_Line_2D (Current, Velocity (Velocity_Bank).Direction);
+      Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
 
-      --  Compute intersections of path line with workspace circle
-
-      Intersect (Intersections, Path, Workspace);
-
-      if Length (Intersections) /= 2 then
-         --  Path from the current position doesn't intersects with workspace
-         --  area.
-
-         Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
+      if Ticks = 0 then
          State (Leg) :=
            (Kind     => Stance,
             PEP_Tick =>
@@ -235,42 +202,9 @@ package body Legs.Gait_Generator is
                  else Current_Tick));
 
       else
-         Point_1   := Point (Intersections, 1);
-         Point_2   := Point (Intersections, 2);
-         Forward_1 := Is_Forward (Path, Point_1);
-         Forward_2 := Is_Forward (Path, Point_2);
-         Length_1  := Magnitude (Create_Vector_2D (Current, Point_1));
-         Length_2  := Magnitude (Create_Vector_2D (Current, Point_2));
-
-         if Forward_1 and Forward_2 then
-            --  There are two intersections of the path with workspace are.
-            --  Current position is outside of the workspace are.
-
-            if Length_1 > Length_2 then
-               Update_State (Length_1);
-
-            else
-               raise Program_Error;
-            end if;
-
-         elsif Forward_1 then
-            Update_State (Length_1);
-
-         elsif Forward_2 then
-            Update_State (Length_2);
-
-         else
-            --  Close to workspace edge, but outside of it.
-
-            Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
-            State (Leg) :=
-              (Kind     => Stance,
-               --  PEP_Tick => Current_Tick);
-               PEP_Tick =>
-                 (if State (Leg).Kind = Stance
-                    then State (Leg).PEP_Tick
-                    else Current_Tick));
-         end if;
+         State (Leg) :=
+           (Kind     => Stance,
+            PEP_Tick => Current_Tick + Ticks);
       end if;
    end Compute_Linear;
 

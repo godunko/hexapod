@@ -10,7 +10,8 @@ with Ada.Numerics;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with CGK.Primitives.Analytical_Intersections_2D;
-with CGK.Primitives.Circles_2D;
+with CGK.Primitives.Directions_2D.Builders;
+with CGK.Primitives.Lines_2D;
 with CGK.Primitives.Points_2D.Containers;
 with CGK.Primitives.Vectors_2D;
 with CGK.Primitives.XYs;
@@ -25,8 +26,10 @@ package body Legs.Trajectory is
    use CGK.Primitives.Analytical_Intersections_2D;
    use CGK.Primitives.Circles_2D;
    use CGK.Primitives.Points_2D;
+   use CGK.Primitives.Transformations_2D;
    use CGK.Primitives.Vectors_2D;
    use CGK.Reals.Elementary_Functions;
+   use CGK.Reals;
 
    use type CGK.Primitives.Points_2D.Containers.Point_2D_Array_Count;
 
@@ -308,6 +311,116 @@ package body Legs.Trajectory is
    --     Put (Buffer);
    --  end Put_Length_Image;
 
+   ---------------------
+   -- Remaining_Ticks --
+   ---------------------
+
+   function Remaining_Ticks
+     (Self      : Trajectory_Information;
+      Workspace : CGK.Primitives.Circles_2D.Circle_2D;
+      Position  : CGK.Primitives.Points_2D.Point_2D) return Natural
+   is
+      use CGK.Primitives.Directions_2D;
+      use CGK.Primitives.Directions_2D.Builders;
+      use CGK.Primitives.Lines_2D;
+      use CGK.Primitives.Vectors_2D;
+      use CGK.Reals;
+
+      function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean;
+
+      ----------------
+      -- Is_Forward --
+      ----------------
+
+      function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean is
+         use type CGK.Primitives.XYs.XY;
+
+         C : CGK.Primitives.XYs.XY := XY (Point) - XY (Location (Path));
+
+      begin
+         return
+           CGK.Primitives.XYs.Dot_Product (C, XY (Direction (Path))) >= 0.0;
+      end Is_Forward;
+
+      Path          : Line_2D;
+      Translation   : Vector_2D;
+      Builder       : Direction_2D_Builder;
+      Intersections : Analytical_Intersection_2D;
+      Point_1       : Point_2D;
+      Point_2       : Point_2D;
+      Forward_1     : Boolean;
+      Forward_2     : Boolean;
+      Length_1      : Real;
+      Length_2      : Real;
+
+   begin
+      if Is_Identity (Self.Tick_Transformation) then
+         return 0;
+
+      elsif Is_Translation (Self.Tick_Transformation) then
+         Translation :=
+           Create_Vector_2D (Translation_Component (Self.Tick_Transformation));
+
+         --  Compute path's line
+
+         Build (Builder, XY (Translation));
+         Path := Create_Line_2D (Position, Direction (Builder));
+
+         --  Compute intersections of path line with workspace circle
+
+         Intersect (Intersections, Path, Workspace);
+
+         if Length (Intersections) /= 2 then
+            --  Path from the current position doesn't intersects with
+            --  workspace area.
+
+      --     Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
+      --     State (Leg) :=
+      --       (Kind     => Stance,
+      --        PEP_Tick =>
+      --          (if State (Leg).Kind = Stance
+      --             then State (Leg).PEP_Tick
+      --             else Current_Tick));
+      --
+            raise Program_Error;
+
+         else
+            Point_1   := Point (Intersections, 1);
+            Point_2   := Point (Intersections, 2);
+            Forward_1 := Is_Forward (Path, Point_1);
+            Forward_2 := Is_Forward (Path, Point_2);
+            Length_1  := Magnitude (Create_Vector_2D (Position, Point_1));
+            Length_2  := Magnitude (Create_Vector_2D (Position, Point_2));
+
+            if Forward_1 and Forward_2 then
+               --  There are two intersections of the path with workspace.
+               --  Current position is outside of the workspace area.
+
+               if Length_1 > Length_2 then
+                  return Natural (Length_1 / Magnitude (Translation));
+
+               else
+                  raise Program_Error;
+               end if;
+
+            elsif Forward_1 then
+               return Natural (Length_1 / Magnitude (Translation));
+
+            elsif Forward_2 then
+               raise Program_Error;
+
+            else
+               --  Close to workspace edge, but outside of it.
+
+               return 0;
+            end if;
+         end if;
+
+      else
+         raise Program_Error;
+      end if;
+   end Remaining_Ticks;
+
    ---------------------------
    -- Set_Relative_Velocity --
    ---------------------------
@@ -318,11 +431,6 @@ package body Legs.Trajectory is
       Velocity_Y : CGK.Reals.Real;
       Velocity_W : CGK.Reals.Real)
    is
-      --  use CGK.Primitives.Vectors_2D;
-      use CGK.Primitives.Transformations_2D;
-      --  use CGK.Primitives.XYs;
-      use CGK.Reals;
-
       use type CGK.Primitives.XYs.XY;
 
       function Normalize_Linear_Velocity return Vector_2D;
