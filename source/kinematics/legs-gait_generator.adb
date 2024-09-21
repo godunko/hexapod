@@ -103,7 +103,7 @@ package body Legs.Gait_Generator is
       if Velocity (Velocity_Bank).X = 0.0
         and Velocity (Velocity_Bank).Y = 0.0
       then
-         Standard.Legs.Trajectory_Generator.Set_Linear (Leg, 0.0, 0.0);
+         Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
          AEP := Workspace_Center;
 
          return;
@@ -172,10 +172,7 @@ package body Legs.Gait_Generator is
          T        : constant Natural := Natural (Real'Floor (Length / DL));
 
       begin
-         Standard.Legs.Trajectory_Generator.Set_Linear
-           (Leg,
-            Velocity (Velocity_Bank).X * Control_Tick_Duration,
-            Velocity (Velocity_Bank).Y * Control_Tick_Duration);
+         Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
          State (Leg) :=
            (Kind     => Stance,
             PEP_Tick => Current_Tick + T);
@@ -201,7 +198,7 @@ package body Legs.Gait_Generator is
       if Velocity (Velocity_Bank).X = 0.0
         and Velocity (Velocity_Bank).Y = 0.0
       then
-         Standard.Legs.Trajectory_Generator.Set_Linear (Leg, 0.0, 0.0);
+         Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
 
          if Current = Center (Workspace) then
             State (Leg) :=
@@ -229,10 +226,7 @@ package body Legs.Gait_Generator is
          --  Path from the current position doesn't intersects with workspace
          --  area.
 
-         Standard.Legs.Trajectory_Generator.Set_Linear
-           (Leg,
-            Velocity (Velocity_Bank).X * Control_Tick_Duration,
-            Velocity (Velocity_Bank).Y * Control_Tick_Duration);
+         Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
          State (Leg) :=
            (Kind     => Stance,
             PEP_Tick =>
@@ -268,10 +262,7 @@ package body Legs.Gait_Generator is
          else
             --  Close to workspace edge, but outside of it.
 
-            Standard.Legs.Trajectory_Generator.Set_Linear
-              (Leg,
-               Velocity (Velocity_Bank).X * Control_Tick_Duration,
-               Velocity (Velocity_Bank).Y * Control_Tick_Duration);
+            Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
             State (Leg) :=
               (Kind     => Stance,
                --  PEP_Tick => Current_Tick);

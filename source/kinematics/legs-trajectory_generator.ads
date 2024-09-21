@@ -51,11 +51,8 @@ is
    procedure Tick;
    --  Computes position of the end-effector and posture of the legs.
 
-   procedure Set_Linear
-     (Leg : Leg_Index;
-      DX  : CGK.Reals.Real;
-      DY  : CGK.Reals.Real);
-   --  Sets leg's trajectory to follow straight line.
+   procedure Set_Stance (Leg : Leg_Index);
+   --  Sets leg's to use body's trajectory to follow path.
 
    procedure Set_Swing
      (Leg    : Leg_Index;

@@ -163,17 +163,13 @@ package body Legs.Trajectory_Generator is
    end Initialize;
 
    ----------------
-   -- Set_Linear --
+   -- Set_Stance --
    ----------------
 
-   procedure Set_Linear
-     (Leg : Leg_Index;
-      DX  : CGK.Reals.Real;
-      DY  : CGK.Reals.Real) is
+   procedure Set_Stance (Leg : Leg_Index) is
    begin
       State (Leg) := (Kind => Linear);
-      null;
-   end Set_Linear;
+   end Set_Stance;
 
    ---------------
    -- Set_Swing --
