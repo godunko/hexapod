@@ -53,6 +53,11 @@ is
    --  Returns a number of the control loop cycle ticks, that is necessary to
    --  reach boundary of the workspace from the given point.
 
+   function Anterior_Extreme_Position
+     (Self : Trajectory_Information;
+      Leg  : Leg_Index) return CGK.Primitives.Points_2D.Point_2D with Inline;
+   --  Returns optimal anterior extreme position.
+
    procedure Set_Relative_Velocity
      (Self       : out Trajectory_Information;
       Velocity_X : CGK.Reals.Real;

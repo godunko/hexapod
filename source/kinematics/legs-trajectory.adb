@@ -25,6 +25,9 @@ package body Legs.Trajectory is
    use Ada.Numerics;
    use CGK.Primitives.Analytical_Intersections_2D;
    use CGK.Primitives.Circles_2D;
+   use CGK.Primitives.Directions_2D;
+   use CGK.Primitives.Directions_2D.Builders;
+   use CGK.Primitives.Lines_2D;
    use CGK.Primitives.Points_2D;
    use CGK.Primitives.Transformations_2D;
    use CGK.Primitives.Vectors_2D;
@@ -32,6 +35,8 @@ package body Legs.Trajectory is
    use CGK.Reals;
 
    use type CGK.Primitives.Points_2D.Containers.Point_2D_Array_Count;
+
+   function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean;
 
    --  package Real_IO is new Ada.Text_IO.Float_IO (CGK.Reals.Real);
 
@@ -237,6 +242,17 @@ package body Legs.Trajectory is
    --     --  end loop;
    --  end Center;
 
+   -------------------------------
+   -- Anterior_Extreme_Position --
+   -------------------------------
+
+   function Anterior_Extreme_Position
+     (Self : Trajectory_Information;
+      Leg  : Leg_Index) return CGK.Primitives.Points_2D.Point_2D is
+   begin
+      return Self.Leg_Information (Leg).AEP;
+   end Anterior_Extreme_Position;
+
    ----------------
    -- Initialize --
    ----------------
@@ -311,6 +327,19 @@ package body Legs.Trajectory is
    --     Put (Buffer);
    --  end Put_Length_Image;
 
+   ----------------
+   -- Is_Forward --
+   ----------------
+
+   function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean is
+      use type CGK.Primitives.XYs.XY;
+
+      C : CGK.Primitives.XYs.XY := XY (Point) - XY (Location (Path));
+
+   begin
+      return CGK.Primitives.XYs.Dot_Product (C, XY (Direction (Path))) >= 0.0;
+   end Is_Forward;
+
    ---------------------
    -- Remaining_Ticks --
    ---------------------
@@ -320,27 +349,8 @@ package body Legs.Trajectory is
       Workspace : CGK.Primitives.Circles_2D.Circle_2D;
       Position  : CGK.Primitives.Points_2D.Point_2D) return Natural
    is
-      use CGK.Primitives.Directions_2D;
-      use CGK.Primitives.Directions_2D.Builders;
-      use CGK.Primitives.Lines_2D;
       use CGK.Primitives.Vectors_2D;
       use CGK.Reals;
-
-      function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean;
-
-      ----------------
-      -- Is_Forward --
-      ----------------
-
-      function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean is
-         use type CGK.Primitives.XYs.XY;
-
-         C : CGK.Primitives.XYs.XY := XY (Point) - XY (Location (Path));
-
-      begin
-         return
-           CGK.Primitives.XYs.Dot_Product (C, XY (Direction (Path))) >= 0.0;
-      end Is_Forward;
 
       Path          : Line_2D;
       Translation   : Vector_2D;
@@ -374,15 +384,7 @@ package body Legs.Trajectory is
             --  Path from the current position doesn't intersects with
             --  workspace area.
 
-      --     Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
-      --     State (Leg) :=
-      --       (Kind     => Stance,
-      --        PEP_Tick =>
-      --          (if State (Leg).Kind = Stance
-      --             then State (Leg).PEP_Tick
-      --             else Current_Tick));
-      --
-            raise Program_Error;
+            return 0;
 
          else
             Point_1   := Point (Intersections, 1);
@@ -510,6 +512,84 @@ package body Legs.Trajectory is
             --  CGK.Primitives.XYs. "-" (CGK.Primitives.Vectors_2D. XY (Absolute_Linear_Velocity))
             -CGK.Primitives.Vectors_2D.XY (Absolute_Linear_Velocity)
                * Hexapod.Parameters.Control_Cycle.Tick_Duration);
+
+         for Leg in Leg_Index loop
+            declare
+               Workspace        : constant Circle_2D :=
+                 Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
+               Workspace_Center : constant Point_2D := Center (Workspace);
+               Builder          : Direction_2D_Builder;
+               Path             : Line_2D;
+               Intersections    : Analytical_Intersection_2D;
+               Point_1          : Point_2D;
+               Point_2          : Point_2D;
+               Forward_1        : Boolean;
+               Forward_2        : Boolean;
+   --     Length_1         : Real;
+   --     Length_2         : Real;
+
+            begin
+               --  Special case to shutdown on stop
+
+               if X (Absolute_Linear_Velocity) = 0.0
+                 and Y (Absolute_Linear_Velocity) = 0.0
+               then
+                  Self.Leg_Information (Leg).AEP := Workspace_Center;
+
+   --     if Velocity (Velocity_Bank).X = 0.0
+   --       and Velocity (Velocity_Bank).Y = 0.0
+   --     then
+   --        Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
+   --        AEP := Workspace_Center;
+   --
+   --        return;
+   --     end if;
+               else
+                  --  Compute path's line
+
+                  Build (Builder, XY (Absolute_Linear_Velocity));
+                  Path :=
+                    Create_Line_2D (Workspace_Center, Direction (Builder));
+
+                  --  Compute intersections of path line with workspace circle
+
+                  Intersect (Intersections, Path, Workspace);
+                  pragma Assert (Length (Intersections) = 2);
+                  --  Workspace area intersects with straight line path in two
+                  --  points.
+
+                  Point_1   := Point (Intersections, 1);
+                  Point_2   := Point (Intersections, 2);
+                  Forward_1 := Is_Forward (Path, Point_1);
+                  Forward_2 := Is_Forward (Path, Point_2);
+   --        Length_1  := Magnitude (Create_Vector_2D (Workspace_Center, Point_1));
+   --        Length_2  := Magnitude (Create_Vector_2D (Workspace_Center, Point_2));
+   --
+                  if Forward_1 and Forward_2 then
+                     --  There are two intersections of the path with workspace
+                     --  are. Current position is outside of the workspace are.
+
+                     --  if Length_1 > Length_2 then
+                     --     raise Program_Error;
+                     --
+                     --  else
+                     --     raise Program_Error;
+                     --  end if;
+
+                     raise Program_Error;
+
+                  elsif Forward_1 then
+                     Self.Leg_Information (Leg).AEP := Point_2;
+
+                  elsif Forward_2 then
+                     raise Program_Error;
+
+                  else
+                     raise Program_Error;
+                  end if;
+               end if;
+            end;
+         end loop;
 
       else
          Absolute_Angular_Velocity :=
