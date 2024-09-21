@@ -7,7 +7,6 @@
 --  pragma Restrictions (No_Elaboration_Code);
 
 with CGK.Primitives.Circles_2D;
-with CGK.Primitives.Directions_2D.Builders;
 with CGK.Primitives.Points_2D;
 
 with Legs.State;
@@ -18,8 +17,6 @@ with Legs.Workspace;
 package body Legs.Gait_Generator is
 
    use CGK.Primitives.Circles_2D;
-   use CGK.Primitives.Directions_2D;
-   use CGK.Primitives.Directions_2D.Builders;
    use CGK.Primitives.Points_2D;
    use CGK.Reals;
    use Standard.Legs.State;
@@ -46,7 +43,6 @@ package body Legs.Gait_Generator is
    type Velocity_Information is record
       X          : CGK.Reals.Real := 0.0;
       Y          : CGK.Reals.Real := 0.0;
-      Direction  : CGK.Primitives.Directions_2D.Direction_2D;
 
       Trajectory : aliased Standard.Legs.Trajectory.Trajectory_Information;
    end record;
@@ -192,26 +188,13 @@ package body Legs.Gait_Generator is
      (VX  : CGK.Reals.Real;
       VY  : CGK.Reals.Real;
       RVX : CGK.Reals.Real;
-      RVY : CGK.Reals.Real)
-   is
-      Builder : Direction_2D_Builder;
-
+      RVY : CGK.Reals.Real) is
    begin
       if VX /= Velocity (Velocity_Bank).X
         or VY /= Velocity (Velocity_Bank).Y
       then
          Velocity (not Velocity_Bank).X := -VX;
          Velocity (not Velocity_Bank).Y := -VY;
-
-         if Velocity (not Velocity_Bank).X /= 0.0
-           or Velocity (not Velocity_Bank).Y /= 0.0
-         then
-            Build
-              (Builder,
-               Velocity (not Velocity_Bank).X,
-               Velocity (not Velocity_Bank).Y);
-            Velocity (not Velocity_Bank).Direction := Direction (Builder);
-         end if;
 
          Standard.Legs.Trajectory.Set_Relative_Velocity
            (Velocity (not Velocity_Bank).Trajectory,
