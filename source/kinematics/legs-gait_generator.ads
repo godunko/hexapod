@@ -20,9 +20,7 @@ is
    --  Computes gait and updates legs' trajectory when necessary.
 
    procedure Set_Velocity
-     (VX  : CGK.Reals.Real;
-      VY  : CGK.Reals.Real;
-      RVX : CGK.Reals.Real;
+     (RVX : CGK.Reals.Real;
       RVY : CGK.Reals.Real);
    --  Sets desired velocity
 

@@ -41,8 +41,8 @@ package body Legs.Gait_Generator is
    --  Number of the current tick.
 
    type Velocity_Information is record
-      X          : CGK.Reals.Real := 0.0;
-      Y          : CGK.Reals.Real := 0.0;
+      RVX        : CGK.Reals.Real := 0.0;
+      RVY        : CGK.Reals.Real := 0.0;
 
       Trajectory : aliased Standard.Legs.Trajectory.Trajectory_Information;
    end record;
@@ -74,8 +74,8 @@ package body Legs.Gait_Generator is
    begin
       --  Special case to shutdown on stop
 
-      if Velocity (Velocity_Bank).X = 0.0
-        and Velocity (Velocity_Bank).Y = 0.0
+      if Velocity (Velocity_Bank).RVX = 0.0
+        and Velocity (Velocity_Bank).RVY = 0.0
       then
          Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
 
@@ -120,12 +120,12 @@ package body Legs.Gait_Generator is
 
    procedure Initialize is
    begin
-      Current_Tick               := 0;
+      Current_Tick                 := 0;
 
-      Velocity_Bank              := False;
-      Velocity (Velocity_Bank).X := 0.0;
-      Velocity (Velocity_Bank).Y := 0.0;
-      Velocity_Changed           := False;
+      Velocity_Bank                := False;
+      Velocity (Velocity_Bank).RVX := 0.0;
+      Velocity (Velocity_Bank).RVY := 0.0;
+      Velocity_Changed             := False;
 
       for Leg in Leg_Index loop
          State (Leg) :=
@@ -185,16 +185,14 @@ package body Legs.Gait_Generator is
    ------------------
 
    procedure Set_Velocity
-     (VX  : CGK.Reals.Real;
-      VY  : CGK.Reals.Real;
-      RVX : CGK.Reals.Real;
+     (RVX : CGK.Reals.Real;
       RVY : CGK.Reals.Real) is
    begin
-      if VX /= Velocity (Velocity_Bank).X
-        or VY /= Velocity (Velocity_Bank).Y
+      if RVX /= Velocity (Velocity_Bank).RVX
+        or RVY /= Velocity (Velocity_Bank).RVY
       then
-         Velocity (not Velocity_Bank).X := -VX;
-         Velocity (not Velocity_Bank).Y := -VY;
+         Velocity (not Velocity_Bank).RVX := RVX;
+         Velocity (not Velocity_Bank).RVY := RVY;
 
          Standard.Legs.Trajectory.Set_Relative_Velocity
            (Velocity (not Velocity_Bank).Trajectory,
