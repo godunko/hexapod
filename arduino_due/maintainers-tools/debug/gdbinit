@@ -12,6 +12,10 @@ monitor reset halt
 # set breakpoint on failure report subprogram instead of last chance handler to
 # be able to turn off motors' power of failure first.
 break __hexapod_report_failure_state
+commands
+  backtrace
+  frame 2
+end
 
 # execute single instruction to load stack pointer and program counter from
 # the interrupt table.
