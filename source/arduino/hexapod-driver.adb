@@ -8,6 +8,7 @@ with A0B.ARMv7M.SysTick;
 with A0B.ATSAM3X8E.TC5_Timer;
 with A0B.Tasking;
 
+with Debug.Log.Console;
 with Hexapod.Command_Line;
 with Hexapod.Hardware;
 with Hexapod.Movement;
@@ -16,6 +17,8 @@ with Hexapod.Remote_Control;
 
 procedure Hexapod.Driver is
 begin
+   Debug.Log.Console.Initialize;
+
    A0B.ARMv7M.SysTick.Initialize
     (Use_Processor_Clock => True,
      Clock_Frequency     => 84_000_000);
