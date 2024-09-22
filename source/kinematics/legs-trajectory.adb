@@ -683,15 +683,8 @@ package body Legs.Trajectory is
          end if;
 
       else
-         Self.Angular_Velocity :=
-           (Max_Step - Magnitude (Linear_Velocity) * Max_Step) / Max_Radius;
-         --    Max_Step / (Linear_Speed / Velocity_W + Max_Radius);
-         Self.Angular_Velocity := Real'Copy_Sign (@, Velocity_W);
+         Self.Angular_Velocity := Max_Step / Max_Radius * Velocity_W;
 
-         --  Put_Length_Image (Absolute_Angular_Velocity);
-         --  Put (") ");
-
-         --  if X (Linear_Velocity) = 0.0 and Y (Linear_Velocity) = 0.0 then
          if Linear_Speed = 0.0 then
             Self.Trajectory_Center := Create_Point_2D (0.0, 0.0);
 
