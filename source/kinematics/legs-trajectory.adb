@@ -790,8 +790,12 @@ package body Legs.Trajectory is
                --  Put_Angle_Image (Angle_12);
                --  Put_Angle_Image (Angle_21);
 
-                  Self.Leg_Information (Leg).AEP := Point_2;
-               --  Current (Leg) := Point_2;
+                  if Self.Angular_Velocity > 0.0 then
+                     Self.Leg_Information (Leg).AEP := Point_2;
+
+                  else
+                     Self.Leg_Information (Leg).AEP := Point_1;
+                  end if;
                end if;
 
             --  New_Line;
