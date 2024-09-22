@@ -30,7 +30,7 @@ with Hexapod.Hardware.Initialize_Servo_Controllers;
 
 package body Hexapod.Movement is
 
-   use type Reals.Real;
+   use type CGK.Reals.Real;
 
    LF_Posture  : Kinematics.Posture
      renames Legs.State.Posture (Legs.Left_Front);
@@ -54,8 +54,8 @@ package body Hexapod.Movement is
       Channel   : not null access BBF.PCA9685.PCA9685_Channel'Class;
       Min_PWM   : BBF.PCA9685.Value_Type;
       Max_PWM   : BBF.PCA9685.Value_Type;
-      Min_Angle : Reals.Real;
-      Max_Angle : Reals.Real;
+      Min_Angle : CGK.Reals.Real;
+      Max_Angle : CGK.Reals.Real;
    end record;
 
    LF_M_1 : constant Motor_Descriptor :=
@@ -250,7 +250,7 @@ package body Hexapod.Movement is
    is
       function Map
         (Descriptor : Motor_Descriptor;
-         Angle      : Reals.Real) return BBF.PCA9685.Value_Type;
+         Angle      : CGK.Reals.Real) return BBF.PCA9685.Value_Type;
 
       ---------
       -- Map --
@@ -258,19 +258,19 @@ package body Hexapod.Movement is
 
       function Map
         (Descriptor : Motor_Descriptor;
-         Angle      : Reals.Real) return BBF.PCA9685.Value_Type
+         Angle      : CGK.Reals.Real) return BBF.PCA9685.Value_Type
       is
          use type BBF.PCA9685.Value_Type;
 
-         PWM_Range : constant Reals.Real :=
-           Reals.Real (Descriptor.Max_PWM - Descriptor.Min_PWM);
+         PWM_Range : constant CGK.Reals.Real :=
+           CGK.Reals.Real (Descriptor.Max_PWM - Descriptor.Min_PWM);
 
       begin
          return
            BBF.PCA9685.Value_Type
              ((Angle - Descriptor.Min_Angle)
               / ( Descriptor.Max_Angle - Descriptor.Min_Angle) * PWM_Range
-                 + Reals.Real (Descriptor.Min_PWM));
+                 + CGK.Reals.Real (Descriptor.Min_PWM));
       end Map;
 
       A : BBF.PCA9685.Value_Type;
@@ -337,12 +337,11 @@ package body Hexapod.Movement is
    ---------------------------
 
    procedure Set_Relative_Velocity
-     (V_X : Reals.Real;
-      V_Y : Reals.Real) is
+     (V_X : CGK.Reals.Real;
+      V_Y : CGK.Reals.Real;
+      V_W : CGK.Reals.Real) is
    begin
-      Legs.Gait_Generator.Set_Velocity
-        (RVX => V_X,
-         RVY => V_Y);
+      Legs.Gait_Generator.Set_Velocity (RVX => V_X, RVY => V_Y, RVW => V_W);
    end Set_Relative_Velocity;
 
    ----------

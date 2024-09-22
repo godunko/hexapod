@@ -21,7 +21,8 @@ is
 
    procedure Set_Velocity
      (RVX : CGK.Reals.Real;
-      RVY : CGK.Reals.Real);
+      RVY : CGK.Reals.Real;
+      RVW : CGK.Reals.Real);
    --  Sets desired velocity
 
 end Legs.Gait_Generator;

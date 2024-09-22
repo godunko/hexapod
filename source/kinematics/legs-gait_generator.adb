@@ -43,6 +43,7 @@ package body Legs.Gait_Generator is
    type Velocity_Information is record
       RVX        : CGK.Reals.Real := 0.0;
       RVY        : CGK.Reals.Real := 0.0;
+      RVW        : CGK.Reals.Real := 0.0;
 
       Trajectory : aliased Standard.Legs.Trajectory.Trajectory_Information;
    end record;
@@ -186,19 +187,22 @@ package body Legs.Gait_Generator is
 
    procedure Set_Velocity
      (RVX : CGK.Reals.Real;
-      RVY : CGK.Reals.Real) is
+      RVY : CGK.Reals.Real;
+      RVW : CGK.Reals.Real) is
    begin
       if RVX /= Velocity (Velocity_Bank).RVX
         or RVY /= Velocity (Velocity_Bank).RVY
+        or RVW /= Velocity (Velocity_Bank).RVW
       then
          Velocity (not Velocity_Bank).RVX := RVX;
          Velocity (not Velocity_Bank).RVY := RVY;
+         Velocity (not Velocity_Bank).RVW := RVW;
 
          Standard.Legs.Trajectory.Set_Relative_Velocity
-           (Velocity (not Velocity_Bank).Trajectory,
-            RVX,
-            RVY,
-            0.0);
+           (Self       => Velocity (not Velocity_Bank).Trajectory,
+            Velocity_X => RVX,
+            Velocity_Y => RVY,
+            Velocity_W => RVW);
 
          Velocity_Changed := True;
       end if;

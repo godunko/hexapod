@@ -124,6 +124,7 @@ package body Hexapod.Remote_Control is
 
       V_X              : CGK.Reals.Real;
       V_Y              : CGK.Reals.Real;
+      V_W              : CGK.Reals.Real;
 
    begin
       loop
@@ -145,8 +146,10 @@ package body Hexapod.Remote_Control is
 
          V_X := Map (State.Right_Joystick_Vertical);
          V_Y := Map (State.Right_Joystick_Horizontal);
+         V_W := Map (State.Left_Joystick_Horizontal);
 
-         Hexapod.Movement.Set_Relative_Velocity (V_X, V_Y);
+         Hexapod.Movement.Set_Relative_Velocity
+           (V_X => V_X, V_Y => V_Y, V_W => V_W);
 
          --  Delay till next polling
 

@@ -8,7 +8,7 @@
 
 --  pragma Restrictions (No_Elaboration_Code);
 
-with Reals;
+with CGK.Reals;
 
 package Hexapod.Movement is
 
@@ -25,8 +25,9 @@ package Hexapod.Movement is
    procedure Step;
 
    procedure Set_Relative_Velocity
-     (V_X : Reals.Real;
-      V_Y : Reals.Real);
+     (V_X : CGK.Reals.Real;
+      V_Y : CGK.Reals.Real;
+      V_W : CGK.Reals.Real);
 
    procedure Register_Task;
    --  Register task
