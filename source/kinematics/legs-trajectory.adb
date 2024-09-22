@@ -507,44 +507,36 @@ package body Legs.Trajectory is
       if Velocity_W = 0.0 then
          Absolute_Angular_Velocity := 0.0;
 
-         Set_Translation
-           (Self.Tick_Transformation,
-            --  CGK.Primitives.XYs. "-" (CGK.Primitives.Vectors_2D. XY (Absolute_Linear_Velocity))
-            -CGK.Primitives.Vectors_2D.XY (Absolute_Linear_Velocity)
-               * Hexapod.Parameters.Control_Cycle.Tick_Duration);
+         if X (Absolute_Linear_Velocity) = 0.0
+           and Y (Absolute_Linear_Velocity) = 0.0
+         then
+            Set_Identity (Self.Tick_Transformation);
 
-         for Leg in Leg_Index loop
-            declare
-               Workspace        : constant Circle_2D :=
-                 Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
-               Workspace_Center : constant Point_2D := Center (Workspace);
-               Builder          : Direction_2D_Builder;
-               Path             : Line_2D;
-               Intersections    : Analytical_Intersection_2D;
-               Point_1          : Point_2D;
-               Point_2          : Point_2D;
-               Forward_1        : Boolean;
-               Forward_2        : Boolean;
-   --     Length_1         : Real;
-   --     Length_2         : Real;
+            for Leg in Leg_Index loop
+               Self.Leg_Information (Leg).AEP :=
+                 Center (Standard.Legs.Workspace.Get_Bounded_Circle (Leg));
+            end loop;
 
-            begin
-               --  Special case to shutdown on stop
+         else
+            Set_Translation
+              (Self.Tick_Transformation,
+               -CGK.Primitives.Vectors_2D.XY (Absolute_Linear_Velocity)
+                 * Hexapod.Parameters.Control_Cycle.Tick_Duration);
 
-               if X (Absolute_Linear_Velocity) = 0.0
-                 and Y (Absolute_Linear_Velocity) = 0.0
-               then
-                  Self.Leg_Information (Leg).AEP := Workspace_Center;
+            for Leg in Leg_Index loop
+               declare
+                  Workspace        : constant Circle_2D :=
+                    Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
+                  Workspace_Center : constant Point_2D := Center (Workspace);
+                  Builder          : Direction_2D_Builder;
+                  Path             : Line_2D;
+                  Intersections    : Analytical_Intersection_2D;
+                  Point_1          : Point_2D;
+                  Point_2          : Point_2D;
+                  Forward_1        : Boolean;
+                  Forward_2        : Boolean;
 
-   --     if Velocity (Velocity_Bank).X = 0.0
-   --       and Velocity (Velocity_Bank).Y = 0.0
-   --     then
-   --        Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
-   --        AEP := Workspace_Center;
-   --
-   --        return;
-   --     end if;
-               else
+               begin
                   --  Compute path's line
 
                   Build (Builder, XY (Absolute_Linear_Velocity));
@@ -562,23 +554,11 @@ package body Legs.Trajectory is
                   Point_2   := Point (Intersections, 2);
                   Forward_1 := Is_Forward (Path, Point_1);
                   Forward_2 := Is_Forward (Path, Point_2);
-   --        Length_1  := Magnitude (Create_Vector_2D (Workspace_Center, Point_1));
-   --        Length_2  := Magnitude (Create_Vector_2D (Workspace_Center, Point_2));
-   --
-                  if Forward_1 and Forward_2 then
-                     --  There are two intersections of the path with workspace
-                     --  are. Current position is outside of the workspace are.
 
-                     --  if Length_1 > Length_2 then
-                     --     raise Program_Error;
-                     --
-                     --  else
-                     --     raise Program_Error;
-                     --  end if;
+                  pragma Assert (Forward_1 xor Forward_2);
+                  --  Only one of the forward flags are True by construction.
 
-                     raise Program_Error;
-
-                  elsif Forward_1 then
+                  if Forward_1 then
                      Self.Leg_Information (Leg).AEP := Point_2;
 
                   elsif Forward_2 then
@@ -587,9 +567,9 @@ package body Legs.Trajectory is
                   else
                      raise Program_Error;
                   end if;
-               end if;
-            end;
-         end loop;
+               end;
+            end loop;
+         end if;
 
       else
          Absolute_Angular_Velocity :=
