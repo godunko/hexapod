@@ -3,7 +3,7 @@ Phoenix Hexapod
 
 This repository contains software for Phoenix Hexapod robot.
 
-Short video is available on [YouTube](https://www.youtube.com/watch?v=2j_bzXEz6qw).
+Short video is available on [YouTube](https://youtu.be/20ni6MPR1c4).
 
 It uses [B2F4A](https://github.com/godunko/b2f4a) library to manage hardware and [CGK](https://github.com/godunko/cgk) for geometric computations.
 
