@@ -30,7 +30,6 @@ procedure Hexapod.Driver is
    use type A0B.Time.Monotonic_Time;
    use type A0B.Time.Time_Span;
    use type Reals.Real;
-   use type Hexapod.Movement.Gait_Kind;
 
    Last_Timestamp : A0B.Time.Monotonic_Time :=
      A0B.Time.Constants.Monotonic_Time_First;

@@ -30,10 +30,7 @@ package body Hexapod.Command_Line is
    ------------
 
    procedure Thread is
-      use type Hexapod.Movement.Gait_Kind;
-
-      C    : Character;
-      Gait : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
+      C : Character;
 
    begin
       loop
@@ -54,17 +51,17 @@ package body Hexapod.Command_Line is
                Hexapod.Hardware.Enable_Motors_Power;
                Hexapod.Movement.Configure;
 
-            when '-' | '_' =>
-               if Gait /= Hexapod.Movement.Gait_Kind'First then
-                  Gait := Hexapod.Movement.Gait_Kind'Pred (@);
-                  Hexapod.Movement.Set_Gait (Gait);
-               end if;
-
-            when '+' | '=' =>
-               if Gait /= Hexapod.Movement.Gait_Kind'Last then
-                  Gait := Hexapod.Movement.Gait_Kind'Succ (@);
-                  Hexapod.Movement.Set_Gait (Gait);
-               end if;
+            --  when '-' | '_' =>
+            --     if Gait /= Hexapod.Movement.Gait_Kind'First then
+            --        Gait := Hexapod.Movement.Gait_Kind'Pred (@);
+            --        Hexapod.Movement.Set_Gait (Gait);
+            --     end if;
+            --
+            --  when '+' | '=' =>
+            --     if Gait /= Hexapod.Movement.Gait_Kind'Last then
+            --        Gait := Hexapod.Movement.Gait_Kind'Succ (@);
+            --        Hexapod.Movement.Set_Gait (Gait);
+            --     end if;
 
                --  when 'P' | 'p' =>
                --     Hexapod.Hardware.Configure_Controllers;

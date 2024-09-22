@@ -332,15 +332,6 @@ package body Hexapod.Movement is
       A0B.Tasking.Register_Thread (TCB, Task_Subprogram'Access, 16#400#);
    end Register_Task;
 
-   --------------
-   -- Set_Gait --
-   --------------
-
-   procedure Set_Gait (Gait : Gait_Kind) is
-   begin
-      null;
-   end Set_Gait;
-
    ---------------------------
    -- Set_Relative_Velocity --
    ---------------------------

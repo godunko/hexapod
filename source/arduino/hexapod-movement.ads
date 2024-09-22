@@ -18,15 +18,11 @@ package Hexapod.Movement is
    Ticks : constant := 100;
    --  Number of ticks per second.
 
-   type Gait_Kind is (Stop, Wave, Quadro, Tripod);
-
    procedure Initialize;
 
    procedure Configure;
 
    procedure Step;
-
-   procedure Set_Gait (Gait : Gait_Kind);
 
    procedure Set_Relative_Velocity
      (V_X : Reals.Real;

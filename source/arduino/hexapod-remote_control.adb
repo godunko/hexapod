@@ -99,7 +99,6 @@ package body Hexapod.Remote_Control is
    procedure Task_Subprogram is
       use type A0B.Time.Monotonic_Time;
       use type A0B.Types.Unsigned_8;
-      use type Hexapod.Movement.Gait_Kind;
       use type CGK.Reals.Real;
 
       function Map (Value : A0B.Types.Unsigned_8) return CGK.Reals.Real;
@@ -122,7 +121,6 @@ package body Hexapod.Remote_Control is
       Polling_Interval : constant A0B.Time.Time_Span :=
         A0B.Time.Milliseconds (1_000 / Polling_Rate);
       State            : A0B.PlayStation2_Controllers.Controller_State;
-      Gait             : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
 
       V_X              : CGK.Reals.Real;
       V_Y              : CGK.Reals.Real;
@@ -147,26 +145,6 @@ package body Hexapod.Remote_Control is
 
          V_X := Map (State.Right_Joystick_Vertical);
          V_Y := Map (State.Right_Joystick_Horizontal);
-
-         if V_X = 0.0 and V_Y = 0.0 then
-            if Gait /= Hexapod.Movement.Stop then
-               Gait := Hexapod.Movement.Stop;
-
-               Hexapod.Console.Put_Line ("PS2C: stop");
-               Hexapod.Movement.Set_Gait (Gait);
-            end if;
-
-         else
-            if Gait = Hexapod.Movement.Stop then
-               Gait := Hexapod.Movement.Wave;
-
-               Hexapod.Console.Put_Line ("PS2C: forward");
-               Hexapod.Movement.Set_Gait (Gait);
-
-               Hexapod.Console.Put_Line
-                 (CGK.Reals.Real'Image (V_X) & CGK.Reals.Real'Image (V_Y));
-            end if;
-         end if;
 
          Hexapod.Movement.Set_Relative_Velocity (V_X, V_Y);
 
