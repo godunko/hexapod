@@ -19,6 +19,7 @@ Hardware
  * 2x relay modules
  * PlayStation2 Controller
  * MPU9150 MotionTracking board
+ * AT24C256 EEPROM board
 
 Implemented Features
 --------------------
@@ -29,11 +30,12 @@ Implemented Features
    * Geometric
    * Numerical (Gradient Descent and Levenberg-Marquardt)
  * Gait transition (fixed step)
+ * Body trajectry control by the PlayStation/2 controller
+ * Free gait genrator for crab movement and turns
 
 Current Development
 -------------------
 
- * Body trajectry control by the PlayStation/2 controller
  * Use of Max-Plus linear system to implement free gait
 
 Notes
