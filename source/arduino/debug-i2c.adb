@@ -10,7 +10,7 @@ with Interfaces;
 
 with Hexapod.Console;
 
-package body Debug is
+package body Debug.I2C is
 
    ----------
    -- Dump --
@@ -34,4 +34,4 @@ package body Debug is
       Hexapod.Console.Put_Line (Line);
    end Dump;
 
-end Debug;
+end Debug.I2C;
