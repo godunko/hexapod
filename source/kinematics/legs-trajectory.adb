@@ -671,6 +671,7 @@ package body Legs.Trajectory is
          Self.Angular_Velocity :=
            (Max_Step - Magnitude (Linear_Velocity) * Max_Step) / Max_Radius;
          --    Max_Step / (Linear_Speed / Velocity_W + Max_Radius);
+         Self.Angular_Velocity := Real'Copy_Sign (@, Velocity_W);
 
          --  Put_Length_Image (Absolute_Angular_Velocity);
          --  Put (") ");
