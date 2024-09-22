@@ -4,19 +4,16 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with A0B.ATSAM3X8E.PIO.PIOA;
 with A0B.ATSAM3X8E.PIO.PIOB;
 with A0B.ATSAM3X8E.USART.SPI;
-with A0B.Callbacks.Generic_Non_Dispatching;
 with A0B.PlayStation2_Controllers.Protocol;
 with A0B.Tasking;
 with A0B.Time.Clock;
-with A0B.Timer;
-with A0B.Types.GCC_Builtins;
+with A0B.Types;
+
+with CGK.Reals;
 
 with BBF.Awaits;
-
-with Reals;
 
 with Hexapod.Console;
 with Hexapod.Hardware;
@@ -103,21 +100,21 @@ package body Hexapod.Remote_Control is
       use type A0B.Time.Monotonic_Time;
       use type A0B.Types.Unsigned_8;
       use type Hexapod.Movement.Gait_Kind;
-      use type Reals.Real;
+      use type CGK.Reals.Real;
 
-      function Map (Value : A0B.Types.Unsigned_8) return Reals.Real;
+      function Map (Value : A0B.Types.Unsigned_8) return CGK.Reals.Real;
 
       ---------
       -- Map --
       ---------
 
-      function Map (Value : A0B.Types.Unsigned_8) return Reals.Real is
+      function Map (Value : A0B.Types.Unsigned_8) return CGK.Reals.Real is
       begin
          if Value <= 16#80# then
-            return 1.0 - (1.0 / 128.0) * Reals.Real (Value);
+            return 1.0 - (1.0 / 128.0) * CGK.Reals.Real (Value);
 
          else
-            return -(1.0 / 127.0) * Reals.Real (Value - 16#80#);
+            return -(1.0 / 127.0) * CGK.Reals.Real (Value - 16#80#);
          end if;
       end Map;
 
@@ -127,8 +124,8 @@ package body Hexapod.Remote_Control is
       State            : A0B.PlayStation2_Controllers.Controller_State;
       Gait             : Hexapod.Movement.Gait_Kind := Hexapod.Movement.Stop;
 
-      V_X              : Reals.Real;
-      V_Y              : Reals.Real;
+      V_X              : CGK.Reals.Real;
+      V_Y              : CGK.Reals.Real;
 
    begin
       loop
@@ -166,7 +163,8 @@ package body Hexapod.Remote_Control is
                Hexapod.Console.Put_Line ("PS2C: forward");
                Hexapod.Movement.Set_Gait (Gait);
 
-               Hexapod.Console.Put_Line (Reals.Real'Image (V_X) & Reals.Real'Image (V_Y));
+               Hexapod.Console.Put_Line
+                 (CGK.Reals.Real'Image (V_X) & CGK.Reals.Real'Image (V_Y));
             end if;
          end if;
 
