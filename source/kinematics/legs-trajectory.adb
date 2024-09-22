@@ -478,16 +478,31 @@ package body Legs.Trajectory is
                  (Real'Image (Angle_1)
                       & Real'Image (Angle_2));
 
-               if Angle_1 > 0.0 then
-                  return 0;
+               if Self.Angular_Velocity > 0.0 then
+                  if Angle_1 > 0.0 then
+                     return 0;
+
+                  else
+                     return
+                       Natural
+                         (CGK.Reals.Real'Floor
+                            (-Angle_1 /
+                               (Self.Angular_Velocity
+                                * Hexapod.Parameters.Control_Cycle.Tick_Duration)));
+                  end if;
 
                else
-                  return
-                    Natural
-                      (CGK.Reals.Real'Floor
-                         (-Angle_1 /
-                            (Self.Angular_Velocity
-                             * Hexapod.Parameters.Control_Cycle.Tick_Duration)));
+                  if Angle_2 < 0.0 then
+                     return 0;
+
+                  else
+                     return
+                       Natural
+                         (CGK.Reals.Real'Floor
+                            (-Angle_2 /
+                               (Self.Angular_Velocity
+                                * Hexapod.Parameters.Control_Cycle.Tick_Duration)));
+                  end if;
                end if;
             --     --  Angle_1 := Arctan (X => X (Vector_1), Y => Y (Vector_1));
             --     --  --  Angle_1 := (if @ < 0.0 then 2.0 * PI - @ else @);
