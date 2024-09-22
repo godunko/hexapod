@@ -6,7 +6,7 @@
 
 --  pragma Restrictions (No_Elaboration_Code);
 
-with Ada.Numerics;
+--  with Ada.Numerics;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with CGK.Primitives.Analytical_Intersections_2D;
@@ -15,14 +15,14 @@ with CGK.Primitives.Lines_2D;
 with CGK.Primitives.Points_2D.Containers;
 with CGK.Primitives.Vectors_2D;
 with CGK.Primitives.XYs;
-with CGK.Reals.Elementary_Functions;
+--  with CGK.Reals.Elementary_Functions;
 
 with Hexapod.Parameters.Control_Cycle;
 with Legs.Workspace;
 
 package body Legs.Trajectory is
 
-   use Ada.Numerics;
+   --  use Ada.Numerics;
    use CGK.Primitives.Analytical_Intersections_2D;
    use CGK.Primitives.Circles_2D;
    use CGK.Primitives.Directions_2D;
@@ -31,7 +31,7 @@ package body Legs.Trajectory is
    use CGK.Primitives.Points_2D;
    use CGK.Primitives.Transformations_2D;
    use CGK.Primitives.Vectors_2D;
-   use CGK.Reals.Elementary_Functions;
+   --  use CGK.Reals.Elementary_Functions;
    use CGK.Reals;
 
    use type CGK.Primitives.Points_2D.Containers.Point_2D_Array_Count;
@@ -49,7 +49,7 @@ package body Legs.Trajectory is
    --  procedure Put (Item : Point_2D);
 
    --  Active_Trajectory : Trajectory_Information;
-   Current             : array (Leg_Index) of Point_2D;
+   --  Current             : array (Leg_Index) of Point_2D;
 
    --  procedure Center
    --    (Body_Velocity : Velocity)
@@ -580,7 +580,10 @@ package body Legs.Trajectory is
          --  Put (") ");
 
          --  if X (Linear_Velocity) = 0.0 and Y (Linear_Velocity) = 0.0 then
-         if Linear_Speed /= 0.0 then
+         if Linear_Speed = 0.0 then
+            Trajectory_Center := Create_Point_2D (0.0, 0.0);
+
+         else
             Trajectory_Center :=
               Create_Point_2D
                 (XY
@@ -603,29 +606,29 @@ package body Legs.Trajectory is
 
       --  New_Line;
 
-      for Leg in Leg_Index loop
-         declare
-            Workspace_Circle  : Circle_2D :=
-              Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
-            Trajectory_Radius : Real :=
-              Magnitude
-                (Create_Vector_2D
-                   (Trajectory_Center, Center (Workspace_Circle)));
-            Trajectory_Circle : Circle_2D :=
-              Create_Circle_2D (Trajectory_Center, Trajectory_Radius);
-            Intersections     : Analytical_Intersection_2D;
-            Point_1           : Point_2D;
-            Point_2           : Point_2D;
-            Vector_1          : Vector_2D;
-            Vector_2          : Vector_2D;
-            Angle_1           : Real;
-            Angle_2           : Real;
-            Angle_12          : Real;
-            Angle_21          : Real;
-            --  AEP               : Point_2D;
-            --  PEP               : Point_2D;
+         for Leg in Leg_Index loop
+            declare
+               Workspace_Circle  : Circle_2D :=
+                 Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
+               Trajectory_Radius : Real :=
+                 Magnitude
+                   (Create_Vector_2D
+                      (Trajectory_Center, Center (Workspace_Circle)));
+               Trajectory_Circle : Circle_2D :=
+                 Create_Circle_2D (Trajectory_Center, Trajectory_Radius);
+               Intersections     : Analytical_Intersection_2D;
+               Point_1           : Point_2D;
+               Point_2           : Point_2D;
+               Vector_1          : Vector_2D;
+               Vector_2          : Vector_2D;
+               --  Angle_1           : Real;
+               --  Angle_2           : Real;
+               --  Angle_12          : Real;
+               --  Angle_21          : Real;
+               --  AEP               : Point_2D;
+               --  PEP               : Point_2D;
 
-         begin
+            begin
             --  Put_Leg_Index (Leg);
             --  Put (" @ ");
             --  Put_Length_Image (X (Center (Workspace_Circle)));
@@ -634,16 +637,16 @@ package body Legs.Trajectory is
             --  Put ("  R");
             --  Put_Length_Image (Trajectory_Radius);
 
-            Intersect (Intersections, Workspace_Circle, Trajectory_Circle);
+               Intersect (Intersections, Workspace_Circle, Trajectory_Circle);
 
-            if Length (Intersections) /= 2 then
-               --  XXX It is possible when circles are inside each other.
+               if Length (Intersections) /= 2 then
+                  --  XXX It is possible when circles are inside each other.
 
-               raise Program_Error;
+                  raise Program_Error;
 
-            else
-               Point_1 := Point (Intersections, 1);
-               Point_2 := Point (Intersections, 2);
+               else
+                  Point_1 := Point (Intersections, 1);
+                  Point_2 := Point (Intersections, 2);
 
                --  Put ("  (1) ");
                --  Put_Length_Image (X (Point_1));
@@ -668,18 +671,18 @@ package body Legs.Trajectory is
                Vector_2 :=
                  Create_Vector_2D (Center (Trajectory_Circle), Point_2);
 
-               Angle_1 := Arctan (X => X (Vector_1), Y => Y (Vector_1));
-               --  Angle_1 := (if @ < 0.0 then 2.0 * PI - @ else @);
-               Angle_2 := Arctan (X => X (Vector_2), Y => Y (Vector_2));
-               --  Angle_2 := (if @ < 0.0 then 2.0 * PI - @ else @);
-
-               Angle_12 := Angle_1 - Angle_2;
-               Angle_12 := (if @ < 0.0 then 2.0 * Pi + @ else @);
-               Angle_12 := Real'Copy_Sign (@, Absolute_Angular_Velocity);
-
-               Angle_21 := Angle_2 - Angle_1;
-               Angle_21 := (if @ < 0.0 then 2.0 * Pi + @ else @);
-               Angle_21 := Real'Copy_Sign (@, Absolute_Angular_Velocity);
+               --  Angle_1 := Arctan (X => X (Vector_1), Y => Y (Vector_1));
+               --  --  Angle_1 := (if @ < 0.0 then 2.0 * PI - @ else @);
+               --  Angle_2 := Arctan (X => X (Vector_2), Y => Y (Vector_2));
+               --  --  Angle_2 := (if @ < 0.0 then 2.0 * PI - @ else @);
+               --
+               --  Angle_12 := Angle_1 - Angle_2;
+               --  Angle_12 := (if @ < 0.0 then 2.0 * Pi + @ else @);
+               --  Angle_12 := Real'Copy_Sign (@, Absolute_Angular_Velocity);
+               --
+               --  Angle_21 := Angle_2 - Angle_1;
+               --  Angle_21 := (if @ < 0.0 then 2.0 * Pi + @ else @);
+               --  Angle_21 := Real'Copy_Sign (@, Absolute_Angular_Velocity);
 
                --  Put_Angle_Image (Angle_1);
                --  Put (" ");
@@ -688,12 +691,13 @@ package body Legs.Trajectory is
                --  Put_Angle_Image (Angle_12);
                --  Put_Angle_Image (Angle_21);
 
-               Current (Leg) := Point_2;
-            end if;
+                  Self.Leg_Information (Leg).AEP := Point_2;
+               --  Current (Leg) := Point_2;
+               end if;
 
             --  New_Line;
-         end;
-      end loop;
+            end;
+         end loop;
       end if;
    end Set_Relative_Velocity;
 
