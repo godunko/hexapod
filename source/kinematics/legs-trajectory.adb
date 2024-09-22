@@ -451,11 +451,11 @@ package body Legs.Trajectory is
          if Velocity_X = 0.0 and Velocity_Y = 0.0 then
             Scale := 1.0;
 
-         elsif Velocity_X >= Velocity_Y then
-            Scale := Velocity_X / Length;
+         elsif abs Velocity_X >= abs Velocity_Y then
+            Scale := abs Velocity_X / Length;
 
          else
-            Scale := Velocity_Y / Length;
+            Scale := abs Velocity_Y / Length;
          end if;
 
          Result := @ * Scale;
@@ -559,7 +559,7 @@ package body Legs.Trajectory is
                   --  Only one of the forward flags are True by construction.
 
                   if Forward_1 then
-                     Self.Leg_Information (Leg).AEP := Point_2;
+                     Self.Leg_Information (Leg).AEP := Point_1;
 
                   elsif Forward_2 then
                      raise Program_Error;
