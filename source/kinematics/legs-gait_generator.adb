@@ -111,7 +111,10 @@ package body Legs.Gait_Generator is
       else
          State (Leg) :=
            (Kind     => Stance,
-            PEP_Tick => Current_Tick + Ticks);
+            PEP_Tick =>
+              (if Ticks = Natural'Last
+                 then Natural'Last
+                 else Current_Tick + Ticks));
       end if;
    end Compute_Linear;
 

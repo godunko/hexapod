@@ -79,8 +79,12 @@ private
      array (Leg_Index) of Leg_Trajectory_Information;
 
    type Trajectory_Information is record
-   --     Trajectory_Center   : CGK.Primitives.Points_2D.Point_2D;
-   --     Delta_Gamma         : CGK.Reals.Real;
+      Angular_Velocity    : CGK.Reals.Real;
+      --  Absolute value of the angular velocity.
+
+      Trajectory_Center   : CGK.Primitives.Points_2D.Point_2D;
+      --  Angular_Delta       : CGK.Reals.Real;
+
       Tick_Transformation :
         CGK.Primitives.Transformations_2D.Transformation_2D;
       Leg_Information     : Leg_Trajectory_Information_Array;
