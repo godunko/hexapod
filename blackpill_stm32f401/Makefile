@@ -1,0 +1,19 @@
+
+all: build-blackpill
+
+build-blackpill:
+	alr build
+	alr exec -- arm-eabi-objcopy -O binary ../bin/blackpill_stm32f401.elf ../bin/blackpill_stm32f401.bin
+	ls -l ../bin/blackpill_stm32f401.bin ../bin/blackpill_stm32f401.elf
+
+clean:
+	rm -rf ../.objs ../bin
+
+ocd:
+	openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg
+
+stlink:
+	openocd -f interface/stlink-dap.cfg -f target/stm32f4x.cfg
+
+gdb:
+	alr exec -- arm-eabi-gdb --command="maintainers-tools/debug/gdbinit" ../bin/blackpill_stm32f401.elf

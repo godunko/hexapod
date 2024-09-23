@@ -1,0 +1,45 @@
+--
+--  Copyright (C) 2024, Vadim Godunko
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+with "../blackpill_stm32f401/config/phoenix_hexapod_blackpill_stm32f401_config.gpr";
+
+with "../subprojects/b2f4a/gnat/bbf";
+with "light_blackpill_stm32f401";
+
+with "kinematics";
+with "phoenyx_common";
+with "trajectory";
+
+project BlackPill_STM32F401 is
+
+   for Target use Light_Blackpill_STM32F401'Target;
+   for Runtime use Light_Blackpill_STM32F401'Runtime;
+   for Languages use ("Ada");
+
+   Target := Project'Target;
+
+   for Main use ("hexapod-driver.adb");
+   for Object_Dir use "../.objs/" & Target & "/arduino";
+   for Exec_Dir use "../bin";
+
+   for Source_Dirs use
+     ("../source/arduino",
+      "../source/blackpill_stm32f401",
+      "../subprojects/b2f4a/source/sandbox");
+
+   package Builder is
+      for Executable ("hexapod-driver.adb") use "blackpill_stm32f401.elf";
+   end Builder;
+
+   package Compiler renames Phoenyx_Common.Compiler;
+
+   package Linker is
+      for Switches ("Ada") use
+        Light_Blackpill_STM32F401.Linker_Switches
+         & ("-Wl,--gc-sections");
+   end Linker;
+
+end BlackPill_STM32F401;
