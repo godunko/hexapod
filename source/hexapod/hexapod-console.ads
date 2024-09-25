@@ -20,4 +20,8 @@ package Hexapod.Console is
      (Item    : out Character;
       Success : in out Boolean);
 
+   procedure On_Failure_Flush;
+   --  Flush content of the output buffers in failure mode. It is expected that
+   --  interrupts are disabled by the caller.
+
 end Hexapod.Console;

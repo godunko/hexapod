@@ -98,6 +98,15 @@ package body Hexapod.Console is
       Put (ASCII.CR & ASCII.LF);
    end New_Line;
 
+   ----------------------
+   -- On_Failure_Flush --
+   ----------------------
+
+   procedure On_Failure_Flush is
+   begin
+      null;
+   end On_Failure_Flush;
+
    ---------
    -- Put --
    ---------
