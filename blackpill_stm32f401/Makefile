@@ -16,4 +16,4 @@ stlink:
 	openocd -f interface/stlink-dap.cfg -f target/stm32f4x.cfg
 
 gdb:
-	alr exec -- arm-eabi-gdb --command="maintainers-tools/debug/gdbinit" ../bin/blackpill_stm32f401.elf
+	eval `alr printenv` && arm-eabi-gdb --command="maintainers-tools/debug/gdbinit" ../bin/blackpill_stm32f401.elf
