@@ -9,6 +9,9 @@ build-blackpill:
 clean:
 	rm -rf ../.objs ../bin
 
+flash:
+	openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c 'program ../bin/blackpill_stm32f401.bin verify reset exit 0x08000000'
+
 ocd:
 	openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg
 
