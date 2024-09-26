@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2019-2023, Vadim Godunko
+--  Copyright (C) 2019-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -20,7 +20,7 @@ package Hexapod.Console is
      (Item    : out Character;
       Success : in out Boolean);
 
-   procedure On_Failure_Flush;
+   procedure Flush_In_Failure_Mode;
    --  Flush content of the output buffers in failure mode. It is expected that
    --  interrupts are disabled by the caller.
 

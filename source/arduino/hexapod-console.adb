@@ -13,6 +13,15 @@ package body Hexapod.Console is
    UART : BBF.Board.UART.UART_Driver
             (Receive_Queue => 0, Transmit_Queue => 255);
 
+   ---------------------------
+   -- Flush_In_Failure_Mode --
+   ---------------------------
+
+   procedure Flush_In_Failure_Mode is
+   begin
+      null;
+   end Flush_In_Failure_Mode;
+
    ----------------------
    -- Get_Asynchronous --
    ----------------------
@@ -88,15 +97,6 @@ package body Hexapod.Console is
    begin
       Put (ASCII.CR & ASCII.LF);
    end New_Line;
-
-   ----------------------
-   -- On_Failure_Flush --
-   ----------------------
-
-   procedure On_Failure_Flush is
-   begin
-      null;
-   end On_Failure_Flush;
 
    ---------
    -- Put --
