@@ -17,37 +17,34 @@ generate_gpr = true
 
 [configuration.values]
 a0b_armv7m.fpu_extension = "VFPv4"
-cgk.Float_Size = "32"
+#cgk.Float_Size = "32"
 
 [[depends-on]]
-a0b_armv7m_systick_clock = "*"
-a0b_atsam3x8e_tc5_timer = "*"
-a0b_atsam3x8e_twi_i2c = "*"
-a0b_atsam3x8e_usart = "*"
-a0b_playstation2_controller = "*"
+a0b_armv7m_systick_clock_timer = "*"
+#a0b_atsam3x8e_tc5_timer = "*"
+#a0b_atsam3x8e_twi_i2c = "*"
+#a0b_atsam3x8e_usart = "*"
+#a0b_playstation2_controller = "*"
+#cgk = "*"
+a0b_stm32f401_gpio = "*"
 a0b_tasking = "*"
-cgk = "*"
 light_blackpill_stm32f401 = "*"
 
+#[[pins]]
+#a0b_armv7m = { path='../subprojects/a0b-armv7m' }
+#a0b_i2c = { path='../subprojects/a0b-i2c' }
+#a0b_playstation2_controller = { path='../subprojects/a0b-playstation2_controller' }
+#a0b_spi = { path='../subprojects/a0b-spi' }
+#cgk = { path='../subprojects/cgk' }
+
 [[pins]]
-a0b_armv7m = { path='../subprojects/a0b-armv7m' }
-#a0b_armv7m_systick_clock = { path='subprojects/a0b-armv7m-systick_clock' }
-a0b_atsam3x8e = { path='../subprojects/a0b-atsam3x8e' }
-a0b_atsam3x8e_gpio = { path='../subprojects/a0b-atsam3x8e-gpio' }
-#a0b_atsam3x8e_tc5_timer = { path='subprojects/a0b-atsam3x8e-tc5_timer' }
-a0b_atsam3x8e_twi_i2c = { path='../subprojects/a0b-atsam3x8e-twi-i2c' }
-a0b_atsam3x8e_usart = { path='../subprojects/a0b-atsam3x8e-usart' }
+#a0b_armv7m_systick_clock_timer = { path='../subprojects/a0b-armv7m-systick_clock_timer' }
 a0b_base = { path='../subprojects/a0b-base' }
 a0b_callbacks = { path='../subprojects/a0b-callbacks' }
 a0b_exti = { path='../subprojects/a0b-exti' }
 a0b_gpio = { path='../subprojects/a0b-gpio' }
-a0b_i2c = { path='../subprojects/a0b-i2c' }
-a0b_playstation2_controller = { path='../subprojects/a0b-playstation2_controller' }
-a0b_spi = { path='../subprojects/a0b-spi' }
+a0b_stm32f401_gpio = { path='../subprojects/a0b-stm32f401-gpio' }
 a0b_tasking = { path='../subprojects/a0b-tasking' }
 a0b_time = { path='../subprojects/a0b-time' }
 a0b_timer = { path='../subprojects/a0b-timer' }
-cgk = { path='../subprojects/cgk' }
-
-[[pins]]
 light_blackpill_stm32f401 = { path='../subprojects/light-startup/blackpill_stm32f401' }
