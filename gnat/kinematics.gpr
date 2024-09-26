@@ -1,10 +1,12 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2024, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 with "phoenyx_common.gpr";
+
+with "debug.gpr";
 with "mathematics.gpr";
 
 project Kinematics is

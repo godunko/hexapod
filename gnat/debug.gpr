@@ -1,0 +1,17 @@
+--
+--  Copyright (C) 2024, Vadim Godunko
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+with "phoenyx_common.gpr";
+
+project Debug is
+
+   for Object_Dir use Phoenyx_Common'Object_Dir & "debug";
+
+   for Source_Dirs use ("../source/debug");
+
+   package Compiler renames Phoenyx_Common.Compiler;
+
+end Debug;

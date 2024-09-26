@@ -26,6 +26,8 @@ project Arduino_Due is
 
    for Source_Dirs use
      ("../source/arduino",
+      "../source/hexapod",
+      "../source/legs",
       "../subprojects/b2f4a/source/sandbox");
 
    package Builder is
