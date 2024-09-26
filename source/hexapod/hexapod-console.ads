@@ -24,4 +24,15 @@ package Hexapod.Console is
    --  Flush content of the output buffers in failure mode. It is expected that
    --  interrupts are disabled by the caller.
 
+private
+
+   Logo : constant String :=
+     ASCII.CR & ASCII.LF
+     & "          /\ .---._" & ASCII.CR & ASCII.LF
+     & "       /\/.-. /\ /\/\" & ASCII.CR & ASCII.LF
+     & "     //\\oo //\\/\\\\" & ASCII.CR & ASCII.LF
+     & "    //  /""/`---\\ \\""`-._" & ASCII.CR & ASCII.LF
+     & "_.-'""           ""`-.`-." & ASCII.CR & ASCII.LF
+     & ASCII.CR & ASCII.LF;
+
 end Hexapod.Console;

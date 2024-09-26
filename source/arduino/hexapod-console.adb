@@ -10,15 +10,6 @@ with BBF.Board.UART;
 
 package body Hexapod.Console is
 
-   Logo : constant String :=
-     ASCII.CR & ASCII.LF
-     & "          /\ .---._" & ASCII.CR & ASCII.LF
-     & "       /\/.-. /\ /\/\" & ASCII.CR & ASCII.LF
-     & "     //\\oo //\\/\\\\" & ASCII.CR & ASCII.LF
-     & "    //  /""/`---\\ \\""`-._" & ASCII.CR & ASCII.LF
-     & "_.-'""           ""`-.`-." & ASCII.CR & ASCII.LF
-     & ASCII.CR & ASCII.LF;
-
    UART : BBF.Board.UART.UART_Driver
             (Receive_Queue => 0, Transmit_Queue => 255);
 
