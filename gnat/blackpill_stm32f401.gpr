@@ -12,6 +12,7 @@ with "light_blackpill_stm32f401";
 --with "kinematics";
 with "phoenyx_common";
 --with "trajectory";
+with "debug.gpr";
 
 project BlackPill_STM32F401 is
 
@@ -28,6 +29,7 @@ project BlackPill_STM32F401 is
    for Source_Dirs use
      ("../source/blackpill_stm32f401",
       "../source/hexapod",
+      "../subprojects/b2f4a/source",
       "../subprojects/b2f4a/source/sandbox");
 
    package Builder is
