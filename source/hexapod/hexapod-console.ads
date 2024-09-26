@@ -28,8 +28,9 @@ private
 
    Logo : constant String :=
      ASCII.CR & ASCII.LF
-     & "          /\ .---._" & ASCII.CR & ASCII.LF
-     & "       /\/.-. /\ /\/\" & ASCII.CR & ASCII.LF
+     & ASCII.CR & ASCII.LF
+     & "         /\ .---._" & ASCII.CR & ASCII.LF
+     & "      /\/.-. /\ /\/\" & ASCII.CR & ASCII.LF
      & "     //\\oo //\\/\\\\" & ASCII.CR & ASCII.LF
      & "    //  /""/`---\\ \\""`-._" & ASCII.CR & ASCII.LF
      & "_.-'""           ""`-.`-." & ASCII.CR & ASCII.LF
