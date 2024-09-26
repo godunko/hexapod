@@ -10,7 +10,10 @@
 --  mode. However, it allows to complete current operation and to flush output
 --  buffers when system is blocked due to failure. In last case it is assumed
 --  that interrupts are disabled outside of this package.
+--
+--  Used peripherals: USART6, DMA2 Stream6 for data transmission, PA11 & PA12.
 
+with Ada.Synchronous_Task_Control;
 with Interfaces;
 with System.Storage_Elements;
 
@@ -34,30 +37,17 @@ package body Hexapod.Console is
    procedure USART6_Handler
      with Export, Convention => C, External_Name => "USART6_Handler";
 
-   --  procedure DMA2_Stream1_Handler is null
-   --    with Export, Convention => C, External_Name => "DMA2_Stream1_Handler";
-
    procedure DMA2_Stream6_Handler
      with Export, Convention => C, External_Name => "DMA2_Stream6_Handler";
 
-   Logo : constant String :=
-     ASCII.CR & ASCII.LF
-     & "          /\ .---._" & ASCII.CR & ASCII.LF
-     & "       /\/.-. /\ /\/\" & ASCII.CR & ASCII.LF
-     & "     //\\oo //\\/\\\\" & ASCII.CR & ASCII.LF
-     & "    //  /""/`---\\ \\""`-._" & ASCII.CR & ASCII.LF
-     & "_.-'""           ""`-.`-." & ASCII.CR & ASCII.LF
-     & ASCII.CR & ASCII.LF;
-
-   --  UART : BBF.Board.UART.UART_Driver
-   --           (Receive_Queue => 0, Transmit_Queue => 255);
-
    Transmit_Buffer : Unsigned_8_Array (0 .. 255);
-   Transmit_Head   : A0B.Types.Unsigned_32 := 0;
-   Transmit_Tail   : A0B.Types.Unsigned_32 := 0;
-   --  Receive_Buffer  : Unsigned_8_Array (0 .. 255);
-   --  Receive_Head    : A0B.Types.Unsigned_32 := 0;
-   --  Receive_Tail    : A0B.Types.Unsigned_32 := 0;
+   Transmit_Head   : Interfaces.Unsigned_32 := 0;
+   Transmit_Tail   : Interfaces.Unsigned_32 := 0;
+   Receive_Buffer  : Unsigned_8_Array (0 .. 255);
+   Receive_Head    : Interfaces.Unsigned_32 := 0;
+   Receive_Tail    : Interfaces.Unsigned_32 := 0;
+
+   Lock            : Ada.Synchronous_Task_Control.Suspension_Object;
 
    --------------------------
    -- DMA2_Stream6_Handler --
@@ -88,32 +78,9 @@ package body Hexapod.Console is
 
    procedure Get_Asynchronous
      (Item    : out Character;
-      Success : in out Boolean)
-   is
-   --     use type BBF.Unsigned_16;
-   --
-   --     Buffer : BBF.Unsigned_8_Array_16 (0 ..0);
-   --     Size   : BBF.Unsigned_16;
-
+      Success : in out Boolean) is
    begin
-      null;
-   --     if not Success then
-   --        Item := Character'Val (0);
-   --
-   --        return;
-   --     end if;
-   --
-   --     UART.Receive_Asynchronous (Buffer, Size);
-   --
-   --     if Size = 0 then
-   --        Success := False;
-   --        Item    := Character'Val (0);
-   --
-   --     else
-   --        Success := True;
-   --        Item    := Character'Val (Buffer (0));
-   --        --  Received := False;
-   --     end if;
+      raise Program_Error;
    end Get_Asynchronous;
 
    ---------------------
@@ -121,22 +88,18 @@ package body Hexapod.Console is
    ---------------------
 
    procedure Get_Synchronous (Item : out Character) is
-   --     use type BBF.Unsigned_16;
-   --
-   --     Buffer : BBF.Unsigned_8_Array_16 (0 ..0);
-   --     Size   : BBF.Unsigned_16;
-
    begin
-      null;
-   --     loop
-   --        UART.Receive_Asynchronous (Buffer, Size);
-   --
-   --        if Size /= 0 then
-   --           Item := Character'Val (Buffer (0));
-   --
-   --           return;
-   --        end if;
-   --     end loop;
+      loop
+         exit when Receive_Head /= Receive_Tail;
+
+         Ada.Synchronous_Task_Control.Suspend_Until_True (Lock);
+      end loop;
+
+      Receive_Tail :=
+        (if Receive_Tail = Receive_Buffer'Last
+           then Receive_Buffer'First
+           else @ + 1);
+      Item := Character'Val (Receive_Buffer (Receive_Tail));
    end Get_Synchronous;
 
    ----------------
@@ -284,15 +247,16 @@ package body Hexapod.Console is
    procedure Put (Item : String) is
    begin
       for C of Item loop
-         Transmit_Head := @ + 1;
          Transmit_Head :=
-           (if Transmit_Head > Transmit_Buffer'Last
-              then Transmit_Buffer'First else @);
-
+           (if Transmit_Head = Transmit_Buffer'Last
+              then Transmit_Buffer'First
+              else @ + 1);
          Transmit_Buffer (Transmit_Head) := Character'Pos (C);
       end loop;
 
-      --  USART6_Periph.CR1.TXEIE := True;
+      --  Enable TC interrupt, operation will be completed in the interrupt
+      --  handler.
+
       USART6_Periph.CR1.TCIE := True;
    end Put;
 
@@ -330,26 +294,32 @@ package body Hexapod.Console is
 
       if State.TC and Mask.TCIE then
          if Transmit_Tail = Transmit_Head then
-            USART6_Periph.CR3.DMAT := False;
+            --  No more data, disable TC interrupt
+
             USART6_Periph.CR1.TCIE := False;
 
          else
             if Transmit_Tail < Transmit_Head then
+               --  Transmit data between tail and head
+
                DMA2_Periph.S6NDTR.NDT :=
                  S6NDTR_NDT_Field (Transmit_Head - Transmit_Tail);
                DMA2_Periph.S6M0AR :=
                  Interfaces.Unsigned_32
                    (System.Storage_Elements.To_Integer
-                      (Transmit_Buffer (Transmit_Tail)'Address));
+                      (Transmit_Buffer (Transmit_Tail + 1)'Address));
                Transmit_Tail := Transmit_Head;
 
             else
+               --  Transmit data from tail till end of the buffer memory,
+               --  remaining data will be transmitted by next operation.
+
                DMA2_Periph.S6NDTR.NDT :=
-                 S6NDTR_NDT_Field (Transmit_Buffer'Last - Transmit_Tail + 1);
+                 S6NDTR_NDT_Field (Transmit_Buffer'Last - Transmit_Tail);
                DMA2_Periph.S6M0AR :=
                  Interfaces.Unsigned_32
                    (System.Storage_Elements.To_Integer
-                      (Transmit_Buffer (Transmit_Tail)'Address));
+                      (Transmit_Buffer (Transmit_Tail + 1)'Address));
                Transmit_Tail := Transmit_Buffer'First;
             end if;
 
@@ -359,7 +329,15 @@ package body Hexapod.Console is
       end if;
 
       if State.RXNE and Mask.RXNEIE then
-         raise Program_Error;
+         Receive_Head :=
+           (if Receive_Head = Receive_Buffer'Last
+              then Receive_Buffer'First
+              else @ + 1);
+
+         Receive_Buffer (Receive_Head) :=
+           Interfaces.Unsigned_8 (USART6_Periph.DR.DR);
+
+         Ada.Synchronous_Task_Control.Set_True (Lock);
       end if;
    end USART6_Handler;
 
