@@ -299,15 +299,20 @@ package body Hexapod.Console is
             USART6_Periph.CR1.TCIE := False;
 
          else
-            if Transmit_Tail < Transmit_Head then
+            Transmit_Tail :=
+              (if Transmit_Tail = Transmit_Buffer'Last
+                 then Transmit_Buffer'First
+                 else @ + 1);
+
+            if Transmit_Tail <= Transmit_Head then
                --  Transmit data between tail and head
 
                DMA2_Periph.S6NDTR.NDT :=
-                 S6NDTR_NDT_Field (Transmit_Head - Transmit_Tail);
+                 S6NDTR_NDT_Field (Transmit_Head - Transmit_Tail + 1);
                DMA2_Periph.S6M0AR :=
                  Interfaces.Unsigned_32
                    (System.Storage_Elements.To_Integer
-                      (Transmit_Buffer (Transmit_Tail + 1)'Address));
+                      (Transmit_Buffer (Transmit_Tail)'Address));
                Transmit_Tail := Transmit_Head;
 
             else
@@ -315,12 +320,12 @@ package body Hexapod.Console is
                --  remaining data will be transmitted by next operation.
 
                DMA2_Periph.S6NDTR.NDT :=
-                 S6NDTR_NDT_Field (Transmit_Buffer'Last - Transmit_Tail);
+                 S6NDTR_NDT_Field (Transmit_Buffer'Last - Transmit_Tail + 1);
                DMA2_Periph.S6M0AR :=
                  Interfaces.Unsigned_32
                    (System.Storage_Elements.To_Integer
-                      (Transmit_Buffer (Transmit_Tail + 1)'Address));
-               Transmit_Tail := Transmit_Buffer'First;
+                      (Transmit_Buffer (Transmit_Tail)'Address));
+               Transmit_Tail := Transmit_Buffer'Last;
             end if;
 
             USART6_Periph.SR.TC := False;
