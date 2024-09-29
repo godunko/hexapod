@@ -15,14 +15,15 @@
 
 with Ada.Synchronous_Task_Control;
 with Interfaces;
-with System.Storage_Elements;
 
 with A0B.ARMv7M.NVIC_Utilities;
+with A0B.STM32F401.DMA.DMA2.Stream6;
 with A0B.STM32F401.GPIO.PIOA;
-with A0B.STM32F401.SVD.DMA;   use A0B.STM32F401.SVD.DMA;
 with A0B.STM32F401.SVD.RCC;   use A0B.STM32F401.SVD.RCC;
 with A0B.STM32F401.SVD.USART; use A0B.STM32F401.SVD.USART;
 with A0B.Types;
+
+with A0B.Callbacks.Generic_Parameterless;
 
 package body Hexapod.Console is
 
@@ -37,8 +38,8 @@ package body Hexapod.Console is
    procedure USART6_Handler
      with Export, Convention => C, External_Name => "USART6_Handler";
 
-   procedure DMA2_Stream6_Handler
-     with Export, Convention => C, External_Name => "DMA2_Stream6_Handler";
+   procedure DMA2_Stream6_Handler;
+     --  with Export, Convention => C, External_Name => "DMA2_Stream6_Handler";
 
    Transmit_Buffer : Unsigned_8_Array (0 .. 255);
    Transmit_Head   : Interfaces.Unsigned_32 := 0;
@@ -49,23 +50,20 @@ package body Hexapod.Console is
 
    Lock            : Ada.Synchronous_Task_Control.Suspension_Object;
 
+   package On_DMA_Interrupt_Callbacks is
+     new A0B.Callbacks.Generic_Parameterless (DMA2_Stream6_Handler);
+
+   Transmit_Stream : A0B.STM32F401.DMA.DMA_Stream
+     renames A0B.STM32F401.DMA.DMA2.Stream6.DMA2_Stream6;
+
    --------------------------
    -- DMA2_Stream6_Handler --
    --------------------------
 
    procedure DMA2_Stream6_Handler is
-      Mask  : constant S6CR_Register := DMA2_Periph.S6CR;
-      State : constant HISR_Register := DMA2_Periph.HISR;
-
    begin
-      if State.TCIF6 and Mask.TCIE then
-         --  DMA2_Periph.HIFCR.CFEIF6  := True;
-         --  DMA2_Periph.HIFCR.CDMEIF6 := True;
-         --  DMA2_Periph.HIFCR.CTEIF6  := True;
-         --  DMA2_Periph.HIFCR.CHTIF6  := True;
-         DMA2_Periph.HIFCR.CTCIF6 := True;
-
-         DMA2_Periph.S6CR.EN := False;
+      if Transmit_Stream.Get_Masked_And_Clear_Transfer_Completed then
+         Transmit_Stream.Disable;
 
       else
          raise Program_Error;
@@ -187,38 +185,12 @@ package body Hexapod.Console is
 
       --  Configure DMA stream (DMA 2 Stream 6 Channel 5)
 
-      DMA2_Periph.S6CR :=
-        (EN     => False,   --  Stream disabled
-         DMEIE  => False,   --  DME interrupt disabled
-         TEIE   => False,   --  TE interrupt disabled
-         HTIE   => False,   --  HT interrupt disabled
-         TCIE   => True,    --  TC interrupt enabled
-         PFCTRL => False,   --  The DMA is the flow controller
-         DIR    => 2#01#,   --  Memory-to-peripheral
-         CIRC   => False,   --  Circular mode disabled
-         PINC   => False,   --  Peripheral address pointer is fixed
-         MINC   => True,
-         --  Memory address pointer is incremented after each data transfer
-         --  (increment is done according to MSIZE)
-         PSIZE  => 2#00#,   --  Byte (8-bit)
-         MSIZE  => 2#00#,   --  Byte (8-bit)
-         PINCOS => <>,      --  No meaning
-         PL     => 2#00#,   --  Low
-         DBM    => False,   --  No buffer switching at the end of transfer
-         CT     => False,
-         --  The current target memory is Memory 0 (addressed by the
-         --  DMA_SxM0AR pointer)
-         ACK    => <>,      --  ??? Not documented
-         PBURST => 2#00#,   --  single transfer
-         MBURST => 2#00#,   --  single transfer
-         CHSEL  => 2#101#,  --  channel 5 selected
-         others => <>);
-      DMA2_Periph.S6PAR :=
-        Interfaces.Unsigned_32
-          (System.Storage_Elements.To_Integer (USART6_Periph.DR'Address));
-
-      A0B.ARMv7M.NVIC_Utilities.Clear_Pending (A0B.STM32F401.DMA2_Stream6);
-      A0B.ARMv7M.NVIC_Utilities.Enable_Interrupt (A0B.STM32F401.DMA2_Stream6);
+      Transmit_Stream.Configure_Memory_To_Peripheral
+        (Channel    => 5,
+         Peripheral => USART6_Periph.DR'Address);
+      Transmit_Stream.Enable_Transfer_Complete_Interrupt;
+      Transmit_Stream.Set_Interrupt_Callback
+        (On_DMA_Interrupt_Callbacks.Create_Callback);
 
       --  Enable USART
 
@@ -307,29 +279,24 @@ package body Hexapod.Console is
             if Transmit_Tail <= Transmit_Head then
                --  Transmit data between tail and head
 
-               DMA2_Periph.S6NDTR.NDT :=
-                 S6NDTR_NDT_Field (Transmit_Head - Transmit_Tail + 1);
-               DMA2_Periph.S6M0AR :=
-                 Interfaces.Unsigned_32
-                   (System.Storage_Elements.To_Integer
-                      (Transmit_Buffer (Transmit_Tail)'Address));
+               Transmit_Stream.Set_Memory_Buffer
+                 (Transmit_Buffer (Transmit_Tail)'Address,
+                  Interfaces.Unsigned_16 (Transmit_Head - Transmit_Tail + 1));
                Transmit_Tail := Transmit_Head;
 
             else
                --  Transmit data from tail till end of the buffer memory,
                --  remaining data will be transmitted by next operation.
 
-               DMA2_Periph.S6NDTR.NDT :=
-                 S6NDTR_NDT_Field (Transmit_Buffer'Last - Transmit_Tail + 1);
-               DMA2_Periph.S6M0AR :=
-                 Interfaces.Unsigned_32
-                   (System.Storage_Elements.To_Integer
-                      (Transmit_Buffer (Transmit_Tail)'Address));
+               Transmit_Stream.Set_Memory_Buffer
+                 (Transmit_Buffer (Transmit_Tail)'Address,
+                  Interfaces.Unsigned_16
+                    (Transmit_Buffer'Last - Transmit_Tail + 1));
                Transmit_Tail := Transmit_Buffer'Last;
             end if;
 
             USART6_Periph.SR.TC := False;
-            DMA2_Periph.S6CR.EN := True;
+            Transmit_Stream.Enable;
          end if;
       end if;
 
