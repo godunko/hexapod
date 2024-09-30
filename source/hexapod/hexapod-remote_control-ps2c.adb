@@ -4,11 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with System.Machine_Code;
-
 with A0B.Callbacks.Generic_Non_Dispatching;
 with A0B.Time;
-with A0B.Types.GCC_Builtins;
 
 package body Hexapod.Remote_Control.PS2C is
 
@@ -54,18 +51,6 @@ package body Hexapod.Remote_Control.PS2C is
    package On_Transfer_Done_Callbacks is
      new A0B.Callbacks.Generic_Non_Dispatching
            (Communication_Driver, On_Transfer_Done);
-
-   function Reverse_Bits
-     (Item : A0B.Types.Unsigned_8) return A0B.Types.Unsigned_8;
-
-   function Reverse_Bits
-     (Item : A0B.Types.Unsigned_32) return A0B.Types.Unsigned_32;
-
-   procedure Reverse_Bits
-     (Source      :
-        A0B.PlayStation2_Controllers.Protocol.Communication_Buffer;
-      Destination : out
-        A0B.PlayStation2_Controllers.Protocol.Communication_Buffer);
 
    ----------------
    -- Initialize --
@@ -168,7 +153,7 @@ package body Hexapod.Remote_Control.PS2C is
       Self.Acknowledge.Disable_Interrupt;
       Self.SPI.Release_Device;
 
-      Reverse_Bits (Self.Buffer, Self.Receive_Buffer.all);
+      Self.Receive_Buffer.all := Self.Buffer;
 
       A0B.Callbacks.Emit (Self.On_Completed);
    end On_Close_Delay;
@@ -185,7 +170,7 @@ package body Hexapod.Remote_Control.PS2C is
 
       Self.Acknowledge.Enable_Interrupt;
 
-      Self.Select_Buffer := 2#1000_0000#;  --  16#01#
+      Self.Select_Buffer := 2#0000_0001#;
       Self.SPI.Transmit
         (Transmit_Buffer   => Self.Select_Buffer,
          Finished_Callback =>
@@ -238,9 +223,8 @@ package body Hexapod.Remote_Control.PS2C is
          when Command_Transfer_Await =>
             Self.Data_Received (Self.Index) := True;
             Self.Length :=
-              A0B.Types.Unsigned_32
-                (Reverse_Bits (Self.Buffer (Self.Index)) and 16#0F#) * 2
-                   + 2 - 1;
+              A0B.Types.Unsigned_32 (Self.Buffer (Self.Index) and 16#0F#) * 2
+                + 2 - 1;
             Self.Initiate_Transfer;
 
          when Data_Transfer_Await =>
@@ -259,63 +243,6 @@ package body Hexapod.Remote_Control.PS2C is
             raise Program_Error;
       end case;
    end On_Transfer_Done;
-
-   ------------------
-   -- Reverse_Bits --
-   ------------------
-
-   function Reverse_Bits
-     (Item : A0B.Types.Unsigned_8) return A0B.Types.Unsigned_8
-   is
-      use type A0B.Types.Unsigned_32;
-
-   begin
-      return
-         A0B.Types.Unsigned_8
-           (A0B.Types.GCC_Builtins.bswap
-              (Reverse_Bits (A0B.Types.Unsigned_32 (Item))));
-   end Reverse_Bits;
-
-   ------------------
-   -- Reverse_Bits --
-   ------------------
-
-   function Reverse_Bits
-     (Item : A0B.Types.Unsigned_32) return A0B.Types.Unsigned_32 is
-   begin
-      return Result : A0B.Types.Unsigned_32 do
-         System.Machine_Code.Asm
-           (Template => "rbit %0, %1",
-            Outputs  => A0B.Types.Unsigned_32'Asm_Output ("=r", Result),
-            Inputs   => A0B.Types.Unsigned_32'Asm_Input ("r", Item));
-      end return;
-   end Reverse_Bits;
-
-   ------------------
-   -- Reverse_Bits --
-   ------------------
-
-   procedure Reverse_Bits
-     (Source      : A0B.PlayStation2_Controllers.Protocol.Communication_Buffer;
-      Destination : out
-        A0B.PlayStation2_Controllers.Protocol.Communication_Buffer)
-   is
-      type Unsigned_32_Buffer is array (0 .. 7) of A0B.Types.Unsigned_32
-         with Alignment => 4, Size => 256;
-
-      S : Unsigned_32_Buffer with Import, Address => Source'Address;
-      D : Unsigned_32_Buffer with Import, Address => Destination'Address;
-
-   begin
-      D (0) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (0)));
-      D (1) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (1)));
-      D (2) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (2)));
-      D (3) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (3)));
-      D (4) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (4)));
-      D (5) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (5)));
-      D (6) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (6)));
-      D (7) := A0B.Types.GCC_Builtins.bswap (Reverse_Bits (S (7)));
-   end Reverse_Bits;
 
    --------------------
    -- Start_Exchange --
@@ -337,7 +264,7 @@ package body Hexapod.Remote_Control.PS2C is
 
       --  Prepare data buffer
 
-      Reverse_Bits (Self.Transmit_Buffer.all, Self.Buffer);
+      Self.Buffer := Self.Transmit_Buffer.all;
 
       --  Select SPI device
 
