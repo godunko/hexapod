@@ -5,7 +5,7 @@
 --
 
 with A0B.ARMv7M.SysTick;
---  with A0B.ATSAM3X8E.TC5_Timer;
+with A0B.STM32F401.TIM11_Timer;
 with A0B.Tasking;
 
 with Debug.Log.Console;
@@ -19,15 +19,14 @@ with Hexapod.Console;
 
 procedure Hexapod.Driver is
 begin
-   Hexapod.Console.Initialize;
-   Debug.Log.Console.Initialize;
-
    A0B.ARMv7M.SysTick.Initialize
     (Use_Processor_Clock => True,
      Clock_Frequency     => 84_000_000);
-   --  A0B.ATSAM3X8E.TC5_Timer.Initialize
-   --    (Master_Clock_Frequency => 84_000_000,
-   --     Source                 => A0B.ATSAM3X8E.TC5_Timer.MCK_32);
+   A0B.STM32F401.TIM11_Timer.Initialize
+     (Timer_Peripheral_Frequency => 84_000_000);
+
+   Hexapod.Console.Initialize;
+   Debug.Log.Console.Initialize;
 
    --  Hexapod.Hardware.Initialize_Hardware;
    --  --  Hexapod.Motor_Power_Consumption.Initialize;
