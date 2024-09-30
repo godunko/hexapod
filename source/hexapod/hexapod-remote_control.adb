@@ -120,6 +120,11 @@ package body Hexapod.Remote_Control is
 
    begin
       loop
+         --  Delay till next polling
+
+         Next := Next + Polling_Interval;
+         A0B.Tasking.Delay_Until (Next);
+
          Poll;
 
          Internals.Get_State (Receive_Buffer, State);
@@ -142,11 +147,6 @@ package body Hexapod.Remote_Control is
 
          Hexapod.Movement.Set_Relative_Velocity
            (V_X => V_X, V_Y => V_Y, V_W => V_W);
-
-         --  Delay till next polling
-
-         Next := Next + Polling_Interval;
-         A0B.Tasking.Delay_Until (Next);
       end loop;
    end Task_Subprogram;
 
