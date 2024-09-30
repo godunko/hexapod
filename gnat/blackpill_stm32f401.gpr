@@ -9,9 +9,9 @@ with "../blackpill_stm32f401/config/phoenix_hexapod_blackpill_stm32f401_config.g
 --with "../subprojects/b2f4a/gnat/bbf";
 with "light_blackpill_stm32f401";
 
---with "kinematics";
+with "kinematics";
 with "phoenyx_common";
---with "trajectory";
+with "trajectory";
 with "debug.gpr";
 
 project BlackPill_STM32F401 is
@@ -23,13 +23,15 @@ project BlackPill_STM32F401 is
    Target := Project'Target;
 
    for Main use ("hexapod-driver.adb");
-   for Object_Dir use "../.objs/" & Target & "/arduino";
+   for Object_Dir use "../.objs/" & Target & "/blackpill_stm32f401";
    for Exec_Dir use "../bin";
 
    for Source_Dirs use
      ("../source/blackpill_stm32f401",
       "../source/hexapod",
+      "../source/legs",
       "../subprojects/b2f4a/source",
+      "../subprojects/b2f4a/source/drivers/",
       "../subprojects/b2f4a/source/sandbox");
 
    package Builder is
