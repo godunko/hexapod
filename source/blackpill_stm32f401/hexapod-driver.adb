@@ -10,10 +10,10 @@ with A0B.Tasking;
 
 with Debug.Log.Console;
 with Hexapod.Command_Line;
---  with Hexapod.Hardware;
---  with Hexapod.Movement;
---  --  with Hexapod.Motor_Power_Consumption;
---  with Hexapod.Remote_Control;
+with Hexapod.Hardware;
+with Hexapod.Movement;
+--  with Hexapod.Motor_Power_Consumption;
+with Hexapod.Remote_Control;
 
 with Hexapod.Console;
 
@@ -28,15 +28,16 @@ begin
    Hexapod.Console.Initialize;
    Debug.Log.Console.Initialize;
 
-   --  Hexapod.Hardware.Initialize_Hardware;
-   --  --  Hexapod.Motor_Power_Consumption.Initialize;
-   --  Hexapod.Movement.Initialize;
+   Hexapod.Hardware.Initialize_Hardware;
+   Hexapod.Remote_Control.Initialize;
+   --  Hexapod.Motor_Power_Consumption.Initialize;
+   Hexapod.Movement.Initialize;
 
    A0B.Tasking.Initialize (16#400#);
 
    Hexapod.Command_Line.Register_Task;
-   --  Hexapod.Remote_Control.Register_Task;
-   --  Hexapod.Movement.Register_Task;
+   Hexapod.Remote_Control.Register_Task;
+   Hexapod.Movement.Register_Task;
 
    A0B.Tasking.Run;
 end Hexapod.Driver;
