@@ -6,13 +6,16 @@
 
 --  Hardware configuration and initialization.
 
-with A0B.I2C.STM32F401_I2C.Generic_I2C1;
-with A0B.I2C.STM32F401_I2C.Generic_I2C2;
 with A0B.STM32F401.DMA.DMA1.Stream0;
 with A0B.STM32F401.DMA.DMA1.Stream2;
 with A0B.STM32F401.DMA.DMA1.Stream6;
 with A0B.STM32F401.DMA.DMA1.Stream7;
 with A0B.STM32F401.GPIO.PIOB;
+--  with A0B.STM32F401.I2C.Generic_I2C1;
+--  XXX GNAT FSF 14: unable to find generic's body of Generic_I2C2. With clause
+--  below is a workaround:
+with A0B.I2C.STM32F401_I2C.Generic_I2C1;
+with A0B.STM32F401.I2C.Generic_I2C2;
 
 with BBF.Drivers.PCA9685;
 --  with BBF.Drivers.MPU6050;
@@ -22,14 +25,14 @@ with BBF.PCA9685;
 package Hexapod.Hardware is
 
    package I2C1 is
-     new A0B.I2C.STM32F401_I2C.Generic_I2C1
+     new A0B.STM32F401.I2C.Generic_I2C1
        (Transmit_Stream => A0B.STM32F401.DMA.DMA1.Stream6.DMA1_Stream6'Access,
         Receive_Stream  => A0B.STM32F401.DMA.DMA1.Stream0.DMA1_Stream0'Access,
         SCL_Pin         => A0B.STM32F401.GPIO.PIOB.PB8'Access,
         SDA_Pin         => A0B.STM32F401.GPIO.PIOB.PB9'Access);
 
    package I2C2 is
-     new A0B.I2C.STM32F401_I2C.Generic_I2C2
+     new A0B.STM32F401.I2C.Generic_I2C2
        (Transmit_Stream => A0B.STM32F401.DMA.DMA1.Stream7.DMA1_Stream7'Access,
         Receive_Stream  => A0B.STM32F401.DMA.DMA1.Stream2.DMA1_Stream2'Access);
 
