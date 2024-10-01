@@ -5,6 +5,7 @@
 --
 
 with A0B.PlayStation2_Controllers.Protocol;
+with A0B.PlayStation2_Controllers.Communications;
 with A0B.Tasking;
 with A0B.Time.Clock;
 with A0B.Types;
@@ -18,15 +19,15 @@ with Hexapod.Hardware;
 with Hexapod.Movement;
 with Hexapod.Remote_Control.Configuration;
 with Hexapod.Remote_Control.Internals;
-with Hexapod.Remote_Control.PS2C;
 
 package body Hexapod.Remote_Control is
 
    Polling_Rate : constant := 100;
 
-   Controller : Hexapod.Remote_Control.PS2C.Communication_Driver
-     (Hexapod.Remote_Control.Configuration.SPI_Device'Access,
-      Hexapod.Remote_Control.Configuration.ACK_Pin'Access);
+   Controller :
+     A0B.PlayStation2_Controllers.Communications.Communication_Driver
+       (Hexapod.Remote_Control.Configuration.SPI_Device'Access,
+        Hexapod.Remote_Control.Configuration.ACK_Pin'Access);
 
    Transmit_Buffer :
      A0B.PlayStation2_Controllers.Protocol.Communication_Buffer;
