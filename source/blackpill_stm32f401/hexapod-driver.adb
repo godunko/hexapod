@@ -36,8 +36,8 @@ begin
    A0B.Tasking.Initialize (16#400#);
 
    Hexapod.Command_Line.Register_Task;
-   Hexapod.Remote_Control.Register_Task;
    Hexapod.Movement.Register_Task;
+   Hexapod.Remote_Control.Register_Task;
 
    A0B.Tasking.Run;
 end Hexapod.Driver;
