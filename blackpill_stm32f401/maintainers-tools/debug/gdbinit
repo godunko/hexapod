@@ -1,0 +1,44 @@
+set pagination off
+
+target extended-remote localhost:3333
+
+monitor arm semihosting enable
+
+monitor reset halt
+
+# set breakpoint on last chance handler to catch unhandled Ada exceptions.
+#break __gnat_last_chance_handler
+#commands
+#  backtrace
+#  frame 1
+#end
+
+# set breakpoint on failure report subprogram instead of last chance handler to
+# be able to turn off motors' power of failure first.
+break __hexapod_report_failure_state
+commands
+  backtrace
+  frame 2
+end
+
+# execute single instruction to load stack pointer and program counter from
+# the interrupt table.
+stepi
+
+#break USART6_Handler
+#break DMA2_Stream6_Handler
+#break I2C1_EV_Handler
+#commands
+#  x/xw 0x40005414
+#end
+#break I2C1_ER_Handler
+#break DMA1_Stream0_Handler
+#break DMA1_Stream6_Handler
+#break TIM1_TRG_COM_TIM11_Handler
+#break USART2_Handler
+#commands
+#  x/xw 0x40004400
+##  p hexapod.remote_control.receive_buffer
+#  p/x hexapod.remote_control.controller.buffer
+#  continue
+#end
