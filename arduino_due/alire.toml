@@ -43,6 +43,7 @@ a0b_callbacks = { path='../subprojects/a0b-callbacks' }
 a0b_exti = { path='../subprojects/a0b-exti' }
 a0b_gpio = { path='../subprojects/a0b-gpio' }
 a0b_i2c = { path='../subprojects/a0b-i2c' }
+a0b_pca9685 = { path='../subprojects/a0b-pca9685' }
 a0b_playstation2_controller = { path='../subprojects/a0b-playstation2_controller' }
 a0b_spi = { path='../subprojects/a0b-spi' }
 a0b_tasking = { path='../subprojects/a0b-tasking' }
