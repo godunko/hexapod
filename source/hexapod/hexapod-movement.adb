@@ -15,7 +15,7 @@ with A0B.Time.Clock;
 with A0B.Types;
 
 with BBF.Delays;
-with BBF.PCA9685;
+with A0B.PCA9685;
 
 with Kinematics;
 with Legs.State;
@@ -51,9 +51,9 @@ package body Hexapod.Movement is
    --  Task thread subprogram.
 
    type Motor_Descriptor is record
-      Channel   : not null access BBF.PCA9685.PCA9685_Channel'Class;
-      Min_PWM   : BBF.PCA9685.Value_Type;
-      Max_PWM   : BBF.PCA9685.Value_Type;
+      Channel   : not null access A0B.PCA9685.PCA9685_Channel'Class;
+      Min_PWM   : A0B.PCA9685.Value_Type;
+      Max_PWM   : A0B.PCA9685.Value_Type;
       Min_Angle : CGK.Reals.Real;
       Max_Angle : CGK.Reals.Real;
    end record;
@@ -250,7 +250,7 @@ package body Hexapod.Movement is
    is
       function Map
         (Descriptor : Motor_Descriptor;
-         Angle      : CGK.Reals.Real) return BBF.PCA9685.Value_Type;
+         Angle      : CGK.Reals.Real) return A0B.PCA9685.Value_Type;
 
       ---------
       -- Map --
@@ -258,24 +258,24 @@ package body Hexapod.Movement is
 
       function Map
         (Descriptor : Motor_Descriptor;
-         Angle      : CGK.Reals.Real) return BBF.PCA9685.Value_Type
+         Angle      : CGK.Reals.Real) return A0B.PCA9685.Value_Type
       is
-         use type BBF.PCA9685.Value_Type;
+         use type A0B.PCA9685.Value_Type;
 
          PWM_Range : constant CGK.Reals.Real :=
            CGK.Reals.Real (Descriptor.Max_PWM - Descriptor.Min_PWM);
 
       begin
          return
-           BBF.PCA9685.Value_Type
+           A0B.PCA9685.Value_Type
              ((Angle - Descriptor.Min_Angle)
               / ( Descriptor.Max_Angle - Descriptor.Min_Angle) * PWM_Range
                  + CGK.Reals.Real (Descriptor.Min_PWM));
       end Map;
 
-      A : BBF.PCA9685.Value_Type;
-      B : BBF.PCA9685.Value_Type;
-      C : BBF.PCA9685.Value_Type;
+      A : A0B.PCA9685.Value_Type;
+      B : A0B.PCA9685.Value_Type;
+      C : A0B.PCA9685.Value_Type;
 
    begin
       --  Console.Put_Line (Debug.Posture_Image (Posture));

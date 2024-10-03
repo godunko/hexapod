@@ -31,7 +31,6 @@ project BlackPill_STM32F401 is
       "../source/hexapod",
       "../source/legs",
       "../subprojects/b2f4a/source",
-      "../subprojects/b2f4a/source/drivers/",
       "../subprojects/b2f4a/source/sandbox");
 
    package Builder is
