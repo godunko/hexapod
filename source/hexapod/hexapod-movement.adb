@@ -37,13 +37,13 @@ package body Hexapod.Movement is
    LM_Posture  : Kinematics.Posture
      renames Legs.State.Posture (Legs.Left_Middle);
    LH_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Left_Rear);
+     renames Legs.State.Posture (Legs.Left_Hind);
    RF_Posture  : Kinematics.Posture
      renames Legs.State.Posture (Legs.Right_Front);
    RM_Posture  : Kinematics.Posture
      renames Legs.State.Posture (Legs.Right_Middle);
    RH_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Right_Rear);
+     renames Legs.State.Posture (Legs.Right_Hind);
 
    TCB : aliased A0B.Tasking.Task_Control_Block;
 

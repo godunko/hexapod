@@ -108,7 +108,7 @@ package body Legs is
             D     => Kinematics.Configuration.LM_DH_D3,
             Alpha => Kinematics.Configuration.LM_DH_Alpha3));
       Initialize
-        (Self      => Legs (Left_Rear),
+        (Self      => Legs (Left_Hind),
          Side      => Standard.Legs.Left,
          Base      =>
            (X     => Kinematics.Configuration.LH_Base_X,
@@ -168,7 +168,7 @@ package body Legs is
             D     => Kinematics.Configuration.RM_DH_D3,
             Alpha => Kinematics.Configuration.RM_DH_Alpha3));
       Initialize
-        (Self      => Legs (Right_Rear),
+        (Self      => Legs (Right_Hind),
          Side      => Standard.Legs.Right,
          Base      =>
            (X     => Kinematics.Configuration.RH_Base_X,
