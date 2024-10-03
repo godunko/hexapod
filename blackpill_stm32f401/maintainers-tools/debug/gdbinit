@@ -28,6 +28,8 @@ stepi
 #break USART6_Handler
 #break DMA2_Stream6_Handler
 #break I2C1_EV_Handler
+#break I2C2_EV_Handler
+#break I2C2_ER_Handler
 #commands
 #  x/xw 0x40005414
 #end
