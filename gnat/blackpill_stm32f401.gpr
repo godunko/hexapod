@@ -46,4 +46,11 @@ project BlackPill_STM32F401 is
          & ("-Wl,--gc-sections");
    end Linker;
 
+   package IDE is
+      for Program_Host use "localhost:3333";
+      for Communication_Protocol use "extended-remote";
+      for Connection_Tool use "openocd";
+      for Connection_Config_File use "../blackpill_stm32f401/openocd.cfg";
+   end IDE;
+
 end BlackPill_STM32F401;
