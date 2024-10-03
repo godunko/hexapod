@@ -4,8 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with A0B.PlayStation2_Controllers.Protocol;
 with A0B.PlayStation2_Controllers.Communications;
+with A0B.PlayStation2_Controllers.Protocol;
 with A0B.Tasking;
 with A0B.Time.Clock;
 with A0B.Types;
@@ -18,7 +18,6 @@ with Hexapod.Console;
 with Hexapod.Hardware;
 with Hexapod.Movement;
 with Hexapod.Remote_Control.Configuration;
-with Hexapod.Remote_Control.Internals;
 
 package body Hexapod.Remote_Control is
 
@@ -59,7 +58,7 @@ package body Hexapod.Remote_Control is
       Success : Boolean := True;
 
    begin
-      A0B.PlayStation2_Controllers.Protocol.Packet_Builder.Poll
+      A0B.PlayStation2_Controllers.Protocol.Packet_Encoder.Poll
         (Transmit_Buffer);
 
       Controller.Transfer
@@ -128,7 +127,8 @@ package body Hexapod.Remote_Control is
 
          Poll;
 
-         Internals.Get_State (Receive_Buffer, State);
+         A0B.PlayStation2_Controllers.Protocol.Packet_Decoder.Poll
+           (Receive_Buffer, State);
 
          if State.Triangle_Button /= 0 then
             Hexapod.Console.Put_Line ("PS2C: activate movement");
