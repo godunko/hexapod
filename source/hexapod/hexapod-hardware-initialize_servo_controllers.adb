@@ -22,19 +22,16 @@ begin
       Await   : aliased BBF.Awaits.Await;
 
    begin
-      Hexapod.Hardware.Left_PWM_Controller.Initialize
+      Hexapod.Hardware.PWM1.Initialize
         (BBF.Awaits.Create_Callback (Await), Success);
 
       if Success then
          BBF.Awaits.Suspend_Till_Callback (Await);
-         Success :=
-           Hexapod.Hardware.Left_PWM_Controller.State
-             = A0B.PCA9685.Drivers.Ready;
+         Success := Hexapod.Hardware.PWM1.State = A0B.PCA9685.Drivers.Ready;
       end if;
 
       if not Success then
-         Console.Put_Line
-           ("FAIL: Servo Motors Controller (Left): initialization failed.");
+         Console.Put_Line ("PWM1: initialization failed.");
       end if;
    end;
 
@@ -43,19 +40,16 @@ begin
       Await   : aliased BBF.Awaits.Await;
 
    begin
-      Hexapod.Hardware.Right_PWM_Controller.Initialize
+      Hexapod.Hardware.PWM2.Initialize
         (BBF.Awaits.Create_Callback (Await), Success);
 
       if Success then
          BBF.Awaits.Suspend_Till_Callback (Await);
-         Success :=
-           Hexapod.Hardware.Right_PWM_Controller.State
-             = A0B.PCA9685.Drivers.Ready;
+         Success := Hexapod.Hardware.PWM2.State = A0B.PCA9685.Drivers.Ready;
       end if;
 
       if not Success then
-         Console.Put_Line
-           ("FAIL: Servo Motors Controller (Right): initialization failed.");
+         Console.Put_Line ("PWM2: initialization failed.");
       end if;
    end;
 
@@ -64,21 +58,18 @@ begin
       Await   : aliased BBF.Awaits.Await;
 
    begin
-      Hexapod.Hardware.Left_PWM_Controller.Configure
+      Hexapod.Hardware.PWM1.Configure
         (Frequency => PWM_Frequency,
          Finished  => BBF.Awaits.Create_Callback (Await),
          Success   => Success);
 
       if Success then
          BBF.Awaits.Suspend_Till_Callback (Await);
-         Success :=
-           Hexapod.Hardware.Left_PWM_Controller.State
-             = A0B.PCA9685.Drivers.Ready;
+         Success := Hexapod.Hardware.PWM1.State = A0B.PCA9685.Drivers.Ready;
       end if;
 
       if not Success then
-         Console.Put_Line
-           ("FAIL: Servo Motors Controller (Left): configuration failed.");
+         Console.Put_Line ("PWM1: configuration failed.");
       end if;
    end;
 
@@ -87,21 +78,18 @@ begin
       Await   : aliased BBF.Awaits.Await;
 
    begin
-      Hexapod.Hardware.Right_PWM_Controller.Configure
+      Hexapod.Hardware.PWM2.Configure
         (Frequency => PWM_Frequency,
          Finished  => BBF.Awaits.Create_Callback (Await),
          Success   => Success);
 
       if Success then
          BBF.Awaits.Suspend_Till_Callback (Await);
-         Success :=
-           Hexapod.Hardware.Right_PWM_Controller.State
-             = A0B.PCA9685.Drivers.Ready;
+         Success := Hexapod.Hardware.PWM2.State = A0B.PCA9685.Drivers.Ready;
       end if;
 
       if not Success then
-         Console.Put_Line
-           ("FAIL: Servo Motors Controller (Right): configuration failed.");
+         Console.Put_Line ("PWM2: configuration failed.");
       end if;
    end;
 end Hexapod.Hardware.Initialize_Servo_Controllers;

@@ -358,8 +358,8 @@ package body Hexapod.Movement is
 
       Legs.Trajectory_Generator.Tick;
 
-      Hexapod.Hardware.Left_Servo_Controller.Start_Transaction;
-      Hexapod.Hardware.Right_Servo_Controller.Start_Transaction;
+      Hexapod.Hardware.PWM1_Controller.Start_Transaction;
+      Hexapod.Hardware.PWM2_Controller.Start_Transaction;
 
       Move (LF_Posture, LF_M_1, LF_M_2, LF_M_3, 0);
       Move (LM_Posture, LM_M_1, LM_M_2, LM_M_3, 0);
@@ -369,7 +369,7 @@ package body Hexapod.Movement is
       Move (RH_Posture, RH_M_1, RH_M_2, RH_M_3, 0);
 
 
-      Hexapod.Hardware.Left_Servo_Controller.Commit_Transaction
+      Hexapod.Hardware.PWM1_Controller.Commit_Transaction
         (Finished => BBF.Awaits.Create_Callback (Await),
          Success  => Success);
 
@@ -377,7 +377,7 @@ package body Hexapod.Movement is
          BBF.Awaits.Suspend_Till_Callback (Await);
       end if;
 
-      Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction
+      Hexapod.Hardware.PWM2_Controller.Commit_Transaction
         (Finished => BBF.Awaits.Create_Callback (Await),
          Success  => Success);
 
