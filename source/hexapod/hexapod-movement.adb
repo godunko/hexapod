@@ -10,11 +10,11 @@ with Ada.Numerics;
 with Interfaces;
 
 with A0B.ARMv7M.DWT;
+with A0B.Callbacks.Generic_Parameterless;
 with A0B.Tasking;
 with A0B.Time.Clock;
 with A0B.Types;
 
-with BBF.Awaits;
 with BBF.Delays;
 with A0B.PCA9685;
 
@@ -181,6 +181,16 @@ package body Hexapod.Movement is
 
    procedure Prepare;
 
+   procedure On_PWM1_Completed;
+
+   procedure On_PWM2_Completed;
+
+   package On_PWM1_Completed_Callbacks is
+     new A0B.Callbacks.Generic_Parameterless (On_PWM1_Completed);
+
+   package On_PWM2_Completed_Callbacks is
+     new A0B.Callbacks.Generic_Parameterless (On_PWM2_Completed);
+
    ---------------
    -- Configure --
    ---------------
@@ -302,6 +312,39 @@ package body Hexapod.Movement is
       BBF.Delays.Delay_For (A0B.Time.Milliseconds (Integer (Wait)));
    end Move;
 
+   -----------------------
+   -- On_PWM1_Completed --
+   -----------------------
+
+   procedure On_PWM1_Completed is
+      Success : Boolean := True;
+
+   begin
+      --  if Transaction_Status /= A0B.Success then
+      --     raise Program_Error;
+      --  end if;
+
+      Hexapod.Hardware.PWM2_Controller.Commit_Transaction
+        (Finished => On_PWM2_Completed_Callbacks.Create_Callback,
+         Success  => Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+   end On_PWM1_Completed;
+
+   -----------------------
+   -- On_PWM2_Completed --
+   -----------------------
+
+   procedure On_PWM2_Completed is
+   begin
+      null;
+      --  if Transaction_Status /= A0B.Success then
+      --     raise Program_Error;
+      --  end if;
+   end On_PWM2_Completed;
+
    -------------
    -- Prepare --
    -------------
@@ -351,7 +394,6 @@ package body Hexapod.Movement is
 
    procedure Step is
       Success : Boolean := True;
-      Await   : aliased BBF.Awaits.Await;
 
    begin
       --  Update desired legs posture.
@@ -368,21 +410,12 @@ package body Hexapod.Movement is
       Move (RM_Posture, RM_M_1, RM_M_2, RM_M_3, 0);
       Move (RH_Posture, RH_M_1, RH_M_2, RH_M_3, 0);
 
-
       Hexapod.Hardware.PWM1_Controller.Commit_Transaction
-        (Finished => BBF.Awaits.Create_Callback (Await),
+        (Finished => On_PWM1_Completed_Callbacks.Create_Callback,
          Success  => Success);
 
-      if Success then
-         BBF.Awaits.Suspend_Till_Callback (Await);
-      end if;
-
-      Hexapod.Hardware.PWM2_Controller.Commit_Transaction
-        (Finished => BBF.Awaits.Create_Callback (Await),
-         Success  => Success);
-
-      if Success then
-         BBF.Awaits.Suspend_Till_Callback (Await);
+      if not Success then
+         raise Program_Error;
       end if;
 
       --  Compute gait.
