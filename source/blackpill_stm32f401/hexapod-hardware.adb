@@ -235,7 +235,7 @@ package body Hexapod.Hardware is
       --  Initialize I2C master controllers
 
       I2C1.I2C1.Configure;
-      I2C2.I2C2.Configure;
+      --  I2C2.I2C2.Configure;
 
       --  --  Initiazlie PCA9685 PWM controllers
       --

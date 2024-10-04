@@ -14,6 +14,7 @@ with A0B.Tasking;
 with A0B.Time.Clock;
 with A0B.Types;
 
+with BBF.Awaits;
 with BBF.Delays;
 with A0B.PCA9685;
 
@@ -349,6 +350,9 @@ package body Hexapod.Movement is
    ----------
 
    procedure Step is
+      Success : Boolean := True;
+      Await   : aliased BBF.Awaits.Await;
+
    begin
       --  Update desired legs posture.
 
@@ -364,8 +368,22 @@ package body Hexapod.Movement is
       Move (RM_Posture, RM_M_1, RM_M_2, RM_M_3, 0);
       Move (RH_Posture, RH_M_1, RH_M_2, RH_M_3, 0);
 
-      Hexapod.Hardware.Left_Servo_Controller.Commit_Transaction;
-      Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction;
+
+      Hexapod.Hardware.Left_Servo_Controller.Commit_Transaction
+        (Finished => BBF.Awaits.Create_Callback (Await),
+         Success  => Success);
+
+      if Success then
+         BBF.Awaits.Suspend_Till_Callback (Await);
+      end if;
+
+      Hexapod.Hardware.Right_Servo_Controller.Commit_Transaction
+        (Finished => BBF.Awaits.Create_Callback (Await),
+         Success  => Success);
+
+      if Success then
+         BBF.Awaits.Suspend_Till_Callback (Await);
+      end if;
 
       --  Compute gait.
 

@@ -8,15 +8,15 @@
 
 with A0B.PCA9685.Drivers;
 with A0B.STM32F401.DMA.DMA1.Stream0;
-with A0B.STM32F401.DMA.DMA1.Stream2;
+--  with A0B.STM32F401.DMA.DMA1.Stream2;
 with A0B.STM32F401.DMA.DMA1.Stream6;
-with A0B.STM32F401.DMA.DMA1.Stream7;
+--  with A0B.STM32F401.DMA.DMA1.Stream7;
 with A0B.STM32F401.GPIO.PIOB;
---  with A0B.STM32F401.I2C.Generic_I2C1;
+with A0B.STM32F401.I2C.Generic_I2C1;
 --  XXX GNAT FSF 14: unable to find generic's body of Generic_I2C2. With clause
 --  below is a workaround:
-with A0B.I2C.STM32F401_I2C.Generic_I2C1;
-with A0B.STM32F401.I2C.Generic_I2C2;
+--  with A0B.I2C.STM32F401_I2C.Generic_I2C1;
+--  with A0B.STM32F401.I2C.Generic_I2C2;
 
 --  with BBF.Drivers.MPU6050;
 --  with BBF.Drivers.MPU9250;
@@ -30,10 +30,10 @@ package Hexapod.Hardware is
         SCL_Pin         => A0B.STM32F401.GPIO.PIOB.PB8'Access,
         SDA_Pin         => A0B.STM32F401.GPIO.PIOB.PB9'Access);
 
-   package I2C2 is
-     new A0B.STM32F401.I2C.Generic_I2C2
-       (Transmit_Stream => A0B.STM32F401.DMA.DMA1.Stream7.DMA1_Stream7'Access,
-        Receive_Stream  => A0B.STM32F401.DMA.DMA1.Stream2.DMA1_Stream2'Access);
+   --  package I2C2 is
+   --    new A0B.STM32F401.I2C.Generic_I2C2
+   --      (Transmit_Stream => A0B.STM32F401.DMA.DMA1.Stream7.DMA1_Stream7'Access,
+   --       Receive_Stream  => A0B.STM32F401.DMA.DMA1.Stream2.DMA1_Stream2'Access);
 
    --  package Bus_3 is
    --    new A0B.I2C.STM32F401_I2C.Generic_I2C3
@@ -114,10 +114,10 @@ package Hexapod.Hardware is
    Left_PWM_Controller    : aliased
      A0B.PCA9685.Drivers.PCA9685_Controller_Driver
        (Controller => I2C1.I2C1'Access,
-        Address    => 16#40#);
+        Address    => 16#41#);
    Right_PWM_Controller   : aliased
      A0B.PCA9685.Drivers.PCA9685_Controller_Driver
-       (Controller => I2C2.I2C2'Access,
+       (Controller => I2C1.I2C1'Access,
         Address    => 16#40#);
 
 private
