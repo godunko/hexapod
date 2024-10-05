@@ -448,11 +448,43 @@ package body Legs.Trajectory is
 
             Intersect (Intersections, Workspace, Trajectory_Circle);
 
-            if Length (Intersections) /= 2 then
-               --  XXX It is possible when circles are inside each other.
+            if Length (Intersections) = 0 then
+               if Is_Disjoint_Elements (Intersections) then
+                  --  Workspace and trajectory are disjoints.
+                  --
+                  --  XXX Why is it appear? Computation error?
 
-               return Natural'Last;
-               --  raise Program_Error;
+                  Debug.Log.Put_Line ("Disjoint");
+
+                  return 0;
+
+               else
+                  if Radius (Workspace) >= Trajectory_Radius then
+                     --  Trajectory is inside workspace area.
+
+                     Debug.Log.Put_Line ("Inside");
+
+                     return Natural'Last;
+
+                  else
+                     --  Trajectory is outside of the workspace.
+                     --
+                     --  XXX Why is it appear? Computation error?
+
+                     return 0;
+                  end if;
+               end if;
+
+            elsif Length (Intersections) = 1 then
+               if Is_Disjoint_Elements (Intersections) then
+                  raise Program_Error;
+
+               else
+                  --  XXX It is possible when circles are inside each other.
+
+                  raise Program_Error;
+                  --  return Natural'Last;
+               end if;
 
             else
                Point_1 := Point (Intersections, 1);

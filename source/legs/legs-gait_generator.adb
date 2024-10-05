@@ -9,6 +9,7 @@
 with CGK.Primitives.Circles_2D;
 with CGK.Primitives.Points_2D;
 
+with Debug.Log;
 with Legs.State;
 with Legs.Trajectory;
 with Legs.Trajectory_Generator;
@@ -30,7 +31,8 @@ package body Legs.Gait_Generator is
    type Leg_State (Kind : Leg_State_Kind := Stance) is record
       case Kind is
          when Stance =>
-            PEP_Tick : Natural;
+            PEP_Tick  : Natural;
+            MPEP_Tick : Natural;
 
          when Swing =>
             AEP_Tick : Natural;
@@ -70,7 +72,10 @@ package body Legs.Gait_Generator is
           (Kinematics.X (Position (Leg)), Kinematics.Y (Position (Leg)));
       Workspace     : constant Circle_2D :=
         Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
+      Shape         : constant Circle_2D :=
+        Standard.Legs.Workspace.Get_Workspace_Shape (Leg);
       Ticks         : Natural;
+      MTicks        : Natural;
 
    begin
       --  Special case to shutdown on stop
@@ -82,13 +87,15 @@ package body Legs.Gait_Generator is
 
          if Current = Center (Workspace) then
             State (Leg) :=
-              (Kind     => Stance,
-               PEP_Tick => Natural'Last);
+              (Kind      => Stance,
+               PEP_Tick  => Natural'Last,
+               MPEP_Tick => Natural'Last);
 
          else
             State (Leg) :=
-              (Kind     => Stance,
-               PEP_Tick => Current_Tick);
+              (Kind      => Stance,
+               PEP_Tick  => Current_Tick,
+               MPEP_Tick => Natural'Last);
          end if;
 
          return;
@@ -97,6 +104,9 @@ package body Legs.Gait_Generator is
       Ticks :=
         Trajectory.Remaining_Ticks
           (Velocity (Velocity_Bank).Trajectory, Workspace, Current);
+      MTicks :=
+        Trajectory.Remaining_Ticks
+          (Velocity (Velocity_Bank).Trajectory, Shape, Current);
 
       Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
 
@@ -106,7 +116,11 @@ package body Legs.Gait_Generator is
             PEP_Tick =>
               (if State (Leg).Kind = Stance
                  then State (Leg).PEP_Tick
-                 else Current_Tick));
+               else Current_Tick),
+            MPEP_Tick =>
+              (if MTicks = Natural'Last
+                 then Natural'Last
+                 else Current_Tick + MTicks));
 
       else
          State (Leg) :=
@@ -114,7 +128,11 @@ package body Legs.Gait_Generator is
             PEP_Tick =>
               (if Ticks = Natural'Last
                  then Natural'Last
-                 else Current_Tick + Ticks));
+                 else Current_Tick + Ticks),
+            MPEP_Tick =>
+              (if MTicks = Natural'Last
+                 then Natural'Last
+                 else Current_Tick + MTicks));
       end if;
    end Compute_Linear;
 
@@ -133,8 +151,9 @@ package body Legs.Gait_Generator is
 
       for Leg in Leg_Index loop
          State (Leg) :=
-           (Kind     => Stance,
-            PEP_Tick => Natural'Last);
+           (Kind      => Stance,
+            PEP_Tick  => Natural'Last,
+            MPEP_Tick => Natural'Last);
       end loop;
 
       Trajectory_Generator.Trajectory :=
@@ -289,6 +308,33 @@ package body Legs.Gait_Generator is
             end if;
          end if;
       end loop;
+
+      declare
+         Legs     : array (Leg_Index) of Boolean := [others => False];
+         Deadlock : Boolean := False;
+
+      begin
+         for Leg in Leg_Index'Range loop
+            if State (Leg).Kind = Stance
+              and then State (Leg).MPEP_Tick < Current_Tick + Swing_Ticks
+            then
+               Legs (Leg) := True;
+               Deadlock := True;
+            end if;
+         end loop;
+
+         if Deadlock then
+            Debug.Log.Put_Line
+              ("Deadlock"
+                 & (if Legs (Left_Front)   then " LF" else "")
+                 & (if Legs (Left_Middle)  then " LM" else "")
+                 & (if Legs (Left_Hind)    then " LH" else "")
+                 & (if Legs (Right_Front)  then " RF" else "")
+                 & (if Legs (Right_Middle) then " RM" else "")
+                 & (if Legs (Right_Hind)   then " RH" else "")
+              );
+         end if;
+      end;
 
       Current_Tick := @ + 1;
    end Tick;

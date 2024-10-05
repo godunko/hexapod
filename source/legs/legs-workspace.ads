@@ -24,9 +24,10 @@ is
    --    (Index  : Leg_Index;
    --     Result : out CGK.Primitives.Circles_2D.Circle_2D);
    --  --  Returns
-   --
-   --  function Get_Bounding_Shape
-   --    (Index  : Leg_Index) return CGK.Primitives.Circles_2D.Circle_2D;
+
+   function Get_Workspace_Shape
+     (Index  : Leg_Index) return CGK.Primitives.Circles_2D.Circle_2D;
+   --  Returns reachable workspace of the given leg.
 
    function Get_Bounded_Circle
      (Leg : Leg_Index) return CGK.Primitives.Circles_2D.Circle_2D;
