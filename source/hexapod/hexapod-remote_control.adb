@@ -27,12 +27,12 @@ package body Hexapod.Remote_Control is
             (Hexapod.Remote_Control.Configuration.SPI_Device'Access,
              Hexapod.Remote_Control.Configuration.ACK_Pin'Access);
 
-   Transfer_Status  : aliased A0B.Operation_Status;
-   Transmit_Buffer  :
+   Transfer_Status : aliased A0B.Operation_Status;
+   Transmit_Buffer :
      A0B.PlayStation2_Controllers.Protocol.Communication_Buffer;
-   Receive_Buffer   :
+   Receive_Buffer  :
      A0B.PlayStation2_Controllers.Protocol.Communication_Buffer;
-   Failure_Reported : Boolean := False;
+   Configured      : Boolean := False;
 
    Task_Control : aliased A0B.Tasking.Task_Control_Block;
 
@@ -128,41 +128,106 @@ package body Hexapod.Remote_Control is
          Next := Next + Polling_Interval;
          A0B.Tasking.Delay_Until (Next);
 
-         Poll;
+         if not Configured then
+            declare
+               Await   : aliased BBF.Awaits.Await;
+               Success : Boolean := True;
 
-         if Transfer_Status /= A0B.Success then
-            if not Failure_Reported then
-               Failure_Reported := True;
-               Hexapod.Console.Put_Line ("PS2C: communication failure");
-            end if;
+            begin
+               --  Turns controller into configuration mode
+
+               A0B.PlayStation2_Controllers.Protocol.Packet_Encoder
+                 .Enter_Configuration_Mode (Transmit_Buffer);
+
+               PS2C.Transfer
+                 (Transmit_Buffer => Transmit_Buffer,
+                  Receive_Buffer  => Receive_Buffer,
+                  Status          => Transfer_Status,
+                  On_Completed    => BBF.Awaits.Create_Callback (Await),
+                  Success         => Success);
+
+               if Success then
+                  BBF.Awaits.Suspend_Till_Callback (Await);
+
+                  Success := Transfer_Status = A0B.Success;
+               end if;
+
+               --  Switch controller into analog joysticts mode and disable
+               --  switch to digital mode by the user.
+
+               A0B.PlayStation2_Controllers.Protocol.Packet_Encoder
+                 .Enable_Analog_Mode (Transmit_Buffer, True);
+
+               PS2C.Transfer
+                 (Transmit_Buffer => Transmit_Buffer,
+                  Receive_Buffer  => Receive_Buffer,
+                  Status          => Transfer_Status,
+                  On_Completed    => BBF.Awaits.Create_Callback (Await),
+                  Success         => Success);
+
+               if Success then
+                  BBF.Awaits.Suspend_Till_Callback (Await);
+
+                  Success := Transfer_Status = A0B.Success;
+               end if;
+
+               --  Turns controller back into polling mode
+
+               A0B.PlayStation2_Controllers.Protocol.Packet_Encoder
+                 .Leave_Configuration_Mode (Transmit_Buffer);
+
+               PS2C.Transfer
+                 (Transmit_Buffer => Transmit_Buffer,
+                  Receive_Buffer  => Receive_Buffer,
+                  Status          => Transfer_Status,
+                  On_Completed    => BBF.Awaits.Create_Callback (Await),
+                  Success         => Success);
+
+               if Success then
+                  BBF.Awaits.Suspend_Till_Callback (Await);
+
+                  Success := Transfer_Status = A0B.Success;
+               end if;
+
+               --  Check whether configuration was successful.
+
+               if Success then
+                  Configured := True;
+                  Hexapod.Console.Put_Line
+                    ("PS2C: communication established, controller configured");
+               end if;
+            end;
 
          else
-            if Failure_Reported then
-               Failure_Reported := False;
-               Hexapod.Console.Put_Line ("PS2C: communication recovered");
+            Poll;
+
+            if Transfer_Status /= A0B.Success then
+               Configured := False;
+               Hexapod.Console.Put_Line ("PS2C: communication failure");
+
+            else
+               A0B.PlayStation2_Controllers.Protocol.Packet_Decoder.Poll
+                 (Receive_Buffer, State);
+
+               if State.Triangle_Button /= 0 then
+                  Hexapod.Console.Put_Line ("PS2C: activate movement");
+                  Hexapod.Hardware.Enable_Motors_Power;
+                  Hexapod.Movement.Configure;
+               end if;
+
+               if State.Circle_Button /= 0 then
+                  Hexapod.Console.Put_Line ("PS2C: turn off motors");
+                  Hexapod.Hardware.Disable_Motors_Power;
+                  --  Hexapod.Movement.Movement_Enabled := False;
+               end if;
+
+               V_X := Map (State.Right_Joystick_Vertical);
+               V_Y := Map (State.Right_Joystick_Horizontal);
+               V_W := Map (State.Left_Joystick_Horizontal);
+
+               Hexapod.Movement.Set_Relative_Velocity
+                 (V_X => V_X, V_Y => V_Y, V_W => V_W);
             end if;
-
-            A0B.PlayStation2_Controllers.Protocol.Packet_Decoder.Poll
-              (Receive_Buffer, State);
-
-            if State.Triangle_Button /= 0 then
-               Hexapod.Console.Put_Line ("PS2C: activate movement");
-               Hexapod.Hardware.Enable_Motors_Power;
-               Hexapod.Movement.Configure;
-            end if;
-
-            if State.Circle_Button /= 0 then
-               Hexapod.Console.Put_Line ("PS2C: turn off motors");
-               Hexapod.Hardware.Disable_Motors_Power;
-               --  Hexapod.Movement.Movement_Enabled := False;
-            end if;
-
-            V_X := Map (State.Right_Joystick_Vertical);
-            V_Y := Map (State.Right_Joystick_Horizontal);
-            V_W := Map (State.Left_Joystick_Horizontal);
-
-            Hexapod.Movement.Set_Relative_Velocity
-              (V_X => V_X, V_Y => V_Y, V_W => V_W);
          end if;
       end loop;
    end Task_Subprogram;
