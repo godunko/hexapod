@@ -12,12 +12,6 @@ with CGK.Reals;
 
 package Hexapod.Movement is
 
-   Cycle : constant := 0.5;
-   --  Length of the cycle.
-
-   Ticks : constant := 100;
-   --  Number of ticks per second.
-
    procedure Initialize;
 
    procedure Configure;

@@ -28,6 +28,7 @@ with Legs.Workspace;
 with Hexapod.Console;
 --  with Hexapod.Debug;
 with Hexapod.Hardware.Initialize_Servo_Controllers;
+with Hexapod.Parameters.Control_Cycle;
 
 package body Hexapod.Movement is
 
@@ -442,9 +443,7 @@ package body Hexapod.Movement is
          use type A0B.Time.Monotonic_Time;
          use type A0B.Time.Time_Span;
 
-         Tick_Duration : constant A0B.Time.Time_Span :=
-           A0B.Time.Milliseconds (1000 / Hexapod.Movement.Ticks);
-         Next_Tick     : A0B.Time.Monotonic_Time := A0B.Time.Clock;
+         Next_Tick : A0B.Time.Monotonic_Time := A0B.Time.Clock;
 
       begin
          loop
@@ -461,7 +460,10 @@ package body Hexapod.Movement is
                   --  single tick.
 
                when Active =>
-                  if A0B.Time.Clock - Next_Tick > Tick_Duration then
+                  if A0B.Time.Clock - Next_Tick
+                       > A0B.Time.To_Time_Span
+                           (Hexapod.Parameters.Control_Cycle.Tick_Duration)
+                  then
                      Console.Put ("-");
                   end if;
 
@@ -475,7 +477,9 @@ package body Hexapod.Movement is
                   Min_Cycles := A0B.Types.Unsigned_32'Min (@, Cur_Cycles);
             end case;
 
-            Next_Tick := @ + Tick_Duration;
+            Next_Tick :=
+              @ + A0B.Time.To_Time_Span
+                    (Hexapod.Parameters.Control_Cycle.Tick_Duration);
             A0B.Tasking.Delay_Until (Next_Tick);
          end loop;
       end;
