@@ -12,12 +12,13 @@ Hardware
 --------
 
  * [Phoenix Hexapod Kit](https://aliexpress.ru/item/1457972327.html?spm=a2g2w.orderdetail.0.0.4cbc4aa6C7frwp&sku_id=67027752015)
- * WeAct BlackPill with STM32F401 MCU
+ * WeAct BlackPill with STM32F401 (Cortex-M4 @84 MHz)
  * 18x DS3218 PRO motors
  * 2x PCA9685 PWM/Servo Driver boards to control motors
  * 2x relay modules
  * PlayStation2 Controller
 
+Software can work on Arduino Due (ATSAM3X8E, Cortex-M3 @84 MHz), however, it doesn't suppot hardware floating point operations and not enough to achieve desired performance of used algoriphms.
  
 Implemented Features
 --------------------
