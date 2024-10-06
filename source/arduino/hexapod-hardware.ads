@@ -27,9 +27,9 @@ package Hexapod.Hardware is
    --  Body_Position_Sensor    :
    --    constant not null access BBF.Drivers.MPU6050.MPU6050_Sensor'Class;
 
-   Left_Servo_Controller   :
+   PWM1_Controller : 
      constant not null access A0B.PCA9685.PCA9685_Controller'Class;
-   Right_Servo_Controller  :
+   PWM2_Controller :
      constant not null access A0B.PCA9685.PCA9685_Controller'Class;
 
    LF_Motor_1_Channel      :
@@ -85,86 +85,84 @@ package Hexapod.Hardware is
    procedure Disable_Motors_Power;
    --  Switch relays to power off motors.
 
-   Left_PWM_Controller    : 
-     aliased A0B.PCA9685.Drivers.PCA9685_Controller_Driver
-               (Controller => A0B.I2C.ATSAM3X8E_TWI.TWI0.TWI0'Access,
-     Address    => 16#40#);
-   Right_PWM_Controller   : 
-     aliased A0B.PCA9685.Drivers.PCA9685_Controller_Driver
-               (Controller => A0B.I2C.ATSAM3X8E_TWI.TWI1.TWI1'Access,
-                Address    => 16#40#);
+   PWM1 : aliased A0B.PCA9685.Drivers.PCA9685_Controller_Driver
+                    (Controller => A0B.I2C.ATSAM3X8E_TWI.TWI0.TWI0'Access,
+                     Address    => 16#40#);
+   PWM2 : aliased A0B.PCA9685.Drivers.PCA9685_Controller_Driver
+                    (Controller => A0B.I2C.ATSAM3X8E_TWI.TWI1.TWI1'Access,
+                     Address    => 16#40#);
 
 private
 
    PWM_Frequency : constant := 321;
    --  Closest value for supported by PCA 9685 controller.
 
-   Left_Servo_Controller  :
+   PWM1_Controller  :
      constant not null access A0B.PCA9685.PCA9685_Controller'Class :=
-       Left_PWM_Controller'Access;
-   Right_Servo_Controller :
+       PWM1'Access;
+   PWM2_Controller :
      constant not null access A0B.PCA9685.PCA9685_Controller'Class :=
-       Right_PWM_Controller'Access;
+       PWM2'Access;
 
    LF_Motor_1_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_00'Access;
+       PWM1.Channel_00'Access;
    LF_Motor_2_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_01'Access;
+       PWM1.Channel_01'Access;
    LF_Motor_3_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_02'Access;
+       PWM1.Channel_02'Access;
    LM_Motor_1_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_03'Access;
+       PWM1.Channel_03'Access;
 
    LM_Motor_2_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_04'Access;
+       PWM1.Channel_04'Access;
    LM_Motor_3_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_05'Access;
+       PWM1.Channel_05'Access;
    LH_Motor_1_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_06'Access;
+       PWM1.Channel_06'Access;
    LH_Motor_2_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_07'Access;
+       PWM1.Channel_07'Access;
 
    LH_Motor_3_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Left_PWM_Controller.Channel_08'Access;
+       PWM1.Channel_08'Access;
 
    RF_Motor_1_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_00'Access;
+       PWM2.Channel_00'Access;
    RF_Motor_2_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_01'Access;
+       PWM2.Channel_01'Access;
    RF_Motor_3_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_02'Access;
+       PWM2.Channel_02'Access;
    RM_Motor_1_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_03'Access;
+       PWM2.Channel_03'Access;
 
    RM_Motor_2_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_04'Access;
+       PWM2.Channel_04'Access;
    RM_Motor_3_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_05'Access;
+       PWM2.Channel_05'Access;
    RH_Motor_1_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_06'Access;
+       PWM2.Channel_06'Access;
    RH_Motor_2_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_07'Access;
+       PWM2.Channel_07'Access;
 
    RH_Motor_3_Channel     :
      constant not null access A0B.PCA9685.PCA9685_Channel'Class :=
-       Right_PWM_Controller.Channel_08'Access;
+       PWM2.Channel_08'Access;
 
    --  Body_Position_Sensor_I : aliased BBF.Drivers.MPU6050.MPU6050_Sensor
    --  Body_Position_Sensor_I : aliased BBF.Drivers.MPU9250.MPU9250_Sensor
