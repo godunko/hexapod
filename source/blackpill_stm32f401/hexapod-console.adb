@@ -41,10 +41,10 @@ package body Hexapod.Console is
    procedure DMA2_Stream6_Handler;
      --  with Export, Convention => C, External_Name => "DMA2_Stream6_Handler";
 
-   Transmit_Buffer : Unsigned_8_Array (0 .. 255);
+   Transmit_Buffer : Unsigned_8_Array (0 .. 511);
    Transmit_Head   : Interfaces.Unsigned_32 := 0;
    Transmit_Tail   : Interfaces.Unsigned_32 := 0;
-   Receive_Buffer  : Unsigned_8_Array (0 .. 255);
+   Receive_Buffer  : Unsigned_8_Array (0 .. 31);
    Receive_Head    : Interfaces.Unsigned_32 := 0;
    Receive_Tail    : Interfaces.Unsigned_32 := 0;
 
