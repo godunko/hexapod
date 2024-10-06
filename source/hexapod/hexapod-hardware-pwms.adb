@@ -20,84 +20,93 @@ package body Hexapod.Hardware.PWMs is
 
       use type A0B.PCA9685.Drivers.State_Kind;
 
+      PWM1_Success : Boolean := True;
+      PWM2_Success : Boolean := True;
+
    begin
       --  Initiazlie PCA9685 PWM controllers
 
       declare
-         Success : Boolean := True;
-         Await   : aliased BBF.Awaits.Await;
+         Await : aliased BBF.Awaits.Await;
 
       begin
          PWM1.Initialize
-           (BBF.Awaits.Create_Callback (Await), Success);
+           (BBF.Awaits.Create_Callback (Await), PWM1_Success);
 
-         if Success then
+         if PWM1_Success then
             BBF.Awaits.Suspend_Till_Callback (Await);
-            Success := PWM1.State = A0B.PCA9685.Drivers.Ready;
+            PWM1_Success := PWM1.State = A0B.PCA9685.Drivers.Ready;
          end if;
 
-         if not Success then
+         if not PWM1_Success then
             Console.Put_Line ("PWM1: initialization failed.");
          end if;
       end;
 
       declare
-         Success : Boolean := True;
-         Await   : aliased BBF.Awaits.Await;
+         Await : aliased BBF.Awaits.Await;
 
       begin
          PWM2.Initialize
-           (BBF.Awaits.Create_Callback (Await), Success);
+           (BBF.Awaits.Create_Callback (Await), PWM2_Success);
 
-         if Success then
+         if PWM2_Success then
             BBF.Awaits.Suspend_Till_Callback (Await);
-            Success := PWM2.State = A0B.PCA9685.Drivers.Ready;
+            PWM2_Success := PWM2.State = A0B.PCA9685.Drivers.Ready;
          end if;
 
-         if not Success then
+         if not PWM2_Success then
             Console.Put_Line ("PWM2: initialization failed.");
          end if;
       end;
 
-      declare
-         Success : Boolean := True;
-         Await   : aliased BBF.Awaits.Await;
+      if PWM1_Success then
+         declare
+            Await : aliased BBF.Awaits.Await;
 
-      begin
-         PWM1.Configure
-           (Frequency => PWM_Frequency,
-            Finished  => BBF.Awaits.Create_Callback (Await),
-            Success   => Success);
+         begin
+            PWM1.Configure
+              (Frequency => PWM_Frequency,
+               Finished  => BBF.Awaits.Create_Callback (Await),
+               Success   => PWM1_Success);
 
-         if Success then
-            BBF.Awaits.Suspend_Till_Callback (Await);
-            Success := PWM1.State = A0B.PCA9685.Drivers.Ready;
-         end if;
+            if PWM1_Success then
+               BBF.Awaits.Suspend_Till_Callback (Await);
+               PWM1_Success := PWM1.State = A0B.PCA9685.Drivers.Ready;
+            end if;
 
-         if not Success then
-            Console.Put_Line ("PWM1: configuration failed.");
-         end if;
-      end;
+            if not PWM1_Success then
+               Console.Put_Line ("PWM1: configuration failed.");
 
-      declare
-         Success : Boolean := True;
-         Await   : aliased BBF.Awaits.Await;
+            else
+               Console.Put_Line ("PWM1: initialized and configured");
+            end if;
+         end;
+      end if;
 
-      begin
-         PWM2.Configure
-           (Frequency => PWM_Frequency,
-            Finished  => BBF.Awaits.Create_Callback (Await),
-            Success   => Success);
+      if PWM2_Success then
+         declare
+            Await : aliased BBF.Awaits.Await;
 
-         if Success then
-            BBF.Awaits.Suspend_Till_Callback (Await);
-            Success := PWM2.State = A0B.PCA9685.Drivers.Ready;
-         end if;
+         begin
+            PWM2.Configure
+              (Frequency => PWM_Frequency,
+               Finished  => BBF.Awaits.Create_Callback (Await),
+               Success   => PWM2_Success);
 
-         if not Success then
-            Console.Put_Line ("PWM2: configuration failed.");
-         end if;
-      end;
+            if PWM2_Success then
+               BBF.Awaits.Suspend_Till_Callback (Await);
+               PWM2_Success := PWM2.State = A0B.PCA9685.Drivers.Ready;
+            end if;
+
+            if not PWM2_Success then
+               Console.Put_Line ("PWM2: configuration failed.");
+
+            else
+               Console.Put_Line ("PWM2: initialized and configured");
+            end if;
+         end;
+      end if;
    end Initialize;
 
 end Hexapod.Hardware.PWMs;
