@@ -327,14 +327,25 @@ package body Legs.Gait_Generator is
                          (Velocity (Velocity_Bank).Trajectory, Leg);
 
                   begin
-                     Standard.Legs.Trajectory_Generator.Set_Swing
-                       (Leg    => Leg,
-                        AEP_X  => X (AEP),
-                        AEP_Y  => Y (AEP),
-                        Height => 0.030);
-                     State (Leg) :=
-                       (Kind     => Swing,
-                        AEP_Tick => Current_Tick + Swing_Ticks);
+                     if abs (X (AEP) - Kinematics.X (Standard.Legs.State.Position (Leg)))
+                          < 0.001
+                       and abs (Y (AEP) - Kinematics.Y (Standard.Legs.State.Position (Leg)))
+                             < 0.001
+                     then
+                        --  Don't switch to swing when position is close to AEP
+
+                        Compute_Linear (Leg);
+
+                     else
+                        Standard.Legs.Trajectory_Generator.Set_Swing
+                          (Leg    => Leg,
+                           AEP_X  => X (AEP),
+                           AEP_Y  => Y (AEP),
+                           Height => 0.030);
+                        State (Leg) :=
+                          (Kind     => Swing,
+                           AEP_Tick => Current_Tick + Swing_Ticks);
+                     end if;
                   end;
                end if;
 
