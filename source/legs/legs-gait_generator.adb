@@ -204,8 +204,12 @@ package body Legs.Gait_Generator is
          return True;
       end if;
 
-      if State (Prev).PEP_Tick = State (Leg).PEP_Tick
-        and State (Leg).PEP_Tick = State (Next).PEP_Tick
+      if (State (Prev).PEP_Tick > State (Leg).PEP_Tick
+          and State (Leg).PEP_Tick = State (Next).PEP_Tick)
+        or (State (Prev).PEP_Tick = State (Leg).PEP_Tick
+            and State (Leg).PEP_Tick < State (Next).PEP_Tick)
+        or (State (Prev).PEP_Tick = State (Leg).PEP_Tick
+            and State (Leg).PEP_Tick = State (Next).PEP_Tick)
       then
          --  Leg and its neighboring legs are equal to PEP, select one of the
          --  leg.
