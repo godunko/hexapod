@@ -8,6 +8,7 @@
 
 with CGK.Primitives.Circles_2D;
 with CGK.Primitives.Points_2D;
+with CGK.Primitives.XYs;
 
 with Debug.Log;
 with Legs.State;
@@ -60,6 +61,12 @@ package body Legs.Gait_Generator is
 
    State : array (Leg_Index) of Leg_State;
 
+   function Is_Identical
+     (Point_1 : Point_2D; Point_2 : Point_2D) return Boolean;
+   function Is_Identical
+     (Point : Point_2D; Position : Kinematics.Position) return Boolean;
+   --  Returns True when given points are closer that 0.001 m to each other.
+
    --------------------
    -- Compute_Linear --
    --------------------
@@ -86,7 +93,7 @@ package body Legs.Gait_Generator is
       then
          Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
 
-         if Current = Center (Workspace) then
+         if Is_Identical (Current, Center (Workspace)) then
             State (Leg) :=
               (Kind      => Stance,
                PEP_Tick  => Natural'Last,
@@ -221,6 +228,42 @@ package body Legs.Gait_Generator is
    end Is_Ahead;
 
    ------------------
+   -- Is_Identical --
+   ------------------
+
+   function Is_Identical
+     (Point_1 : Point_2D; Point_2 : Point_2D) return Boolean
+   is
+      use CGK.Primitives.XYs;
+
+      XY_1 : constant CGK.Primitives.XYs.XY :=
+        CGK.Primitives.Points_2D.XY (Point_1);
+      XY_2 : constant CGK.Primitives.XYs.XY :=
+        CGK.Primitives.Points_2D.XY (Point_2);
+
+   begin
+      return Modulus (XY_1 - XY_2) < 0.001;
+   end Is_Identical;
+
+   ------------------
+   -- Is_Identical --
+   ------------------
+
+   function Is_Identical
+     (Point : Point_2D; Position : Kinematics.Position) return Boolean
+   is
+      use CGK.Primitives.XYs;
+
+      Point_XY    : constant CGK.Primitives.XYs.XY :=
+        CGK.Primitives.Points_2D.XY (Point);
+      Position_XY : constant CGK.Primitives.XYs.XY :=
+        Create_XY (Kinematics.X (Position), Kinematics.Y (Position));
+
+   begin
+      return Modulus (Point_XY - Position_XY) < 0.001;
+   end Is_Identical;
+
+   ------------------
    -- Set_Velocity --
    ------------------
 
@@ -327,11 +370,7 @@ package body Legs.Gait_Generator is
                          (Velocity (Velocity_Bank).Trajectory, Leg);
 
                   begin
-                     if abs (X (AEP) - Kinematics.X (Standard.Legs.State.Position (Leg)))
-                          < 0.001
-                       and abs (Y (AEP) - Kinematics.Y (Standard.Legs.State.Position (Leg)))
-                             < 0.001
-                     then
+                     if Is_Identical (AEP, Position (Leg)) then
                         --  Don't switch to swing when position is close to AEP
 
                         Compute_Linear (Leg);
