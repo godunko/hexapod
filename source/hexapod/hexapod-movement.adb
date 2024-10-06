@@ -27,7 +27,7 @@ with Legs.Workspace;
 
 with Hexapod.Console;
 --  with Hexapod.Debug;
-with Hexapod.Hardware.Initialize_Servo_Controllers;
+with Hexapod.Hardware.PWMs;
 with Hexapod.Parameters.Control_Cycle;
 
 package body Hexapod.Movement is
@@ -61,114 +61,114 @@ package body Hexapod.Movement is
    end record;
 
    LF_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LF_Motor_1_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LF_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LF_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LF_Motor_2_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LF_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LF_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LF_Motor_3_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LF_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0 - 0.16,
       Ada.Numerics.Pi - 0.32);
 
    LM_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LM_Motor_1_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LM_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LM_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LM_Motor_2_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LM_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LM_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LM_Motor_3_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LM_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0 - 0.16,
       Ada.Numerics.Pi - 0.32);
 
    LH_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LH_Motor_1_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LH_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LH_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LH_Motor_2_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LH_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    LH_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.LH_Motor_3_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.LH_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0 - 0.16,
       Ada.Numerics.Pi - 0.32);
 
    RF_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RF_Motor_1_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RF_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RF_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RF_Motor_2_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RF_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RF_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RF_Motor_3_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RF_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi + 0.16,
       Ada.Numerics.Pi / 2.0 + 0.32);
 
    RM_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RM_Motor_1_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RM_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RM_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RM_Motor_2_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RM_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RM_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RM_Motor_3_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RM_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi + 0.16,
       Ada.Numerics.Pi / 2.0 + 0.32);
 
    RH_M_1 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RH_Motor_1_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RH_Motor_1_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RH_M_2 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RH_Motor_2_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RH_Motor_2_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi / 2.0,
       Ada.Numerics.Pi / 2.0);
    RH_M_3 : constant Motor_Descriptor :=
-     (Hexapod.Hardware.RH_Motor_3_Channel.all'Access,
+     (Hexapod.Hardware.PWMs.RH_Motor_3_Channel.all'Access,
       658,
       3289,
       -Ada.Numerics.Pi + 0.16,
@@ -325,7 +325,7 @@ package body Hexapod.Movement is
       --     raise Program_Error;
       --  end if;
 
-      Hexapod.Hardware.PWM2_Controller.Commit_Transaction
+      Hexapod.Hardware.PWMs.PWM2_Controller.Commit_Transaction
         (Finished => On_PWM2_Completed_Callbacks.Create_Callback,
          Success  => Success);
 
@@ -401,8 +401,8 @@ package body Hexapod.Movement is
 
       Legs.Trajectory_Generator.Tick;
 
-      Hexapod.Hardware.PWM1_Controller.Start_Transaction;
-      Hexapod.Hardware.PWM2_Controller.Start_Transaction;
+      Hexapod.Hardware.PWMs.PWM1_Controller.Start_Transaction;
+      Hexapod.Hardware.PWMs.PWM2_Controller.Start_Transaction;
 
       Move (LF_Posture, LF_M_1, LF_M_2, LF_M_3, 0);
       Move (LM_Posture, LM_M_1, LM_M_2, LM_M_3, 0);
@@ -411,7 +411,7 @@ package body Hexapod.Movement is
       Move (RM_Posture, RM_M_1, RM_M_2, RM_M_3, 0);
       Move (RH_Posture, RH_M_1, RH_M_2, RH_M_3, 0);
 
-      Hexapod.Hardware.PWM1_Controller.Commit_Transaction
+      Hexapod.Hardware.PWMs.PWM1_Controller.Commit_Transaction
         (Finished => On_PWM1_Completed_Callbacks.Create_Callback,
          Success  => Success);
 
@@ -434,7 +434,7 @@ package body Hexapod.Movement is
 
    procedure Task_Subprogram is
    begin
-      Hexapod.Hardware.Initialize_Servo_Controllers;
+      Hexapod.Hardware.PWMs.Initialize;
       --  ??? It is unclear how to initialize hardware in tasking environment.
       --  Code was moved here just to avoid crash at startup and need to be
       --  reviewed.
