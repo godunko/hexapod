@@ -99,6 +99,12 @@ package body Legs.Gait_Generator is
                MPEP_Tick => Natural'Last);
          end if;
 
+         Debug.Log.Put
+           (" (S) "
+            & Leg_Index'Image (Leg)
+            & Integer'Image (State (Leg).PEP_Tick)
+            & Integer'Image (State (Leg).MPEP_Tick));
+
          return;
       end if;
 
@@ -135,6 +141,12 @@ package body Legs.Gait_Generator is
                  then Natural'Last
                  else Current_Tick + MTicks));
       end if;
+
+      Debug.Log.Put
+        (" "
+         & Leg_Index'Image (Leg)
+         & Integer'Image (State (Leg).PEP_Tick)
+         & Integer'Image (State (Leg).MPEP_Tick));
    end Compute_Linear;
 
    ----------------
@@ -256,25 +268,45 @@ package body Legs.Gait_Generator is
    begin
       --  Update state of the landed legs.
 
-      for Leg in Leg_Index loop
-         if State (Leg).Kind = Swing
-           and then State (Leg).AEP_Tick <= Current_Tick
-         then
-            Compute_Linear (Leg);
+      declare
+         New_Line : Boolean := False;
+
+      begin
+         for Leg in Leg_Index loop
+            if State (Leg).Kind = Swing
+              and then State (Leg).AEP_Tick <= Current_Tick
+            then
+               Compute_Linear (Leg);
+               New_Line := True;
+            end if;
+         end loop;
+
+         if New_Line then
+            Debug.Log.Put (" (touchdown)");
+            Debug.Log.New_Line;
          end if;
-      end loop;
+      end;
 
       if Velocity_Changed then
          --  Velocity has been changed, recompute path of legs in stance.
 
          Velocity_Bank := not Velocity_Bank;
 
-         for Leg in Leg_Index loop
-            if State (Leg).Kind = Stance then
-               Compute_Linear (Leg);
-            end if;
-         end loop;
+         declare
+            New_Line : Boolean := False;
 
+         begin
+            for Leg in Leg_Index loop
+               if State (Leg).Kind = Stance then
+                  Compute_Linear (Leg);
+                  New_Line := True;
+               end if;
+            end loop;
+
+            if New_Line then
+               Debug.Log.New_Line;
+            end if;
+         end;
          Trajectory_Generator.Trajectory :=
            Velocity (Velocity_Bank).Trajectory'Access;
 

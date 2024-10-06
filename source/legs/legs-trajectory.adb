@@ -506,9 +506,9 @@ package body Legs.Trajectory is
                    (X => Dot (Vector_P, Vector_2),
                     Y => Cross (Vector_P, Vector_2));
 
-               Debug.Log.Put_Line
-                 (Real'Image (Angle_1)
-                      & Real'Image (Angle_2));
+               --  Debug.Log.Put_Line
+               --    (Real'Image (Angle_1)
+               --         & Real'Image (Angle_2));
 
                if Self.Angular_Velocity > 0.0 then
                   if Angle_1 > 0.0 then
