@@ -82,6 +82,7 @@ package body Legs.Gait_Generator is
 
       if Velocity (Velocity_Bank).RVX = 0.0
         and Velocity (Velocity_Bank).RVY = 0.0
+        and Velocity (Velocity_Bank).RVW = 0.0
       then
          Standard.Legs.Trajectory_Generator.Set_Stance (Leg);
 
