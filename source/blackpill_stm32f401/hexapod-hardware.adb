@@ -45,39 +45,6 @@ package body Hexapod.Hardware is
    MMFAR_Position : constant := HFSR_Position + 19;
    BFAR_Position  : constant := MMFAR_Position + 19;
 
-   ---------------------------
-   -- Configure_Controllers --
-   ---------------------------
-
-   procedure Configure_Controllers is
-   begin
-      null;
-      --  declare
-      --     Success : Boolean := True;
-
-      --  begin
-      --     --  Body_Position_Sensor.Configure
-      --     --    (BBF.Board.Delay_Controller,
-      --     --     BBF.Drivers.MPU.FSR_2G,
-      --     --     BBF.Drivers.MPU.FSR_2000DPS,
-      --     --     True,
-      --     --     True,
-      --     --     198,
-      --     --     Success);
-      --     Body_Position_Sensor.Configure
-      --       (BBF.Board.Delay_Controller,
-      --        200,
-      --        Success);
-
-      --     if not Success then
-      --        Console.Put_Line
-      --          ("FAIL: Body Position Sensor: configuration failed.");
-      --     end if;
-
-      --     Body_Position_Sensor.Enable (BBF.Board.Delay_Controller);
-      --  end;
-   end Configure_Controllers;
-
    --------------------------
    -- Disable_Motors_Power --
    --------------------------
@@ -195,23 +162,6 @@ package body Hexapod.Hardware is
       A0B.STM32F401.SVD.RCC.RCC_Periph.AHB1ENR.GPIOCEN  := True;
       A0B.STM32F401.SVD.RCC.RCC_Periph.APB2ENR.SYSCFGEN := True;
 
-      --  --  Disable watchdog timer.
-      --
-      --  A0B.ATSAM3X8E.SVD.SYSC.WDT_Periph.MR :=
-      --    (WDFIEN    => False,
-      --     -- A Watchdog fault (underflow or error) has no effect on interrupt.
-      --     WDRSTEN   => False,
-      --     --  A Watchdog fault (underflow or error) has no effect on the
-      --     --  resets.
-      --     WDRPROC   => <>,
-      --     WDDIS     => True,  --  Disables the Watchdog Timer.
-      --     WDD       => <>,
-      --     WDDBGHLT  => True,
-      --     --  The Watchdog stops when the processor is in debug state.
-      --     WDIDLEHLT => False,
-      --     --  The Watchdog runs when the processor is in debug state.
-      --     others    => <>);
-
       --  Turn off onboard LED (used by last chance handler)
 
       LED.Configure_Output;
@@ -236,53 +186,6 @@ package body Hexapod.Hardware is
 
       I2C1.I2C1.Configure;
       --  I2C2.I2C2.Configure;
-
-      --  --  Initiazlie PCA9685 PWM controllers
-      --
-      --  declare
-      --     Success : Boolean := True;
-      --
-      --  begin
-      --     Left_PWM_Controller.Initialize (Success);
-      --
-      --     if not Success then
-      --        Console.Put_Line
-      --          ("FAIL: Servo Motors Controller (Left): initialization failed.");
-      --     end if;
-      --  end;
-      --
-      --  declare
-      --     Success : Boolean := True;
-      --
-      --  begin
-      --     Right_PWM_Controller.Initialize (Success);
-      --
-      --     if not Success then
-      --        Console.Put_Line
-      --          ("FAIL: Servo Motors Controller (Right): initialization failed.");
-      --     end if;
-      --  end;
-      --
-      --  Initialize body position sensor
-
-      --  declare
-      --     Success : Boolean := True;
-
-      --  begin
-      --     BBF.HPL.PMC.Enable_Peripheral_Clock
-      --       (BBF.HPL.Parallel_IO_Controller_A);
-      --     BBF.HPL.PMC.Enable_Peripheral_Clock
-      --       (BBF.HPL.Parallel_IO_Controller_C);
-      --     --  XXX Must be moved out! Clock should be enabled when interrupt
-      --     --  handling on the pin is enabled.
-
-      --     Body_Position_Sensor.Initialize (BBF.Board.Delay_Controller, Success);
-
-      --     if not Success then
-      --        Console.Put_Line
-      --          ("FAIL: Body Position Sensor initialization failure.");
-      --     end if;
-      --  end;
    end Initialize_Hardware;
 
    -------------------------

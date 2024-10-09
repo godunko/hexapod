@@ -32,8 +32,6 @@ package Hexapod.Hardware is
    procedure Initialize_Hardware;
    --  Do basic initialization of the hardware.
 
-   procedure Configure_Controllers;
-
    procedure Enable_Motors_Power;
    --  Switch relays to provide power to motors.
 
