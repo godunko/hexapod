@@ -185,7 +185,13 @@ package body Hexapod.Hardware is
       --  Initialize I2C master controllers
 
       I2C1.I2C1.Configure;
-      --  I2C2.I2C2.Configure;
+      I2C2.I2C2.Configure;
+
+      --  Initialize INT external interrupt line for body position sensor
+
+      IMU_INT_Pin.Configure_EXTI
+        (Mode => A0B.STM32F401.GPIO.Rising_Edge,
+         Pull => A0B.STM32F401.GPIO.No);
    end Initialize_Hardware;
 
    -------------------------
