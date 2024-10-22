@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with A0B.ARMv7M.SysTick;
+with A0B.ARMv7M.SysTick_Clock;
 with A0B.ATSAM3X8E.TC5_Timer;
 with A0B.Tasking;
 
@@ -19,7 +19,7 @@ procedure Hexapod.Driver is
 begin
    Debug.Log.Console.Initialize;
 
-   A0B.ARMv7M.SysTick.Initialize
+   A0B.ARMv7M.SysTick_Clock.Initialize
     (Use_Processor_Clock => True,
      Clock_Frequency     => 84_000_000);
    A0B.ATSAM3X8E.TC5_Timer.Initialize
