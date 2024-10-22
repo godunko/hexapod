@@ -21,6 +21,7 @@ with A0B.STM32F401.DMA.DMA2.Stream6;
 with A0B.STM32F401.GPIO.PIOA;
 with A0B.STM32F401.SVD.RCC;   use A0B.STM32F401.SVD.RCC;
 with A0B.STM32F401.SVD.USART; use A0B.STM32F401.SVD.USART;
+with A0B.STM32F401.USART_Function_Lines;
 with A0B.Types;
 
 with A0B.Callbacks.Generic_Parameterless;
@@ -120,12 +121,12 @@ package body Hexapod.Console is
       RCC_Periph.AHB1ENR.DMA2EN := True;
 
       TX_Line.Configure_Alternative_Function
-        (Line  => A0B.STM32F401.USART6_TX,
+        (Line  => A0B.STM32F401.USART_Function_Lines.USART6_TX,
          Mode  => A0B.STM32F401.GPIO.Push_Pull,
          Speed => A0B.STM32F401.GPIO.Very_High,
          Pull  => A0B.STM32F401.GPIO.No);
       RX_Line.Configure_Alternative_Function
-        (Line  => A0B.STM32F401.USART6_RX,
+        (Line  => A0B.STM32F401.USART_Function_Lines.USART6_RX,
          Mode  => A0B.STM32F401.GPIO.Push_Pull,
          Speed => A0B.STM32F401.GPIO.Very_High,
          Pull  => A0B.STM32F401.GPIO.No);
