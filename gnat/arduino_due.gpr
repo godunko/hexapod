@@ -7,7 +7,7 @@
 with "../arduino_due/config/phoenix_hexapod_arduino_due_config.gpr";
 
 with "../subprojects/b2f4a/gnat/bbf";
-with "arduino_due_startup";
+with "light_arduino_due";
 
 with "kinematics";
 with "phoenyx_common";
@@ -15,8 +15,8 @@ with "trajectory";
 
 project Arduino_Due is
 
-   for Target use Arduino_Due_Startup'Target;
-   for Runtime use Arduino_Due_Startup'Runtime;
+   for Target use Light_Arduino_Due'Target;
+   for Runtime use Light_Arduino_Due'Runtime;
 
    Target := Project'Target;
 
@@ -38,7 +38,7 @@ project Arduino_Due is
 
    package Linker is
       for Switches ("Ada") use
-        Arduino_Due_Startup.Linker_Switches
+        Light_Arduino_Due.Linker_Switches
          & ("-Wl,--gc-sections");
    end Linker;
 
