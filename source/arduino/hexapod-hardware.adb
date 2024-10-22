@@ -9,7 +9,7 @@ with System.Storage_Elements;
 pragma Warnings (Off, """System.Semihosting"" is an internal GNAT unit");
 with System.Semihosting;
 
-with A0B.ARMv7M.System_Control_Block;
+with A0B.ARMv7M.SCS.SCB;
 with A0B.Types;
 
 with BBF.HPL;
@@ -76,21 +76,22 @@ package body Hexapod.Hardware is
 
       function To_Unsigned_32 is
         new Ada.Unchecked_Conversion
-             (A0B.ARMv7M.System_Control_Block.SCB_CFSR_Register,
+             (A0B.ARMv7M.SCS.SCB.CFSR_Register,
               A0B.Types.Unsigned_32);
 
       function To_Unsigned_32 is
         new Ada.Unchecked_Conversion
-             (A0B.ARMv7M.System_Control_Block.SCB_HFSR_Register,
+             (A0B.ARMv7M.SCS.SCB.HFSR_Register,
               A0B.Types.Unsigned_32);
 
       function To_Unsigned_32 is
         new Ada.Unchecked_Conversion
-             (A0B.ARMv7M.System_Control_Block.SCB_ICSR_Register,
+             (A0B.ARMv7M.SCS.SCB.ICSR_Register,
               A0B.Types.Unsigned_32);
 
       function To_Unsigned_32 is
-        new Ada.Unchecked_Conversion (System.Address, A0B.Types.Unsigned_32);
+        new Ada.Unchecked_Conversion
+              (System.Storage_Elements.Integer_Address, A0B.Types.Unsigned_32);
 
       --------------
       -- Fill_Hex --
@@ -127,26 +128,16 @@ package body Hexapod.Hardware is
       end Fill_Hex;
 
    begin
-      Fill_Hex
-        (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.ICSR),
-         ICSR_Position);
-      Fill_Hex
-        (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.CFSR),
-         CFSR_Position);
-      Fill_Hex
-        (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.HFSR),
-         HFSR_Position);
+      Fill_Hex (To_Unsigned_32 (A0B.ARMv7M.SCS.SCB.ICSR), ICSR_Position);
+      Fill_Hex (To_Unsigned_32 (A0B.ARMv7M.SCS.SCB.CFSR), CFSR_Position);
+      Fill_Hex (To_Unsigned_32 (A0B.ARMv7M.SCS.SCB.HFSR), HFSR_Position);
 
-      if A0B.ARMv7M.System_Control_Block.SCB.CFSR.MemManage.MMARVALID then
-         Fill_Hex
-           (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.MMFAR),
-            MMFAR_Position);
+      if A0B.ARMv7M.SCS.SCB.CFSR.MemManage.MMARVALID then
+         Fill_Hex (To_Unsigned_32 (A0B.ARMv7M.SCS.SCB.MMFAR), MMFAR_Position);
       end if;
 
-      if A0B.ARMv7M.System_Control_Block.SCB.CFSR.BusFault.BFARVALID then
-         Fill_Hex
-           (To_Unsigned_32 (A0B.ARMv7M.System_Control_Block.SCB.BFAR),
-            BFAR_Position);
+      if A0B.ARMv7M.SCS.SCB.CFSR.BusFault.BFARVALID then
+         Fill_Hex (To_Unsigned_32 (A0B.ARMv7M.SCS.SCB.BFAR), BFAR_Position);
       end if;
 
       loop
