@@ -34,6 +34,7 @@ light_blackpill_stm32f401 = "*"
 
 [[pins]]
 a0b_armv7m = { path='../subprojects/a0b-armv7m' }
+a0b_armv7m_systick_clock = { path='../subprojects/a0b-armv7m-systick_clock' }
 a0b_base = { path='../subprojects/a0b-base' }
 a0b_callbacks = { path='../subprojects/a0b-callbacks' }
 a0b_exti = { path='../subprojects/a0b-exti' }
@@ -46,6 +47,7 @@ a0b_spi = { path='../subprojects/a0b-spi' }
 a0b_stm32f401_dma = { path='../subprojects/a0b-stm32f401-dma' }
 a0b_stm32f401_gpio = { path='../subprojects/a0b-stm32f401-gpio' }
 a0b_stm32f401_i2c = { path='../subprojects/a0b-stm32f401-i2c' }
+a0b_stm32f401_tim11_timer = { path='../subprojects/a0b-stm32f401-tim11_timer' }
 a0b_stm32f401_usart = { path='../subprojects/a0b-stm32f401-usart' }
 a0b_tasking = { path='../subprojects/a0b-tasking' }
 a0b_time = { path='../subprojects/a0b-time' }
