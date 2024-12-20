@@ -12,7 +12,7 @@ with OpenGL.Programs;
 package Telemetry.GUI.Programs.Lines is
 
    type Vertex_Data is record
-      VP : OpenGL.GLfloat_Vector_3;
+      VP : OpenGL.GLfloat_Vector_3;  --  Vertex Position
    end record with Pack;
 
    type Vertex_Data_Array is array (Positive range <>) of Vertex_Data;
@@ -35,10 +35,16 @@ package Telemetry.GUI.Programs.Lines is
       MVP  : OpenGL.GLfloat_Matrix_4x4);
    --  Sets Model-View-Projection matrix
 
+   procedure Set_Color
+     (Self : in out Line_Program'Class;
+      To   : OpenGL.GLubyte_Vector_3);
+   --  Sets color to be used to draw lines
+
 private
 
    type Line_Program is new OpenGL.Programs.OpenGL_Program with record
       MVP : OpenGL.Uniform_Location;
+      C   : OpenGL.Uniform_Location;
       VP  : OpenGL.Attribute_Location;
    end record;
 

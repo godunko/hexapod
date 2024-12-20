@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+pragma Ada_2022;
+
 with League.Characters.Latin;
 with League.Strings;
 
@@ -22,13 +24,16 @@ package body Telemetry.GUI.Programs.Lines is
    Text_F : constant League.Strings.Universal_String :=
      League.Strings.To_Universal_String
        ("#version 130") & League.Characters.Latin.Line_Feed &
+     "uniform vec3 c;" &
      "out vec4 frag_colour;" &
      "void main() {" &
-     "  frag_colour = vec4(0.0, 0.0, 0.8, 1.0);" &
+     "  frag_colour = vec4(c, 1.0);" &
      "}";
 
    MVP_Name : constant League.Strings.Universal_String :=
      League.Strings.To_Universal_String ("mvp");
+   C_Name   : constant League.Strings.Universal_String :=
+     League.Strings.To_Universal_String ("c");
    VP_Name  : constant League.Strings.Universal_String :=
      League.Strings.To_Universal_String ("vp");
 
@@ -53,10 +58,28 @@ package body Telemetry.GUI.Programs.Lines is
       end if;
 
       Self.MVP := Self.Uniform_Location (MVP_Name);
+      Self.C   := Self.Uniform_Location (C_Name);
       Self.VP  := Self.Attribute_Location (VP_Name);
 
       return True;
    end Link;
+
+   ---------------
+   -- Set_Color --
+   ---------------
+
+   procedure Set_Color
+     (Self : in out Line_Program'Class;
+      To   : OpenGL.GLubyte_Vector_3)
+   is
+      use type OpenGL.GLfloat;
+
+      C : constant OpenGL.GLfloat_Vector_3 :=
+        [for J in To'Range => OpenGL.GLfloat (To (J)) / 255.0];
+
+   begin
+      Self.Set_Uniform_Value (Self.C, C);
+   end Set_Color;
 
    -------------
    -- Set_MVP --
