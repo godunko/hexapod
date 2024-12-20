@@ -11,6 +11,8 @@ private with Gtk.GLArea;
 with Gtk.Widget;
 private with OpenGL;
 
+private with Telemetry.GUI.Programs.Lines;
+
 package Telemetry.GUI.Graphics_Views is
 
    type Graphics_View_Record is new Gtk.Widget.Gtk_Widget_Record with private;
@@ -29,10 +31,15 @@ package Telemetry.GUI.Graphics_Views is
 
 private
 
+   type Line_Program_Access is
+     access all Telemetry.GUI.Programs.Lines.Line_Program;
+
    type Graphics_View_Record is new Gtk.GLArea.Gtk_GLArea_Record with record
       Horizontal_Angle : OpenGL.GLfloat;
       Vertical_Angle   : OpenGL.GLfloat;
       Viewport_Matrix  : OpenGL.GLfloat_Matrix_4x4;
+
+      Line_Program     : Line_Program_Access;
    end record;
 
 end Telemetry.GUI.Graphics_Views;

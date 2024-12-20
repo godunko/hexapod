@@ -14,8 +14,6 @@ with epoxy;
 with epoxy_gl_generated_h;
 with OpenGL.Contexts;
 
-with Pyramid.Programs;
-
 package body Telemetry.GUI.Graphics_Views is
 
    --  XXX BEGIN stub transition
@@ -23,17 +21,19 @@ package body Telemetry.GUI.Graphics_Views is
    use type OpenGL.GLfloat;
 
    Context : OpenGL.Contexts.OpenGL_Context;
-   Buffer  : Pyramid.Programs.Vertex_Data_Buffers.OpenGL_Buffer
+   Buffer  : Telemetry.GUI.Programs.Lines.Vertex_Data_Buffers.OpenGL_Buffer
                (OpenGL.Vertex);
-   Program : Pyramid.Programs.Pyramid_Program;
 
-   Points : constant Pyramid.Programs.Vertex_Data_Array
-     --  := [(VP => [0.0, 0.5, 0.0]),
-     --      (VP => [0.5, -0.5, 0.0]),
-     --      (VP => [-0.5, -0.5, 0.0])];
-     := [([0.0, 0.5, 0.0],   [0.5, 1.0]),
-         ([0.5, -0.5, 0.0],  [1.0, 0.0]),
-         ([-0.5, -0.5, 0.0], [0.0, 0.0])];
+   Points : constant Telemetry.GUI.Programs.Lines.Vertex_Data_Array
+     := [(VP => [0.0, 0.5, 0.0]),
+         (VP => [0.5, -0.5, 0.0]),
+         (VP => [0.5, -0.5, 0.0]),
+         (VP => [-0.5, -0.5, 0.0]),
+         (VP => [-0.5, -0.5, 0.0]),
+         (VP => [0.0, 0.5, 0.0])];
+     --  := [([0.0, 0.5, 0.0],   [0.5, 1.0]),
+     --      ([0.5, -0.5, 0.0],  [1.0, 0.0]),
+     --      ([-0.5, -0.5, 0.0], [0.0, 0.0])];
 
    package Elementary_Function is
      new Ada.Numerics.Generic_Elementary_Functions (OpenGL.GLfloat);
@@ -164,9 +164,10 @@ package body Telemetry.GUI.Graphics_Views is
       Buffer.Create;
       Buffer.Bind;
 
-      Program.Initialize;
-      Program.Bind;
-      Program.Set_Vertex_Data_Buffer (Buffer);
+      Self.Line_Program := new Telemetry.GUI.Programs.Lines.Line_Program;
+      Self.Line_Program.Initialize;
+      Self.Line_Program.Bind;
+      Self.Line_Program.Set_Vertex_Data_Buffer (Buffer);
    end On_Realize;
 
    ---------------
@@ -202,15 +203,15 @@ package body Telemetry.GUI.Graphics_Views is
       Buffer.Bind;
       Buffer.Allocate (Points);
 
-      Program.Bind;
-      Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
+      Self.Line_Program.Bind;
+      Self.Line_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
 
       --
 
       Context.Functions.Clear
         (OpenGL.GL_DEPTH_BUFFER_BIT + OpenGL.GL_COLOR_BUFFER_BIT);
 
-      Context.Functions.Draw_Arrays (OpenGL.GL_TRIANGLES, 0, Points'Length);
+      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Points'Length);
 
       return True;
    end On_Render;
