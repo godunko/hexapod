@@ -14,7 +14,7 @@ project Telemetry_GUI is
    for Main use ("telemetry-gui-driver.adb");
 
    package Builder is
-      for Executable ("telemetry-driver.adb") use "telemetry";
+      for Executable ("telemetry-gui-driver.adb") use "telemetry";
    end Builder;
 
    package Compiler is
