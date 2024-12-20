@@ -103,7 +103,7 @@ package body Telemetry.GUI.Main_Window is
 
       VA :=
         Gtk.Adjustment.Gtk_Adjustment_New
-          (Value          => 70.0,
+          (Value          => -70.0,
            Lower          => -90.0,
            Upper          => 90.0,
            Step_Increment => 1.0,
@@ -113,7 +113,6 @@ package body Telemetry.GUI.Main_Window is
 
       VS := Gtk.Scale.Gtk_Vscale_New (VA);
       VS.Set_Has_Origin (False);
-      VS.Set_Inverted (True);
       VS.Set_Value_Pos (Gtk.Enums.Pos_Bottom);
 
       HA :=
