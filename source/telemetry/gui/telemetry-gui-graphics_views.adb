@@ -9,7 +9,6 @@ pragma Ada_2022;
 with Ada.Numerics.Generic_Elementary_Functions;
 
 with Gdk.GLContext;
-with Glib;
 
 with epoxy;
 with epoxy_gl_generated_h;
@@ -35,17 +34,6 @@ package body Telemetry.GUI.Graphics_Views is
      := [([0.0, 0.5, 0.0],   [0.5, 1.0]),
          ([0.5, -0.5, 0.0],  [1.0, 0.0]),
          ([-0.5, -0.5, 0.0], [0.0, 0.0])];
-
-   View_Matrix     : OpenGL.GLfloat_Matrix_4x4 :=
-     [[1.0, 0.0, 0.0, 0.0],
-      [0.0, 1.0, 0.0, 0.0],
-      [0.0, 0.0, 1.0, 0.0],
-      [0.0, 0.0, 0.0, 1.0]];
-   Viewport_Matrix : OpenGL.GLfloat_Matrix_4x4 :=
-     [[1.0, 0.0, 0.0, 0.0],
-      [0.0, 1.0, 0.0, 0.0],
-      [0.0, 0.0, 1.0, 0.0],
-      [0.0, 0.0, 0.0, 1.0]];
 
    package Elementary_Function is
      new Ada.Numerics.Generic_Elementary_Functions (OpenGL.GLfloat);
@@ -150,6 +138,12 @@ package body Telemetry.GUI.Graphics_Views is
       Self.On_Realize (Call => Dispatch_Realize'Access);
       Self.On_Resize (Call => Dispatch_Resize'Access);
       Self.On_Render (Call => Dispatch_Render'Access);
+
+      Self.Viewport_Matrix :=
+        [[1.0, 0.0, 0.0, 0.0],
+         [0.0, 1.0, 0.0, 0.0],
+         [0.0, 0.0, 1.0, 0.0],
+         [0.0, 0.0, 0.0, 1.0]];
    end Initialize;
 
    ----------------
@@ -184,15 +178,21 @@ package body Telemetry.GUI.Graphics_Views is
       GLContext : not null access Gdk.GLContext.Gdk_GLContext_Record'Class)
       return Boolean
    is
-      pragma Unreferenced (Self, GLContext);
+      pragma Unreferenced (GLContext);
 
       use type OpenGL.GLfloat_Matrix_4x4;
       use type OpenGL.GLbitfield;
 
+      View_Matrix : OpenGL.GLfloat_Matrix_4x4 :=
+        [[1.0, 0.0, 0.0, 0.0],
+         [0.0, 1.0, 0.0, 0.0],
+         [0.0, 0.0, 1.0, 0.0],
+         [0.0, 0.0, 0.0, 1.0]];
+
    begin
       View_Matrix :=
-        Rotate_X (Degrees_To_Radians (70.0))
-          * Rotate_Z (Degrees_To_Radians (45.0));
+        Rotate_X (Degrees_To_Radians (Self.Vertical_Angle))
+          * Rotate_Z (Degrees_To_Radians (Self.Horizontal_Angle));
 
       Context.Functions.Enable (OpenGL.GL_DEPTH_TEST);
       Context.Functions.Clear_Color (0.2, 0.2, 0.2, 1.0);
@@ -203,7 +203,7 @@ package body Telemetry.GUI.Graphics_Views is
       Buffer.Allocate (Points);
 
       Program.Bind;
-      Program.Set_MVP (Viewport_Matrix * View_Matrix);
+      Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
 
       --
 
@@ -224,19 +224,17 @@ package body Telemetry.GUI.Graphics_Views is
       Width  : Glib.Gint;
       Height : Glib.Gint)
    is
-      pragma Unreferenced (Self);
-
       W : constant OpenGL.GLfloat := OpenGL.GLfloat (Width);
       H : constant OpenGL.GLfloat := OpenGL.GLfloat (Height);
 
    begin
       if W < H then
-         Viewport_Matrix (1, 1) := 1.0;
-         Viewport_Matrix (2, 2) := W / H;
+         Self.Viewport_Matrix (1, 1) := 1.0;
+         Self.Viewport_Matrix (2, 2) := W / H;
 
       else
-         Viewport_Matrix (1, 1) := H / W;
-         Viewport_Matrix (2, 2) := 1.0;
+         Self.Viewport_Matrix (1, 1) := H / W;
+         Self.Viewport_Matrix (2, 2) := 1.0;
       end if;
    end On_Resize;
 
@@ -275,5 +273,29 @@ package body Telemetry.GUI.Graphics_Views is
          [0.0, 0.0, 1.0, 0.0],
          [0.0, 0.0, 0.0, 1.0]];
    end Rotate_Z;
+
+   -----------------------------
+   -- Set_Horizontal_Rotation --
+   -----------------------------
+
+   procedure Set_Horizontal_Rotation
+     (Self  : in out Graphics_View_Record'Class;
+      Angle : Glib.Gdouble) is
+   begin
+      Self.Horizontal_Angle := OpenGL.GLfloat (Angle);
+      Self.Queue_Draw;
+   end Set_Horizontal_Rotation;
+
+   ---------------------------
+   -- Set_Vertical_Rotation --
+   ---------------------------
+
+   procedure Set_Vertical_Rotation
+     (Self  : in out Graphics_View_Record'Class;
+      Angle : Glib.Gdouble) is
+   begin
+      Self.Vertical_Angle := OpenGL.GLfloat (Angle);
+      Self.Queue_Draw;
+   end Set_Vertical_Rotation;
 
 end Telemetry.GUI.Graphics_Views;
