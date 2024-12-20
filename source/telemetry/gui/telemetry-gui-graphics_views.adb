@@ -367,12 +367,12 @@ package body Telemetry.GUI.Graphics_Views is
 
    begin
       if W < H then
-         Self.Viewport_Matrix (1, 1) := 1.0;
-         Self.Viewport_Matrix (2, 2) := W / H;
-
-      else
          Self.Viewport_Matrix (1, 1) := H / W;
          Self.Viewport_Matrix (2, 2) := 1.0;
+
+      else
+         Self.Viewport_Matrix (1, 1) := 1.0;
+         Self.Viewport_Matrix (2, 2) := W / H;
       end if;
    end On_Resize;
 
