@@ -14,6 +14,8 @@ with epoxy;
 with epoxy_gl_generated_h;
 with OpenGL.Contexts;
 
+with Kinematics.Configuration;
+
 package body Telemetry.GUI.Graphics_Views is
 
    --  XXX BEGIN stub transition
@@ -23,17 +25,6 @@ package body Telemetry.GUI.Graphics_Views is
    Context : OpenGL.Contexts.OpenGL_Context;
    Buffer  : Telemetry.GUI.Programs.Lines.Vertex_Data_Buffers.OpenGL_Buffer
                (OpenGL.Vertex);
-
-   Points : constant Telemetry.GUI.Programs.Lines.Vertex_Data_Array
-     := [(VP => [0.0, 0.5, 0.0]),
-         (VP => [0.5, -0.5, 0.0]),
-         (VP => [0.5, -0.5, 0.0]),
-         (VP => [-0.5, -0.5, 0.0]),
-         (VP => [-0.5, -0.5, 0.0]),
-         (VP => [0.0, 0.5, 0.0])];
-     --  := [([0.0, 0.5, 0.0],   [0.5, 1.0]),
-     --      ([0.5, -0.5, 0.0],  [1.0, 0.0]),
-     --      ([-0.5, -0.5, 0.0], [0.0, 0.0])];
 
    package Elementary_Function is
      new Ada.Numerics.Generic_Elementary_Functions (OpenGL.GLfloat);
@@ -72,6 +63,150 @@ package body Telemetry.GUI.Graphics_Views is
      (Self      : access Gtk.GLArea.Gtk_GLArea_Record'Class;
       GLContext : not null access Gdk.GLContext.Gdk_GLContext_Record'Class)
       return Boolean;
+
+   procedure Build_Grid (Self : in out Graphics_View_Record'Class);
+
+   procedure Build_Robot (Self : in out Graphics_View_Record'Class);
+
+   ----------------
+   -- Build_Grid --
+   ----------------
+
+   procedure Build_Grid (Self : in out Graphics_View_Record'Class) is
+      Points : Telemetry.GUI.Programs.Lines.Vertex_Data_Array (1 .. 44);
+      Last   : Natural := 0;
+
+   begin
+      for J in 0 .. 10 loop
+         declare
+            X : constant OpenGL.GLfloat :=
+              -0.5 + (0.1 * OpenGL.GLfloat (J)) + Self.Grid_Offset_X;
+
+         begin
+            exit when X > 0.5;
+
+            Last := @ + 1;
+            Points (Last) := (VP => [X, -0.5, 0.0]);
+            Last := @ + 1;
+            Points (Last) := (VP => [X, 0.5, 0.0]);
+         end;
+      end loop;
+
+      for J in 0 .. 10 loop
+         declare
+            Y : constant OpenGL.GLfloat :=
+              -0.5 + (0.1 * OpenGL.GLfloat (J)) + Self.Grid_Offset_Y;
+
+         begin
+            exit when Y > 0.5;
+
+            Last := @ + 1;
+            Points (Last) := (VP => [-0.5, Y, 0.0]);
+            Last := @ + 1;
+            Points (Last) := (VP => [0.5, Y, 0.0]);
+         end;
+      end loop;
+
+      Self.Line_Elements := OpenGL.GLsizei (Last);
+
+      Buffer.Bind;
+      Buffer.Allocate (Points (Points'First .. Last));
+   end Build_Grid;
+
+   -----------------
+   -- Build_Robot --
+   -----------------
+
+   procedure Build_Robot (Self : in out Graphics_View_Record'Class) is
+      Points : Telemetry.GUI.Programs.Lines.Vertex_Data_Array (1 .. 12);
+      Last   : Natural := 0;
+
+      Z : constant := 0.05;
+
+   begin
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.LF_Base_X,
+            Kinematics.Configuration.LF_Base_Y,
+            Kinematics.Configuration.LF_Base_Z + Z]);
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.LM_Base_X,
+            Kinematics.Configuration.LM_Base_Y,
+            Kinematics.Configuration.LM_Base_Z + Z]);
+
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.LM_Base_X,
+            Kinematics.Configuration.LM_Base_Y,
+            Kinematics.Configuration.LM_Base_Z + Z]);
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.LH_Base_X,
+            Kinematics.Configuration.LH_Base_Y,
+            Kinematics.Configuration.LH_Base_Z + Z]);
+
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.LH_Base_X,
+            Kinematics.Configuration.LH_Base_Y,
+            Kinematics.Configuration.LH_Base_Z + Z]);
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.RH_Base_X,
+            Kinematics.Configuration.RH_Base_Y,
+            Kinematics.Configuration.RH_Base_Z + Z]);
+
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.RH_Base_X,
+            Kinematics.Configuration.RH_Base_Y,
+            Kinematics.Configuration.RH_Base_Z + Z]);
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.RM_Base_X,
+            Kinematics.Configuration.RM_Base_Y,
+            Kinematics.Configuration.RM_Base_Z + Z]);
+
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.RM_Base_X,
+            Kinematics.Configuration.RM_Base_Y,
+            Kinematics.Configuration.RM_Base_Z + Z]);
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.RF_Base_X,
+            Kinematics.Configuration.RF_Base_Y,
+            Kinematics.Configuration.RF_Base_Z + Z]);
+
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.RF_Base_X,
+            Kinematics.Configuration.RF_Base_Y,
+            Kinematics.Configuration.RF_Base_Z + Z]);
+      Last := @ + 1;
+      Points (Last) :=
+        (VP =>
+           [Kinematics.Configuration.LF_Base_X,
+            Kinematics.Configuration.LF_Base_Y,
+            Kinematics.Configuration.LF_Base_Z + Z]);
+
+      Self.Line_Elements := OpenGL.GLsizei (Last);
+
+      Buffer.Bind;
+      Buffer.Allocate (Points (Points'First .. Last));
+   end Build_Robot;
 
    ------------------------
    -- Degrees_To_Radians --
@@ -198,20 +333,17 @@ package body Telemetry.GUI.Graphics_Views is
       Context.Functions.Enable (OpenGL.GL_DEPTH_TEST);
       Context.Functions.Clear_Color (0.2, 0.2, 0.2, 1.0);
 
-      --
-
-      Buffer.Bind;
-      Buffer.Allocate (Points);
+      Context.Functions.Clear
+        (OpenGL.GL_DEPTH_BUFFER_BIT + OpenGL.GL_COLOR_BUFFER_BIT);
 
       Self.Line_Program.Bind;
       Self.Line_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
 
-      --
+      Self.Build_Grid;
+      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
-      Context.Functions.Clear
-        (OpenGL.GL_DEPTH_BUFFER_BIT + OpenGL.GL_COLOR_BUFFER_BIT);
-
-      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Points'Length);
+      Self.Build_Robot;
+      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
       return True;
    end On_Render;
