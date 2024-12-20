@@ -6,6 +6,8 @@
 
 with "../telemetry/config/hexapod_telemetry_gui_config.gpr";
 
+with "kinematics.gpr";
+
 project Telemetry_GUI is
 
    for Source_Dirs use ("../source/telemetry/gui");
