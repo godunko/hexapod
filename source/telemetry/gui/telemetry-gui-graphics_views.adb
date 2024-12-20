@@ -29,6 +29,8 @@ package body Telemetry.GUI.Graphics_Views is
    package Elementary_Function is
      new Ada.Numerics.Generic_Elementary_Functions (OpenGL.GLfloat);
 
+   function Scale (Scale : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4;
+
    function Rotate_X (Angle : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4;
 
    function Rotate_Z (Angle : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4;
@@ -327,7 +329,8 @@ package body Telemetry.GUI.Graphics_Views is
 
    begin
       View_Matrix :=
-        Rotate_X (Degrees_To_Radians (Self.Vertical_Angle))
+        Scale (Self.Scale)
+          * Rotate_X (Degrees_To_Radians (Self.Vertical_Angle))
           * Rotate_Z (Degrees_To_Radians (Self.Horizontal_Angle));
 
       Context.Functions.Enable (OpenGL.GL_DEPTH_TEST);
@@ -409,6 +412,19 @@ package body Telemetry.GUI.Graphics_Views is
          [0.0, 0.0, 0.0, 1.0]];
    end Rotate_Z;
 
+   -----------
+   -- Scale --
+   -----------
+
+   function Scale (Scale : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4 is
+   begin
+      return
+        [[Scale, 0.0,   0.0,   0.0],
+         [0.0,   Scale, 0.0,   0.0],
+         [0.0,   0.0,   Scale, 0.0],
+         [0.0,   0.0,   0.0,   1.0]];
+   end Scale;
+
    -----------------------------
    -- Set_Horizontal_Rotation --
    -----------------------------
@@ -420,6 +436,18 @@ package body Telemetry.GUI.Graphics_Views is
       Self.Horizontal_Angle := OpenGL.GLfloat (Angle);
       Self.Queue_Draw;
    end Set_Horizontal_Rotation;
+
+   ---------------
+   -- Set_Scale --
+   ---------------
+
+   procedure Set_Scale
+     (Self : in out Graphics_View_Record'Class;
+      To   : Glib.Gdouble) is
+   begin
+      Self.Scale := OpenGL.GLfloat (To);
+      Self.Queue_Draw;
+   end Set_Scale;
 
    ---------------------------
    -- Set_Vertical_Rotation --

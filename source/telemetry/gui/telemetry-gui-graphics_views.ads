@@ -29,6 +29,10 @@ package Telemetry.GUI.Graphics_Views is
      (Self  : in out Graphics_View_Record'Class;
       Angle : Glib.Gdouble);
 
+   procedure Set_Scale
+     (Self : in out Graphics_View_Record'Class;
+      To   : Glib.Gdouble);
+
 private
 
    type Line_Program_Access is
@@ -37,6 +41,7 @@ private
    type Graphics_View_Record is new Gtk.GLArea.Gtk_GLArea_Record with record
       Horizontal_Angle : OpenGL.GLfloat;
       Vertical_Angle   : OpenGL.GLfloat;
+      Scale            : OpenGL.GLfloat;
       Viewport_Matrix  : OpenGL.GLfloat_Matrix_4x4;
 
       Grid_Offset_X    : OpenGL.GLfloat := 0.04;

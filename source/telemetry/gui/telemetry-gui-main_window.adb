@@ -30,6 +30,8 @@ package body Telemetry.GUI.Main_Window is
    VS  : Gtk.Scale.Gtk_Scale;
    HA  : Gtk.Adjustment.Gtk_Adjustment;
    HS  : Gtk.Scale.Gtk_Scale;
+   SA  : Gtk.Adjustment.Gtk_Adjustment;
+   SS  : Gtk.Scale.Gtk_Scale;
 
    procedure On_Activate
      (Self : access Glib.Application.Gapplication_Record'Class);
@@ -38,6 +40,9 @@ package body Telemetry.GUI.Main_Window is
      (Self : access Glib.Object.GObject_Record'Class);
 
    procedure Dispatch_Vertical_Value_Changed
+     (Self : access Glib.Object.GObject_Record'Class);
+
+   procedure Dispatch_Scale_Value_Changed
      (Self : access Glib.Object.GObject_Record'Class);
 
    ---------------------------------------
@@ -52,6 +57,19 @@ package body Telemetry.GUI.Main_Window is
    begin
       GV.Set_Horizontal_Rotation (HA.Get_Value);
    end Dispatch_Horizontal_Value_Changed;
+
+   ----------------------------------
+   -- Dispatch_Scale_Value_Changed --
+   ----------------------------------
+
+   procedure Dispatch_Scale_Value_Changed
+     (Self : access Glib.Object.GObject_Record'Class)
+   is
+      pragma Unreferenced (Self);
+
+   begin
+      GV.Set_Scale (SA.Get_Value);
+   end Dispatch_Scale_Value_Changed;
 
    -------------------------------------
    -- Dispatch_Vertical_Value_Changed --
@@ -129,10 +147,25 @@ package body Telemetry.GUI.Main_Window is
       HS.Set_Has_Origin (False);
       HS.Set_Value_Pos (Gtk.Enums.Pos_Right);
 
+      SA :=
+        Gtk.Adjustment.Gtk_Adjustment_New
+          (Value          => 2.0,
+           Lower          => 1.0,
+           Upper          => 10.0,
+           Step_Increment => 0.5,
+           Page_Increment => 1.0);
+      SA.On_Value_Changed
+        (Call => Dispatch_Scale_Value_Changed'Access, Slot => Self);
+
+      SS := Gtk.Scale.Gtk_Vscale_New (SA);
+      SS.Set_Has_Origin (False);
+      SS.Set_Value_Pos (Gtk.Enums.Pos_Bottom);
+
       Gtk.Grid.Gtk_New (G);
       G.Attach (GV, 0, 0, 1, 1);
       G.Attach (VS, 1, 0, 1, 1);
       G.Attach (HS, 0, 1, 1, 1);
+      G.Attach (SS, 2, 0, 1, 1);
 
       AW :=
         Gtk.Application_Window.Gtk_Application_Window_New
@@ -142,6 +175,7 @@ package body Telemetry.GUI.Main_Window is
 
       GV.Set_Horizontal_Rotation (HA.Get_Value);
       GV.Set_Vertical_Rotation (VA.Get_Value);
+      GV.Set_Scale (SA.Get_Value);
    end On_Activate;
 
 end Telemetry.GUI.Main_Window;
