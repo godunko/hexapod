@@ -8,6 +8,7 @@ package Hexapod.Parameters.Control_Cycle is
 
    pragma Pure;
 
-   Tick_Duration : constant := 1.0 / 100.0;
+   Tick_Frequency : constant := 100;
+   Tick_Duration  : constant := 1.0 / Tick_Frequency;
 
 end Hexapod.Parameters.Control_Cycle;
