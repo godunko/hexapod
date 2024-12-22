@@ -9,7 +9,6 @@ pragma Ada_2022;
 with Ada.Numerics.Generic_Elementary_Functions;
 
 with Gdk.GLContext;
-with Glib.Main;
 
 with epoxy;
 with epoxy_gl_generated_h;
@@ -56,6 +55,8 @@ package body GUI.Graphics_Views is
 
    procedure On_Realize (Self : in out Graphics_View_Record'Class);
 
+   procedure On_Destroy (Self : in out Graphics_View_Record'Class);
+
    procedure On_Resize
      (Self   : in out Graphics_View_Record'Class;
       Width  : Glib.Gint;
@@ -67,6 +68,9 @@ package body GUI.Graphics_Views is
       return Boolean;
 
    procedure Dispatch_Realize
+     (Self : access Gtk.Widget.Gtk_Widget_Record'Class);
+
+   procedure Dispatch_Destroy
      (Self : access Gtk.Widget.Gtk_Widget_Record'Class);
 
    procedure Dispatch_Resize
@@ -552,6 +556,16 @@ package body GUI.Graphics_Views is
    end Degrees_To_Radians;
 
    ----------------------
+   -- Dispatch_Destroy --
+   ----------------------
+
+   procedure Dispatch_Destroy
+     (Self : access Gtk.Widget.Gtk_Widget_Record'Class) is
+   begin
+      Graphics_View_Record'Class (Self.all).On_Destroy;
+   end Dispatch_Destroy;
+
+   ----------------------
    -- Dispatch_Realize --
    ----------------------
 
@@ -604,18 +618,34 @@ package body GUI.Graphics_Views is
    begin
       Gtk.GLArea.Initialize (Self);
 
-      Self.On_Realize (Call => Dispatch_Realize'Access);
-      Self.On_Resize (Call => Dispatch_Resize'Access);
-      Self.On_Render (Call => Dispatch_Render'Access);
-
       Self.Viewport_Matrix :=
         [[1.0, 0.0, 0.0, 0.0],
          [0.0, 1.0, 0.0, 0.0],
          [0.0, 0.0, 1.0, 0.0],
          [0.0, 0.0, 0.0, 1.0]];
+      Self.Timer_Source := Glib.Main.No_Source_Id;
+
+      Self.On_Realize (Call => Dispatch_Realize'Access);
+      Self.On_Destroy (Call => Dispatch_Destroy'Access);
+      Self.On_Resize (Call => Dispatch_Resize'Access);
+      Self.On_Render (Call => Dispatch_Render'Access);
 
       Movement.Initialize;
    end Initialize;
+
+   ----------------
+   -- On_Destroy --
+   ----------------
+
+   procedure On_Destroy (Self : in out Graphics_View_Record'Class) is
+      use type Glib.Main.G_Source_Id;
+
+   begin
+      if Self.Timer_Source /= Glib.Main.No_Source_Id then
+         Glib.Main.Remove (Self.Timer_Source);
+         Self.Timer_Source := Glib.Main.No_Source_Id;
+      end if;
+   end On_Destroy;
 
    ----------------
    -- On_Realize --
@@ -623,7 +653,6 @@ package body GUI.Graphics_Views is
 
    procedure On_Realize (Self : in out Graphics_View_Record'Class) is
       VAO : aliased epoxy.GLuint;
-      SI  : Glib.Main.G_Source_Id;
 
    begin
       Self.Make_Current;
@@ -641,7 +670,7 @@ package body GUI.Graphics_Views is
       Self.Line_Program.Bind;
       Self.Line_Program.Set_Vertex_Data_Buffer (Buffer);
 
-      SI :=
+      Self.Timer_Source :=
         Sources.Timeout_Add
           (Interval =>
              Glib.Guint

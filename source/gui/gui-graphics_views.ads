@@ -7,6 +7,7 @@
 pragma Ada_2022;
 
 with Glib;
+private with Glib.Main;
 private with Gtk.GLArea;
 with Gtk.Widget;
 
@@ -52,6 +53,8 @@ private
 
       Line_Program     : Line_Program_Access;
       Line_Elements    : OpenGL.GLsizei;
+
+      Timer_Source     : Glib.Main.G_Source_Id;
    end record;
 
 end GUI.Graphics_Views;
