@@ -4,8 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-package Telemetry.GUI
+package GUI
   with Pure
 is
 
-end Telemetry.GUI;
+end GUI;

@@ -9,7 +9,7 @@ pragma Ada_2022;
 with League.Characters.Latin;
 with League.Strings;
 
-package body Telemetry.GUI.Programs.Lines is
+package body GUI.Programs.Lines is
 
    use type League.Strings.Universal_String;
 
@@ -115,4 +115,4 @@ package body Telemetry.GUI.Programs.Lines is
         Stride     => Vertex_Data_Buffers.Stride);
    end Set_Vertex_Data_Buffer;
 
-end Telemetry.GUI.Programs.Lines;
+end GUI.Programs.Lines;

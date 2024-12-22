@@ -17,14 +17,14 @@ with Gtk.Enums;
 with Gtk.Grid;
 with Gtk.Scale;
 
-with Telemetry.GUI.Graphics_Views;
+with GUI.Graphics_Views;
 
-package body Telemetry.GUI.Main_Window is
+package body GUI.Main_Window is
 
    App : Gtk.Application.Gtk_Application;
    AW  : Gtk.Application_Window.Gtk_Application_Window;
 
-   GV  : Telemetry.GUI.Graphics_Views.Graphics_View;
+   GV  : GUI.Graphics_Views.Graphics_View;
    G   : Gtk.Grid.Gtk_Grid;
    VA  : Gtk.Adjustment.Gtk_Adjustment;
    VS  : Gtk.Scale.Gtk_Scale;
@@ -115,7 +115,7 @@ package body Telemetry.GUI.Main_Window is
       use type Glib.Gdouble;
 
    begin
-      Telemetry.GUI.Graphics_Views.Gtk_New (GV);
+      GUI.Graphics_Views.Gtk_New (GV);
       GV.Set_Hexpand (True);
       GV.Set_Vexpand (True);
 
@@ -178,4 +178,4 @@ package body Telemetry.GUI.Main_Window is
       GV.Set_Scale (SA.Get_Value);
    end On_Activate;
 
-end Telemetry.GUI.Main_Window;
+end GUI.Main_Window;

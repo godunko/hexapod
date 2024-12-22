@@ -9,7 +9,7 @@
 with OpenGL.Generic_Buffers;
 with OpenGL.Programs;
 
-package Telemetry.GUI.Programs.Lines is
+package GUI.Programs.Lines is
 
    type Vertex_Data is record
       VP : OpenGL.GLfloat_Vector_3;  --  Vertex Position
@@ -52,4 +52,4 @@ private
    --  Executed at link time. Link shaders into program and extracts locations
    --  of attributes.
 
-end Telemetry.GUI.Programs.Lines;
+end GUI.Programs.Lines;

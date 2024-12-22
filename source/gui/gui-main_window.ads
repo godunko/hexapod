@@ -4,8 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-package Telemetry.GUI.Main_Window is
+package GUI.Main_Window is
 
    procedure Initialize;
 
-end Telemetry.GUI.Main_Window;
+end GUI.Main_Window;

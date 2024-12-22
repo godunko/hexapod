@@ -25,14 +25,14 @@ with Legs.Trajectory;
 with Legs.Trajectory_Generator;
 with Legs.Workspace;
 
-package body Telemetry.GUI.Graphics_Views is
+package body GUI.Graphics_Views is
 
    --  XXX BEGIN stub transition
 
    use type OpenGL.GLfloat;
 
    Context : OpenGL.Contexts.OpenGL_Context;
-   Buffer  : Telemetry.GUI.Programs.Lines.Vertex_Data_Buffers.OpenGL_Buffer
+   Buffer  : GUI.Programs.Lines.Vertex_Data_Buffers.OpenGL_Buffer
                (OpenGL.Vertex);
 
    package Elementary_Function is
@@ -119,7 +119,7 @@ package body Telemetry.GUI.Graphics_Views is
    ----------------
 
    procedure Build_Grid (Self : in out Graphics_View_Record'Class) is
-      Points : Telemetry.GUI.Programs.Lines.Vertex_Data_Array (1 .. 44);
+      Points : GUI.Programs.Lines.Vertex_Data_Array (1 .. 44);
       Last   : Natural := 0;
 
    begin
@@ -168,7 +168,7 @@ package body Telemetry.GUI.Graphics_Views is
    -----------------
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class) is
-      Points : Telemetry.GUI.Programs.Lines.Vertex_Data_Array (1 .. 12 + 24);
+      Points : GUI.Programs.Lines.Vertex_Data_Array (1 .. 12 + 24);
       Last   : Natural := 0;
 
       procedure Build_Leg
@@ -414,7 +414,7 @@ package body Telemetry.GUI.Graphics_Views is
       Buffer.Create;
       Buffer.Bind;
 
-      Self.Line_Program := new Telemetry.GUI.Programs.Lines.Line_Program;
+      Self.Line_Program := new GUI.Programs.Lines.Line_Program;
       Self.Line_Program.Initialize;
       Self.Line_Program.Bind;
       Self.Line_Program.Set_Vertex_Data_Buffer (Buffer);
@@ -624,4 +624,4 @@ package body Telemetry.GUI.Graphics_Views is
       Self.Queue_Draw;
    end Set_Vertical_Rotation;
 
-end Telemetry.GUI.Graphics_Views;
+end GUI.Graphics_Views;
