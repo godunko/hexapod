@@ -9,12 +9,19 @@ pragma Ada_2022;
 with Ada.Numerics.Generic_Elementary_Functions;
 
 with Gdk.GLContext;
+with Glib.Main;
 
 with epoxy;
 with epoxy_gl_generated_h;
 with OpenGL.Contexts;
 
+with Hexapod.Parameters.Control_Cycle;
 with Kinematics.Configuration;
+with Legs.Gait_Generator;
+with Legs.State;
+with Legs.Trajectory;
+with Legs.Trajectory_Generator;
+with Legs.Workspace;
 
 package body Telemetry.GUI.Graphics_Views is
 
@@ -66,9 +73,44 @@ package body Telemetry.GUI.Graphics_Views is
       GLContext : not null access Gdk.GLContext.Gdk_GLContext_Record'Class)
       return Boolean;
 
+   function On_Timeout (Data : Graphics_View) return Boolean;
+
+   package Sources is new Glib.Main.Generic_Sources (Graphics_View);
+
    procedure Build_Grid (Self : in out Graphics_View_Record'Class);
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class);
+
+   package Movement is
+
+      Body_Height : constant := 0.070;
+
+      procedure Initialize;
+
+      --  procedure Step;
+
+   end Movement;
+
+   --------------
+   -- Movement --
+   --------------
+
+   package body Movement is
+
+      ----------------
+      -- Initialize --
+      ----------------
+
+      procedure Initialize is
+      begin
+         Legs.Initialize;
+         Legs.Workspace.Compute (Body_Height);
+         Legs.Trajectory.Initialize;
+         Legs.Trajectory_Generator.Initialize;
+         Legs.Gait_Generator.Initialize;
+      end Initialize;
+
+   end Movement;
 
    ----------------
    -- Build_Grid --
@@ -120,10 +162,39 @@ package body Telemetry.GUI.Graphics_Views is
    -----------------
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class) is
-      Points : Telemetry.GUI.Programs.Lines.Vertex_Data_Array (1 .. 12);
+      Points : Telemetry.GUI.Programs.Lines.Vertex_Data_Array (1 .. 12 + 24);
       Last   : Natural := 0;
 
-      Z : constant := 0.05;
+      procedure Build_Leg
+        (Base_X   : OpenGL.GLfloat;
+         Base_Y   : OpenGL.GLfloat;
+         Base_Z   : OpenGL.GLfloat;
+         Position : Kinematics.Position);
+
+      ---------------
+      -- Build_Leg --
+      ---------------
+
+      procedure Build_Leg
+        (Base_X   : OpenGL.GLfloat;
+         Base_Y   : OpenGL.GLfloat;
+         Base_Z   : OpenGL.GLfloat;
+         Position : Kinematics.Position) is
+      begin
+         Last := @ + 1;
+         Points (Last) :=
+           (VP =>
+              [Base_X,
+               Base_Y,
+               Base_Z + Movement.Body_Height]);
+         Last := @ + 1;
+         Points (Last) :=
+           (VP =>
+              [OpenGL.GLfloat (Kinematics.X (Position)),
+               OpenGL.GLfloat (Kinematics.Y (Position)),
+               OpenGL.GLfloat (Kinematics.Z (Position))
+                 + Movement.Body_Height]);
+      end Build_Leg;
 
    begin
       Last := @ + 1;
@@ -131,78 +202,110 @@ package body Telemetry.GUI.Graphics_Views is
         (VP =>
            [Kinematics.Configuration.LF_Base_X,
             Kinematics.Configuration.LF_Base_Y,
-            Kinematics.Configuration.LF_Base_Z + Z]);
+            Kinematics.Configuration.LF_Base_Z + Movement.Body_Height]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LM_Base_X,
             Kinematics.Configuration.LM_Base_Y,
-            Kinematics.Configuration.LM_Base_Z + Z]);
+            Kinematics.Configuration.LM_Base_Z + Movement.Body_Height]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LM_Base_X,
             Kinematics.Configuration.LM_Base_Y,
-            Kinematics.Configuration.LM_Base_Z + Z]);
+            Kinematics.Configuration.LM_Base_Z + Movement.Body_Height]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LH_Base_X,
             Kinematics.Configuration.LH_Base_Y,
-            Kinematics.Configuration.LH_Base_Z + Z]);
+            Kinematics.Configuration.LH_Base_Z + Movement.Body_Height]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LH_Base_X,
             Kinematics.Configuration.LH_Base_Y,
-            Kinematics.Configuration.LH_Base_Z + Z]);
+            Kinematics.Configuration.LH_Base_Z + Movement.Body_Height]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RH_Base_X,
             Kinematics.Configuration.RH_Base_Y,
-            Kinematics.Configuration.RH_Base_Z + Z]);
+            Kinematics.Configuration.RH_Base_Z + Movement.Body_Height]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RH_Base_X,
             Kinematics.Configuration.RH_Base_Y,
-            Kinematics.Configuration.RH_Base_Z + Z]);
+            Kinematics.Configuration.RH_Base_Z + Movement.Body_Height]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RM_Base_X,
             Kinematics.Configuration.RM_Base_Y,
-            Kinematics.Configuration.RM_Base_Z + Z]);
+            Kinematics.Configuration.RM_Base_Z + Movement.Body_Height]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RM_Base_X,
             Kinematics.Configuration.RM_Base_Y,
-            Kinematics.Configuration.RM_Base_Z + Z]);
+            Kinematics.Configuration.RM_Base_Z + Movement.Body_Height]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RF_Base_X,
             Kinematics.Configuration.RF_Base_Y,
-            Kinematics.Configuration.RF_Base_Z + Z]);
+            Kinematics.Configuration.RF_Base_Z + Movement.Body_Height]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RF_Base_X,
             Kinematics.Configuration.RF_Base_Y,
-            Kinematics.Configuration.RF_Base_Z + Z]);
+            Kinematics.Configuration.RF_Base_Z + Movement.Body_Height]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LF_Base_X,
             Kinematics.Configuration.LF_Base_Y,
-            Kinematics.Configuration.LF_Base_Z + Z]);
+            Kinematics.Configuration.LF_Base_Z + Movement.Body_Height]);
+
+      Build_Leg
+        (Kinematics.Configuration.LF_Base_X,
+         Kinematics.Configuration.LF_Base_Y,
+         Kinematics.Configuration.LF_Base_Z,
+         Legs.State.Position (Legs.Left_Front));
+      Build_Leg
+        (Kinematics.Configuration.LM_Base_X,
+         Kinematics.Configuration.LM_Base_Y,
+         Kinematics.Configuration.LM_Base_Z,
+         Legs.State.Position (Legs.Left_Middle));
+      Build_Leg
+        (Kinematics.Configuration.LH_Base_X,
+         Kinematics.Configuration.LH_Base_Y,
+         Kinematics.Configuration.LH_Base_Z,
+         Legs.State.Position (Legs.Left_Hind));
+
+      Build_Leg
+        (Kinematics.Configuration.RF_Base_X,
+         Kinematics.Configuration.RF_Base_Y,
+         Kinematics.Configuration.RF_Base_Z,
+         Legs.State.Position (Legs.Right_Front));
+      Build_Leg
+        (Kinematics.Configuration.RM_Base_X,
+         Kinematics.Configuration.RM_Base_Y,
+         Kinematics.Configuration.RM_Base_Z,
+         Legs.State.Position (Legs.Right_Middle));
+      Build_Leg
+        (Kinematics.Configuration.RH_Base_X,
+         Kinematics.Configuration.RH_Base_Y,
+         Kinematics.Configuration.RH_Base_Z,
+         Legs.State.Position (Legs.Right_Hind));
 
       Self.Line_Elements := OpenGL.GLsizei (Last);
 
@@ -281,6 +384,9 @@ package body Telemetry.GUI.Graphics_Views is
          [0.0, 1.0, 0.0, 0.0],
          [0.0, 0.0, 1.0, 0.0],
          [0.0, 0.0, 0.0, 1.0]];
+
+      Movement.Initialize;
+      Legs.Gait_Generator.Set_Velocity (1.0, 0.0, 0.0);
    end Initialize;
 
    ----------------
@@ -289,6 +395,7 @@ package body Telemetry.GUI.Graphics_Views is
 
    procedure On_Realize (Self : in out Graphics_View_Record'Class) is
       VAO : aliased epoxy.GLuint;
+      SI  : Glib.Main.G_Source_Id;
 
    begin
       Self.Make_Current;
@@ -305,6 +412,14 @@ package body Telemetry.GUI.Graphics_Views is
       Self.Line_Program.Initialize;
       Self.Line_Program.Bind;
       Self.Line_Program.Set_Vertex_Data_Buffer (Buffer);
+
+      SI :=
+        Sources.Timeout_Add
+          (Interval =>
+             Glib.Guint
+               (Hexapod.Parameters.Control_Cycle.Tick_Duration * 1_000),
+           Func     => On_Timeout'Access,
+           Data     => Self'Unchecked_Access);
    end On_Realize;
 
    ---------------
@@ -346,6 +461,9 @@ package body Telemetry.GUI.Graphics_Views is
       Self.Line_Program.Set_Color ([0, 0, 255]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
+      Legs.Trajectory_Generator.Tick;
+      Legs.Gait_Generator.Tick;
+
       Self.Build_Robot;
       Self.Line_Program.Set_Color ([0, 255, 0]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
@@ -375,6 +493,17 @@ package body Telemetry.GUI.Graphics_Views is
          Self.Viewport_Matrix (2, 2) := W / H;
       end if;
    end On_Resize;
+
+   ----------------
+   -- On_Timeout --
+   ----------------
+
+   function On_Timeout (Data : Graphics_View) return Boolean is
+   begin
+      Data.Queue_Draw;
+
+      return True;
+   end On_Timeout;
 
    --------------
    -- Rotate_X --
