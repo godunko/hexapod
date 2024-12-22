@@ -8,10 +8,10 @@ with "../telemetry/config/hexapod_telemetry_gui_config.gpr";
 
 with "trajectory.gpr";
 
-project Telemetry_GUI is
+project GUI is
 
    for Source_Dirs use
-     ("../source/telemetry/gui",
+     ("../source/gui",
       "../source/hexapod",        --  XXX Shared, should be moved to own project?
       "../source/legs");          --  XXX Shared, should be moved to own project?
    for Object_Dir use "obj/" & Hexapod_Telemetry_GUI_Config.Build_Profile;
@@ -19,7 +19,7 @@ project Telemetry_GUI is
    for Main use ("telemetry-gui-driver.adb");
 
    package Builder is
-      for Executable ("telemetry-gui-driver.adb") use "telemetry";
+      for Executable ("telemetry-gui-driver.adb") use "hexoviewer";
    end Builder;
 
    package Compiler is
@@ -30,4 +30,4 @@ project Telemetry_GUI is
       for Switches ("Ada") use ("-Es"); --  Symbolic traceback
    end Binder;
 
-end Telemetry_GUI;
+end GUI;

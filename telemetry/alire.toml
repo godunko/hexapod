@@ -9,7 +9,7 @@ licenses = "Apache-2.0 WITH LLVM-exception"
 website = "https://github.com/godunko/hexapod/"
 tags = ["hexapod", "robot", "gui"]
 
-project-files = ["../gnat/telemetry_gui.gpr"]
+project-files = ["../gnat/gui.gpr"]
 
 [configuration]
 generate_ada = false
