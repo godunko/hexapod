@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-pragma Restrictions (No_Elaboration_Code);
+--  pragma Restrictions (No_Elaboration_Code);
 
 package Debug.Log.Loggers
   with Preelaborate
