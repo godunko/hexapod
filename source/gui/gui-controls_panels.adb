@@ -90,11 +90,13 @@ package body GUI.Controls_Panels is
       Self.Velocity_X :=
         Gtk.Scale.Gtk_Vscale_New (Velocity_X_Adjustment);
       Self.Velocity_X.Set_Has_Origin (False);
+      Self.Velocity_X.Set_Inverted (True);
       Self.Velocity_X.Set_Vexpand (True);
 
       Self.Velocity_Y :=
         Gtk.Scale.Gtk_Vscale_New (Velocity_Y_Adjustment);
       Self.Velocity_Y.Set_Has_Origin (False);
+      Self.Velocity_X.Set_Inverted (True);
       Self.Velocity_Y.Set_Vexpand (True);
 
       Self.Velocity_W :=
