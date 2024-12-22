@@ -433,7 +433,6 @@ package body GUI.Graphics_Views is
          [0.0, 0.0, 0.0, 1.0]];
 
       Movement.Initialize;
-      Legs.Gait_Generator.Set_Velocity (1.0, 1.0, 0.5);
    end Initialize;
 
    ----------------

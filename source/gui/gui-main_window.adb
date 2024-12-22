@@ -17,6 +17,7 @@ with Gtk.Enums;
 with Gtk.Grid;
 with Gtk.Scale;
 
+with GUI.Controls_Panels;
 with GUI.Graphics_Views;
 
 package body GUI.Main_Window is
@@ -32,6 +33,8 @@ package body GUI.Main_Window is
    HS  : Gtk.Scale.Gtk_Scale;
    SA  : Gtk.Adjustment.Gtk_Adjustment;
    SS  : Gtk.Scale.Gtk_Scale;
+
+   CP  : GUI.Controls_Panels.Controls_Panel;
 
    procedure On_Activate
      (Self : access Glib.Application.Gapplication_Record'Class);
@@ -161,11 +164,14 @@ package body GUI.Main_Window is
       SS.Set_Has_Origin (False);
       SS.Set_Value_Pos (Gtk.Enums.Pos_Bottom);
 
+      GUI.Controls_Panels.Gtk_New (CP);
+
       Gtk.Grid.Gtk_New (G);
       G.Attach (GV, 0, 0, 1, 1);
       G.Attach (VS, 1, 0, 1, 1);
       G.Attach (HS, 0, 1, 1, 1);
       G.Attach (SS, 2, 0, 1, 1);
+      G.Attach (CP, 3, 0, 1, 2);
 
       AW :=
         Gtk.Application_Window.Gtk_Application_Window_New
