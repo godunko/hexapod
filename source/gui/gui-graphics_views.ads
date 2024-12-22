@@ -9,7 +9,10 @@ pragma Ada_2022;
 with Glib;
 private with Gtk.GLArea;
 with Gtk.Widget;
+
 private with OpenGL;
+
+private with CGK.Reals;
 
 private with GUI.Programs.Lines;
 
@@ -43,8 +46,9 @@ private
       Scale            : OpenGL.GLfloat;
       Viewport_Matrix  : OpenGL.GLfloat_Matrix_4x4;
 
-      Grid_Offset_X    : OpenGL.GLfloat := 0.0;
-      Grid_Offset_Y    : OpenGL.GLfloat := 0.0;
+      Ground_Offset_X  : CGK.Reals.Real := 0.0;
+      Ground_Offset_Y  : CGK.Reals.Real := 0.0;
+      Ground_Rotate_Z  : CGK.Reals.Real := 0.0;
 
       Line_Program     : Line_Program_Access;
       Line_Elements    : OpenGL.GLsizei;

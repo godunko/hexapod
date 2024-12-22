@@ -16,6 +16,9 @@ with epoxy_gl_generated_h;
 with OpenGL.Contexts;
 
 with CGK.Primitives.Points_2D;
+with CGK.Primitives.Transformations_2D;
+with CGK.Primitives.Vectors_2D;
+with CGK.Reals.Elementary_Functions;
 
 with Hexapod.Parameters.Control_Cycle;
 with Kinematics.Configuration;
@@ -119,40 +122,78 @@ package body GUI.Graphics_Views is
    ----------------
 
    procedure Build_Grid (Self : in out Graphics_View_Record'Class) is
-      Points : GUI.Programs.Lines.Vertex_Data_Array (1 .. 44);
-      Last   : Natural := 0;
+
+      use type CGK.Reals.Real;
+
+      X1             : constant := -0.5;
+      X2             : constant := 0.5;
+      Y1             : constant := -0.5;
+      Y2             : constant := 0.5;
+
+      Points         : GUI.Programs.Lines.Vertex_Data_Array (1 .. 44);
+      Last           : Natural := 0;
+      Transformation : CGK.Primitives.Transformations_2D.Transformation_2D;
+
+      procedure Append (Point : CGK.Primitives.Points_2D.Point_2D);
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append (Point : CGK.Primitives.Points_2D.Point_2D) is
+      begin
+         Last := @ + 1;
+         Points (Last) :=
+           (VP =>
+              [OpenGL.GLfloat (CGK.Primitives.Points_2D.X (Point)),
+               OpenGL.GLfloat (CGK.Primitives.Points_2D.Y (Point)),
+               0.0]);
+      end Append;
 
    begin
+      CGK.Primitives.Transformations_2D.Rotate
+        (Transformation, Self.Ground_Rotate_Z);
+
       for J in 0 .. 10 loop
          declare
-            X : constant OpenGL.GLfloat :=
-              -0.5 + (0.1 * OpenGL.GLfloat (J)) + Self.Grid_Offset_X;
+            X  : constant CGK.Reals.Real :=
+              -0.5 + (0.1 * CGK.Reals.Real (J)) + Self.Ground_Offset_X;
+            P1 : CGK.Primitives.Points_2D.Point_2D :=
+              CGK.Primitives.Points_2D.Create_Point_2D (X, Y1);
+            P2 : CGK.Primitives.Points_2D.Point_2D :=
+              CGK.Primitives.Points_2D.Create_Point_2D (X, Y2);
 
          begin
             exit when X > 0.5;
 
             if X >= -0.5 then
-               Last := @ + 1;
-               Points (Last) := (VP => [X, -0.5, 0.0]);
-               Last := @ + 1;
-               Points (Last) := (VP => [X, 0.5, 0.0]);
+               CGK.Primitives.Points_2D.Transform (P1, Transformation);
+               CGK.Primitives.Points_2D.Transform (P2, Transformation);
+
+               Append (P1);
+               Append (P2);
             end if;
          end;
       end loop;
 
       for J in 0 .. 10 loop
          declare
-            Y : constant OpenGL.GLfloat :=
-              -0.5 + (0.1 * OpenGL.GLfloat (J)) + Self.Grid_Offset_Y;
+            Y  : constant CGK.Reals.Real :=
+              -0.5 + (0.1 * CGK.Reals.Real (J)) + Self.Ground_Offset_Y;
+            P1 : CGK.Primitives.Points_2D.Point_2D :=
+              CGK.Primitives.Points_2D.Create_Point_2D (X1, Y);
+            P2 : CGK.Primitives.Points_2D.Point_2D :=
+              CGK.Primitives.Points_2D.Create_Point_2D (X2, Y);
 
          begin
             exit when Y > 0.5;
 
             if Y >= -0.5 then
-               Last := @ + 1;
-               Points (Last) := (VP => [-0.5, Y, 0.0]);
-               Last := @ + 1;
-               Points (Last) := (VP => [0.5, Y, 0.0]);
+               CGK.Primitives.Points_2D.Transform (P1, Transformation);
+               CGK.Primitives.Points_2D.Transform (P2, Transformation);
+
+               Append (P1);
+               Append (P2);
             end if;
          end;
       end loop;
@@ -502,36 +543,59 @@ package body GUI.Graphics_Views is
    ----------------
 
    function On_Timeout (Data : Graphics_View) return Boolean is
+      use type CGK.Reals.Real;
+
    begin
       Legs.Trajectory_Generator.Tick;
       Legs.Gait_Generator.Tick;
 
       declare
-         P : CGK.Primitives.Points_2D.Point_2D :=
-           CGK.Primitives.Points_2D.Create_Point_2D (0.0, 0.0);
+         P0              : CGK.Primitives.Points_2D.Point_2D :=
+           CGK.Primitives.Points_2D.Create_Point_2D (X => 0.0, Y => 0.0);
+         P1              : CGK.Primitives.Points_2D.Point_2D :=
+           CGK.Primitives.Points_2D.Create_Point_2D (X => 1.0, Y => 0.0);
+         V               : CGK.Primitives.Vectors_2D.Vector_2D;
+         Transformation  : CGK.Primitives.Transformations_2D.Transformation_2D;
 
       begin
+         --  Compute rotation vector
+
          Legs.Trajectory.Transform
-           (Legs.Trajectory_Generator.Trajectory.all, P);
+           (Legs.Trajectory_Generator.Trajectory.all, P0);
+         Legs.Trajectory.Transform
+           (Legs.Trajectory_Generator.Trajectory.all, P1);
 
-         Data.Grid_Offset_X :=
-           @ + OpenGL.GLfloat (CGK.Primitives.Points_2D.X (P));
-         Data.Grid_Offset_Y :=
-           @ + OpenGL.GLfloat (CGK.Primitives.Points_2D.Y (P));
+         V := CGK.Primitives.Vectors_2D.Create_Vector_2D (P0, P1);
 
-         if Data.Grid_Offset_X < -0.1 then
-            Data.Grid_Offset_X := @ + 0.1;
+         Data.Ground_Rotate_Z :=
+           @ + CGK.Reals.Elementary_Functions.Arctan
+                 (X => CGK.Primitives.Vectors_2D.X (V),
+                  Y => CGK.Primitives.Vectors_2D.Y (V));
 
-         elsif Data.Grid_Offset_X > 0.1 then
-            Data.Grid_Offset_X := @ - 0.1;
+         --  Compute coordinates offset
+
+         CGK.Primitives.Transformations_2D.Set_Identity (Transformation);
+         CGK.Primitives.Transformations_2D.Rotate
+           (Transformation, -Data.Ground_Rotate_Z);
+         CGK.Primitives.Points_2D.Transform (P0, Transformation);
+
+         Data.Ground_Offset_X := @ + CGK.Primitives.Points_2D.X (P0);
+         Data.Ground_Offset_Y := @ + CGK.Primitives.Points_2D.Y (P0);
+
+         if Data.Ground_Offset_X < -0.1 then
+            Data.Ground_Offset_X := @ + 0.1;
+
+         elsif Data.Ground_Offset_X > 0.1 then
+            Data.Ground_Offset_X := @ - 0.1;
          end if;
 
-         if Data.Grid_Offset_Y < -0.1 then
-            Data.Grid_Offset_Y := @ + 0.1;
+         if Data.Ground_Offset_Y < -0.1 then
+            Data.Ground_Offset_Y := @ + 0.1;
 
-         elsif Data.Grid_Offset_Y > 0.1 then
-            Data.Grid_Offset_Y := @ - 0.1;
+         elsif Data.Ground_Offset_Y > 0.1 then
+            Data.Ground_Offset_Y := @ - 0.1;
          end if;
+
       end;
 
       Data.Queue_Draw;
