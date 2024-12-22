@@ -15,6 +15,8 @@ with epoxy;
 with epoxy_gl_generated_h;
 with OpenGL.Contexts;
 
+with CGK.Primitives.Points_2D;
+
 with Hexapod.Parameters.Control_Cycle;
 with Kinematics.Configuration;
 with Legs.Gait_Generator;
@@ -461,9 +463,6 @@ package body Telemetry.GUI.Graphics_Views is
       Self.Line_Program.Set_Color ([0, 0, 255]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
-      Legs.Trajectory_Generator.Tick;
-      Legs.Gait_Generator.Tick;
-
       Self.Build_Robot;
       Self.Line_Program.Set_Color ([0, 255, 0]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
@@ -500,6 +499,37 @@ package body Telemetry.GUI.Graphics_Views is
 
    function On_Timeout (Data : Graphics_View) return Boolean is
    begin
+      Legs.Trajectory_Generator.Tick;
+      Legs.Gait_Generator.Tick;
+
+      declare
+         P : CGK.Primitives.Points_2D.Point_2D :=
+           CGK.Primitives.Points_2D.Create_Point_2D (0.0, 0.0);
+
+      begin
+         Legs.Trajectory.Transform
+           (Legs.Trajectory_Generator.Trajectory.all, P);
+
+         Data.Grid_Offset_X :=
+           @ + OpenGL.GLfloat (CGK.Primitives.Points_2D.X (P));
+         Data.Grid_Offset_Y :=
+           @ + OpenGL.GLfloat (CGK.Primitives.Points_2D.Y (P));
+
+         if Data.Grid_Offset_X < -0.1 then
+            Data.Grid_Offset_X := @ + 0.1;
+
+         elsif Data.Grid_Offset_X > 0.1 then
+            Data.Grid_Offset_X := @ - 0.1;
+         end if;
+
+         if Data.Grid_Offset_Y < -0.1 then
+            Data.Grid_Offset_Y := @ + 0.1;
+
+         elsif Data.Grid_Offset_Y > 0.1 then
+            Data.Grid_Offset_Y := @ - 0.1;
+         end if;
+      end;
+
       Data.Queue_Draw;
 
       return True;

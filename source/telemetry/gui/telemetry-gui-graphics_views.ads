@@ -44,8 +44,8 @@ private
       Scale            : OpenGL.GLfloat;
       Viewport_Matrix  : OpenGL.GLfloat_Matrix_4x4;
 
-      Grid_Offset_X    : OpenGL.GLfloat := 0.04;
-      Grid_Offset_Y    : OpenGL.GLfloat := 0.06;
+      Grid_Offset_X    : OpenGL.GLfloat := 0.0;
+      Grid_Offset_Y    : OpenGL.GLfloat := 0.0;
 
       Line_Program     : Line_Program_Access;
       Line_Elements    : OpenGL.GLsizei;
