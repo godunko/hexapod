@@ -16,7 +16,7 @@ generate_c = false
 generate_gpr = true
 
 [configuration.values]
-a0b_armv7m.fpu_extension = "VFPv4"
+light_blackpill_stm32f401.STM32F401 = "CB"
 cgk.Float_Size = "32"
 
 [[depends-on]]
@@ -44,6 +44,7 @@ a0b_mpuxxxx = { path='../subprojects/a0b-mpuxxxx' }
 a0b_pca9685 = { path='../subprojects/a0b-pca9685' }
 a0b_playstation2_controller = { path='../subprojects/a0b-playstation2_controller' }
 a0b_spi = { path='../subprojects/a0b-spi' }
+a0b_stm32f401 = { path='../subprojects/a0b-stm32f401' }
 a0b_stm32f401_dma = { path='../subprojects/a0b-stm32f401-dma' }
 a0b_stm32f401_gpio = { path='../subprojects/a0b-stm32f401-gpio' }
 a0b_stm32f401_i2c = { path='../subprojects/a0b-stm32f401-i2c' }
