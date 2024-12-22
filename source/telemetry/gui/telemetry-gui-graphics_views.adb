@@ -131,10 +131,12 @@ package body Telemetry.GUI.Graphics_Views is
          begin
             exit when X > 0.5;
 
-            Last := @ + 1;
-            Points (Last) := (VP => [X, -0.5, 0.0]);
-            Last := @ + 1;
-            Points (Last) := (VP => [X, 0.5, 0.0]);
+            if X >= -0.5 then
+               Last := @ + 1;
+               Points (Last) := (VP => [X, -0.5, 0.0]);
+               Last := @ + 1;
+               Points (Last) := (VP => [X, 0.5, 0.0]);
+            end if;
          end;
       end loop;
 
@@ -146,10 +148,12 @@ package body Telemetry.GUI.Graphics_Views is
          begin
             exit when Y > 0.5;
 
-            Last := @ + 1;
-            Points (Last) := (VP => [-0.5, Y, 0.0]);
-            Last := @ + 1;
-            Points (Last) := (VP => [0.5, Y, 0.0]);
+            if Y >= -0.5 then
+               Last := @ + 1;
+               Points (Last) := (VP => [-0.5, Y, 0.0]);
+               Last := @ + 1;
+               Points (Last) := (VP => [0.5, Y, 0.0]);
+            end if;
          end;
       end loop;
 
@@ -388,7 +392,7 @@ package body Telemetry.GUI.Graphics_Views is
          [0.0, 0.0, 0.0, 1.0]];
 
       Movement.Initialize;
-      Legs.Gait_Generator.Set_Velocity (1.0, 0.0, 0.0);
+      Legs.Gait_Generator.Set_Velocity (1.0, 1.0, 0.5);
    end Initialize;
 
    ----------------
