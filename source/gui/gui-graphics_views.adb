@@ -161,12 +161,12 @@ package body GUI.Graphics_Views is
 
    begin
       CGK.Primitives.Transformations_2D.Rotate
-        (Transformation, Self.Ground_Rotate_Z);
+        (Transformation, Self.Scene.Ground_Rotate_Z);
 
       for J in 0 .. 10 loop
          declare
             X  : constant CGK.Reals.Real :=
-              -0.5 + (0.1 * CGK.Reals.Real (J)) + Self.Ground_Offset_X;
+              -0.5 + (0.1 * CGK.Reals.Real (J)) + Self.Scene.Ground_Offset_X;
             P1 : CGK.Primitives.Points_2D.Point_2D :=
               CGK.Primitives.Points_2D.Create_Point_2D (X, Y1);
             P2 : CGK.Primitives.Points_2D.Point_2D :=
@@ -188,7 +188,7 @@ package body GUI.Graphics_Views is
       for J in 0 .. 10 loop
          declare
             Y  : constant CGK.Reals.Real :=
-              -0.5 + (0.1 * CGK.Reals.Real (J)) + Self.Ground_Offset_Y;
+              -0.5 + (0.1 * CGK.Reals.Real (J)) + Self.Scene.Ground_Offset_Y;
             P1 : CGK.Primitives.Points_2D.Point_2D :=
               CGK.Primitives.Points_2D.Create_Point_2D (X1, Y);
             P2 : CGK.Primitives.Points_2D.Point_2D :=
@@ -824,7 +824,7 @@ package body GUI.Graphics_Views is
 
          V := CGK.Primitives.Vectors_2D.Create_Vector_2D (P0, P1);
 
-         Data.Ground_Rotate_Z :=
+         Data.Scene.Ground_Rotate_Z :=
            @ + CGK.Reals.Elementary_Functions.Arctan
                  (X => CGK.Primitives.Vectors_2D.X (V),
                   Y => CGK.Primitives.Vectors_2D.Y (V));
@@ -833,24 +833,24 @@ package body GUI.Graphics_Views is
 
          CGK.Primitives.Transformations_2D.Set_Identity (Transformation);
          CGK.Primitives.Transformations_2D.Rotate
-           (Transformation, -Data.Ground_Rotate_Z);
+           (Transformation, -Data.Scene.Ground_Rotate_Z);
          CGK.Primitives.Points_2D.Transform (P0, Transformation);
 
-         Data.Ground_Offset_X := @ + CGK.Primitives.Points_2D.X (P0);
-         Data.Ground_Offset_Y := @ + CGK.Primitives.Points_2D.Y (P0);
+         Data.Scene.Ground_Offset_X := @ + CGK.Primitives.Points_2D.X (P0);
+         Data.Scene.Ground_Offset_Y := @ + CGK.Primitives.Points_2D.Y (P0);
 
-         if Data.Ground_Offset_X < -0.1 then
-            Data.Ground_Offset_X := @ + 0.1;
+         if Data.Scene.Ground_Offset_X < -0.1 then
+            Data.Scene.Ground_Offset_X := @ + 0.1;
 
-         elsif Data.Ground_Offset_X > 0.1 then
-            Data.Ground_Offset_X := @ - 0.1;
+         elsif Data.Scene.Ground_Offset_X > 0.1 then
+            Data.Scene.Ground_Offset_X := @ - 0.1;
          end if;
 
-         if Data.Ground_Offset_Y < -0.1 then
-            Data.Ground_Offset_Y := @ + 0.1;
+         if Data.Scene.Ground_Offset_Y < -0.1 then
+            Data.Scene.Ground_Offset_Y := @ + 0.1;
 
-         elsif Data.Ground_Offset_Y > 0.1 then
-            Data.Ground_Offset_Y := @ - 0.1;
+         elsif Data.Scene.Ground_Offset_Y > 0.1 then
+            Data.Scene.Ground_Offset_Y := @ - 0.1;
          end if;
 
       end;

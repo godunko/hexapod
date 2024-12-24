@@ -15,9 +15,8 @@ with Gtk.Widget;
 
 private with OpenGL;
 
-private with CGK.Reals;
-
 private with GUI.Programs.Lines;
+private with GUI.Scene_States;
 
 package GUI.Graphics_Views is
 
@@ -49,9 +48,7 @@ private
       Scale              : OpenGL.GLfloat;
       Viewport_Matrix    : OpenGL.GLfloat_Matrix_4x4;
 
-      Ground_Offset_X    : CGK.Reals.Real := 0.0;
-      Ground_Offset_Y    : CGK.Reals.Real := 0.0;
-      Ground_Rotate_Z    : CGK.Reals.Real := 0.0;
+      Scene              : GUI.Scene_States.Scene_Information;
 
       Line_Program       : Line_Program_Access;
       Line_Elements      : OpenGL.GLsizei;
