@@ -20,17 +20,13 @@ with OpenGL.Contexts;
 
 with CGK.Primitives.Points_2D;
 with CGK.Primitives.Transformations_2D;
-with CGK.Primitives.Vectors_2D;
-with CGK.Reals.Elementary_Functions;
+with CGK.Reals;
 
 with Hexapod.Parameters.Control_Cycle;
 with Kinematics.Configuration.Derived;
-with Legs.Gait_Generator;
-with Legs.State;
-with Legs.Trajectory;
-with Legs.Trajectory_Generator;
-with Legs.Workspace;
+with Legs;
 with Reals;
+with Simulation.Control_Loop;
 
 package body GUI.Graphics_Views is
 
@@ -94,37 +90,6 @@ package body GUI.Graphics_Views is
    procedure Build_Grid (Self : in out Graphics_View_Record'Class);
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class);
-
-   package Movement is
-
-      Body_Height : constant := 0.070;
-
-      procedure Initialize;
-
-      --  procedure Step;
-
-   end Movement;
-
-   --------------
-   -- Movement --
-   --------------
-
-   package body Movement is
-
-      ----------------
-      -- Initialize --
-      ----------------
-
-      procedure Initialize is
-      begin
-         Legs.Initialize;
-         Legs.Workspace.Compute (Body_Height);
-         Legs.Trajectory.Initialize;
-         Legs.Trajectory_Generator.Initialize;
-         Legs.Gait_Generator.Initialize;
-      end Initialize;
-
-   end Movement;
 
    ----------------
    -- Build_Grid --
@@ -310,8 +275,8 @@ package body GUI.Graphics_Views is
            (VP =>
               [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
                OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Z (Point))
-                 + Movement.Body_Height]);
+               OpenGL.GLfloat
+                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
 
          Transformation := Transformation * Transformation_1;
          Point := Reals.Transformations_3D.Transform (Transformation, Origin);
@@ -321,8 +286,8 @@ package body GUI.Graphics_Views is
            (VP =>
               [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
                OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Z (Point))
-                 + Movement.Body_Height]);
+               OpenGL.GLfloat
+                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
 
          --  Femur
 
@@ -331,8 +296,8 @@ package body GUI.Graphics_Views is
            (VP =>
               [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
                OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Z (Point))
-                 + Movement.Body_Height]);
+               OpenGL.GLfloat
+                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
 
          Transformation := Transformation * Transformation_2;
          Point := Reals.Transformations_3D.Transform (Transformation, Origin);
@@ -342,8 +307,8 @@ package body GUI.Graphics_Views is
            (VP =>
               [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
                OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Z (Point))
-                 + Movement.Body_Height]);
+               OpenGL.GLfloat
+                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
 
          --  Tibia
 
@@ -352,8 +317,8 @@ package body GUI.Graphics_Views is
            (VP =>
               [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
                OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Z (Point))
-                 + Movement.Body_Height]);
+               OpenGL.GLfloat
+                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
 
          Transformation := Transformation * Transformation_3;
          Point := Reals.Transformations_3D.Transform (Transformation, Origin);
@@ -363,8 +328,8 @@ package body GUI.Graphics_Views is
            (VP =>
               [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
                OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Z (Point))
-                 + Movement.Body_Height]);
+               OpenGL.GLfloat
+                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
       end Build_Leg;
 
    begin
@@ -373,78 +338,90 @@ package body GUI.Graphics_Views is
         (VP =>
            [Kinematics.Configuration.LF_Base_X,
             Kinematics.Configuration.LF_Base_Y,
-            Kinematics.Configuration.LF_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.LF_Base_Z + Self.Scene.Body_Height)]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LM_Base_X,
             Kinematics.Configuration.LM_Base_Y,
-            Kinematics.Configuration.LM_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.LM_Base_Z + Self.Scene.Body_Height)]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LM_Base_X,
             Kinematics.Configuration.LM_Base_Y,
-            Kinematics.Configuration.LM_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.LM_Base_Z + Self.Scene.Body_Height)]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LH_Base_X,
             Kinematics.Configuration.LH_Base_Y,
-            Kinematics.Configuration.LH_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.LH_Base_Z + Self.Scene.Body_Height)]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LH_Base_X,
             Kinematics.Configuration.LH_Base_Y,
-            Kinematics.Configuration.LH_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.LH_Base_Z + Self.Scene.Body_Height)]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RH_Base_X,
             Kinematics.Configuration.RH_Base_Y,
-            Kinematics.Configuration.RH_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.RH_Base_Z + Self.Scene.Body_Height)]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RH_Base_X,
             Kinematics.Configuration.RH_Base_Y,
-            Kinematics.Configuration.RH_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.RH_Base_Z + Self.Scene.Body_Height)]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RM_Base_X,
             Kinematics.Configuration.RM_Base_Y,
-            Kinematics.Configuration.RM_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.RM_Base_Z + Self.Scene.Body_Height)]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RM_Base_X,
             Kinematics.Configuration.RM_Base_Y,
-            Kinematics.Configuration.RM_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.RM_Base_Z + Self.Scene.Body_Height)]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RF_Base_X,
             Kinematics.Configuration.RF_Base_Y,
-            Kinematics.Configuration.RF_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.RF_Base_Z + Self.Scene.Body_Height)]);
 
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.RF_Base_X,
             Kinematics.Configuration.RF_Base_Y,
-            Kinematics.Configuration.RF_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.RF_Base_Z + Self.Scene.Body_Height)]);
       Last := @ + 1;
       Points (Last) :=
         (VP =>
            [Kinematics.Configuration.LF_Base_X,
             Kinematics.Configuration.LF_Base_Y,
-            Kinematics.Configuration.LF_Base_Z + Movement.Body_Height]);
+            OpenGL.GLfloat
+              (Kinematics.Configuration.LF_Base_Z + Self.Scene.Body_Height)]);
 
       Build_Leg
         (Base_X         => Kinematics.Configuration.LF_Base_X,
@@ -461,7 +438,7 @@ package body GUI.Graphics_Views is
          d_3            => Kinematics.Configuration.LF_DH_D3,
          r_3            => Kinematics.Configuration.LF_DH_R3,
          α_3            => Kinematics.Configuration.LF_DH_Alpha3,
-         Posture        => Legs.State.Posture (Legs.Left_Front));
+         Posture        => Self.Scene.Legs_Posture (Legs.Left_Front));
       Build_Leg
         (Base_X         => Kinematics.Configuration.LM_Base_X,
          Base_Y         => Kinematics.Configuration.LM_Base_Y,
@@ -477,7 +454,7 @@ package body GUI.Graphics_Views is
          d_3            => Kinematics.Configuration.LM_DH_D3,
          r_3            => Kinematics.Configuration.LM_DH_R3,
          α_3            => Kinematics.Configuration.LM_DH_Alpha3,
-         Posture        => Legs.State.Posture (Legs.Left_Middle));
+         Posture        => Self.Scene.Legs_Posture (Legs.Left_Middle));
       Build_Leg
         (Base_X         => Kinematics.Configuration.LH_Base_X,
          Base_Y         => Kinematics.Configuration.LH_Base_Y,
@@ -493,7 +470,7 @@ package body GUI.Graphics_Views is
          d_3            => Kinematics.Configuration.LH_DH_D3,
          r_3            => Kinematics.Configuration.LH_DH_R3,
          α_3            => Kinematics.Configuration.LH_DH_Alpha3,
-         Posture        => Legs.State.Posture (Legs.Left_Hind));
+         Posture        => Self.Scene.Legs_Posture (Legs.Left_Hind));
 
       Build_Leg
         (Base_X         => Kinematics.Configuration.RF_Base_X,
@@ -510,7 +487,7 @@ package body GUI.Graphics_Views is
          d_3            => Kinematics.Configuration.RF_DH_D3,
          r_3            => Kinematics.Configuration.RF_DH_R3,
          α_3            => Kinematics.Configuration.RF_DH_Alpha3,
-         Posture        => Legs.State.Posture (Legs.Right_Front));
+         Posture        => Self.Scene.Legs_Posture (Legs.Right_Front));
       Build_Leg
         (Base_X         => Kinematics.Configuration.RM_Base_X,
          Base_Y         => Kinematics.Configuration.RM_Base_Y,
@@ -526,7 +503,7 @@ package body GUI.Graphics_Views is
          d_3            => Kinematics.Configuration.RM_DH_D3,
          r_3            => Kinematics.Configuration.RM_DH_R3,
          α_3            => Kinematics.Configuration.RM_DH_Alpha3,
-         Posture        => Legs.State.Posture (Legs.Right_Middle));
+         Posture        => Self.Scene.Legs_Posture (Legs.Right_Middle));
       Build_Leg
         (Base_X         => Kinematics.Configuration.RH_Base_X,
          Base_Y         => Kinematics.Configuration.RH_Base_Y,
@@ -542,7 +519,7 @@ package body GUI.Graphics_Views is
          d_3            => Kinematics.Configuration.RH_DH_D3,
          r_3            => Kinematics.Configuration.RH_DH_R3,
          α_3            => Kinematics.Configuration.RH_DH_Alpha3,
-         Posture        => Legs.State.Posture (Legs.Right_Hind));
+         Posture        => Self.Scene.Legs_Posture (Legs.Right_Hind));
 
       Self.Line_Elements := OpenGL.GLsizei (Last);
 
@@ -639,8 +616,6 @@ package body GUI.Graphics_Views is
       Self.On_Destroy (Call => Dispatch_Destroy'Access);
       Self.On_Resize (Call => Dispatch_Resize'Access);
       Self.On_Render (Call => Dispatch_Render'Access);
-
-      Movement.Initialize;
    end Initialize;
 
    ----------------
@@ -703,6 +678,8 @@ package body GUI.Graphics_Views is
          [0.0, 0.0, 0.0, 1.0]];
 
    begin
+      Self.Scene := Simulation.Control_Loop.Get_Scene;
+
       View_Matrix :=
         Scale (Self.Scale)
           * Rotate_X (Degrees_To_Radians (Self.Vertical_Angle))
@@ -800,61 +777,7 @@ package body GUI.Graphics_Views is
    ----------------
 
    function On_Timeout (Data : Graphics_View) return Boolean is
-      use type CGK.Reals.Real;
-
    begin
-      Legs.Trajectory_Generator.Tick;
-      Legs.Gait_Generator.Tick;
-
-      declare
-         P0              : CGK.Primitives.Points_2D.Point_2D :=
-           CGK.Primitives.Points_2D.Create_Point_2D (X => 0.0, Y => 0.0);
-         P1              : CGK.Primitives.Points_2D.Point_2D :=
-           CGK.Primitives.Points_2D.Create_Point_2D (X => 1.0, Y => 0.0);
-         V               : CGK.Primitives.Vectors_2D.Vector_2D;
-         Transformation  : CGK.Primitives.Transformations_2D.Transformation_2D;
-
-      begin
-         --  Compute rotation vector
-
-         Legs.Trajectory.Transform
-           (Legs.Trajectory_Generator.Trajectory.all, P0);
-         Legs.Trajectory.Transform
-           (Legs.Trajectory_Generator.Trajectory.all, P1);
-
-         V := CGK.Primitives.Vectors_2D.Create_Vector_2D (P0, P1);
-
-         Data.Scene.Ground_Rotate_Z :=
-           @ + CGK.Reals.Elementary_Functions.Arctan
-                 (X => CGK.Primitives.Vectors_2D.X (V),
-                  Y => CGK.Primitives.Vectors_2D.Y (V));
-
-         --  Compute coordinates offset
-
-         CGK.Primitives.Transformations_2D.Set_Identity (Transformation);
-         CGK.Primitives.Transformations_2D.Rotate
-           (Transformation, -Data.Scene.Ground_Rotate_Z);
-         CGK.Primitives.Points_2D.Transform (P0, Transformation);
-
-         Data.Scene.Ground_Offset_X := @ + CGK.Primitives.Points_2D.X (P0);
-         Data.Scene.Ground_Offset_Y := @ + CGK.Primitives.Points_2D.Y (P0);
-
-         if Data.Scene.Ground_Offset_X < -0.1 then
-            Data.Scene.Ground_Offset_X := @ + 0.1;
-
-         elsif Data.Scene.Ground_Offset_X > 0.1 then
-            Data.Scene.Ground_Offset_X := @ - 0.1;
-         end if;
-
-         if Data.Scene.Ground_Offset_Y < -0.1 then
-            Data.Scene.Ground_Offset_Y := @ + 0.1;
-
-         elsif Data.Scene.Ground_Offset_Y > 0.1 then
-            Data.Scene.Ground_Offset_Y := @ - 0.1;
-         end if;
-
-      end;
-
       Data.Queue_Draw;
 
       Data.Timer_Source := Glib.Main.No_Source_Id;

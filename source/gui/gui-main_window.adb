@@ -19,6 +19,7 @@ with Gtk.Scale;
 
 with GUI.Controls_Panels;
 with GUI.Graphics_Views;
+with Simulation.Control_Loop;
 
 package body GUI.Main_Window is
 
@@ -103,6 +104,8 @@ package body GUI.Main_Window is
 
       Status := App.Run;
 
+      Simulation.Control_Loop.Finalize;
+
       App.Unref;
 
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Exit_Status (Status));
@@ -118,6 +121,9 @@ package body GUI.Main_Window is
       use type Glib.Gdouble;
 
    begin
+      Simulation.Control_Loop.Initialize;
+      Simulation.Control_Loop.Start;
+
       GUI.Graphics_Views.Gtk_New (GV);
       GV.Set_Hexpand (True);
       GV.Set_Vexpand (True);

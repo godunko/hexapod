@@ -18,6 +18,8 @@ package GUI.Scene_States is
    type Legs_Posture is array (Legs.Leg_Index) of Kinematics.Posture;
 
    type Scene_Information is record
+      Body_Height     : CGK.Reals.Real := 0.070;
+
       Legs_Posture    : GUI.Scene_States.Legs_Posture;
 
       Ground_Offset_X : CGK.Reals.Real := 0.0;
