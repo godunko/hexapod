@@ -8,10 +8,6 @@ pragma Ada_2022;
 
 with Ada.Numerics.Generic_Elementary_Functions;
 
-with VSS.Strings.Formatters.Integers;
-with VSS.Strings.Templates;
-with VSS.Text_Streams.Standards;
-
 with Gdk.GLContext;
 
 with epoxy;
@@ -22,7 +18,6 @@ with CGK.Primitives.Points_2D;
 with CGK.Primitives.Transformations_2D;
 with CGK.Reals;
 
-with Hexapod.Parameters.Control_Cycle;
 with Kinematics.Configuration.Derived;
 with Legs;
 with Reals;
@@ -55,8 +50,6 @@ package body GUI.Graphics_Views is
 
    procedure On_Realize (Self : in out Graphics_View_Record'Class);
 
-   procedure On_Destroy (Self : in out Graphics_View_Record'Class);
-
    procedure On_Resize
      (Self   : in out Graphics_View_Record'Class;
       Width  : Glib.Gint;
@@ -70,9 +63,6 @@ package body GUI.Graphics_Views is
    procedure Dispatch_Realize
      (Self : access Gtk.Widget.Gtk_Widget_Record'Class);
 
-   procedure Dispatch_Destroy
-     (Self : access Gtk.Widget.Gtk_Widget_Record'Class);
-
    procedure Dispatch_Resize
      (Self   : access Gtk.GLArea.Gtk_GLArea_Record'Class;
       Width  : Glib.Gint;
@@ -83,9 +73,9 @@ package body GUI.Graphics_Views is
       GLContext : not null access Gdk.GLContext.Gdk_GLContext_Record'Class)
       return Boolean;
 
-   function On_Timeout (Data : Graphics_View) return Boolean;
+   --  function On_Timeout (Data : Graphics_View) return Boolean;
 
-   package Sources is new Glib.Main.Generic_Sources (Graphics_View);
+   --  package Sources is new Glib.Main.Generic_Sources (Graphics_View);
 
    procedure Build_Grid (Self : in out Graphics_View_Record'Class);
 
@@ -537,16 +527,6 @@ package body GUI.Graphics_Views is
    end Degrees_To_Radians;
 
    ----------------------
-   -- Dispatch_Destroy --
-   ----------------------
-
-   procedure Dispatch_Destroy
-     (Self : access Gtk.Widget.Gtk_Widget_Record'Class) is
-   begin
-      Graphics_View_Record'Class (Self.all).On_Destroy;
-   end Dispatch_Destroy;
-
-   ----------------------
    -- Dispatch_Realize --
    ----------------------
 
@@ -604,33 +584,11 @@ package body GUI.Graphics_Views is
          [0.0, 1.0, 0.0, 0.0],
          [0.0, 0.0, 1.0, 0.0],
          [0.0, 0.0, 0.0, 1.0]];
-      Self.Timer_Source       := Glib.Main.No_Source_Id;
-      Self.Next_Tick          := Ada.Real_Time.Time_First;
-      Self.Tick_Duration      :=
-        Ada.Real_Time.To_Time_Span
-          (Hexapod.Parameters.Control_Cycle.Tick_Duration);
-      Self.Frame_Counter      := 0;
-      Self.Skip_Frame_Counter := 0;
 
       Self.On_Realize (Call => Dispatch_Realize'Access);
-      Self.On_Destroy (Call => Dispatch_Destroy'Access);
       Self.On_Resize (Call => Dispatch_Resize'Access);
       Self.On_Render (Call => Dispatch_Render'Access);
    end Initialize;
-
-   ----------------
-   -- On_Destroy --
-   ----------------
-
-   procedure On_Destroy (Self : in out Graphics_View_Record'Class) is
-      use type Glib.Main.G_Source_Id;
-
-   begin
-      if Self.Timer_Source /= Glib.Main.No_Source_Id then
-         Glib.Main.Remove (Self.Timer_Source);
-         Self.Timer_Source := Glib.Main.No_Source_Id;
-      end if;
-   end On_Destroy;
 
    ----------------
    -- On_Realize --
@@ -667,7 +625,6 @@ package body GUI.Graphics_Views is
    is
       pragma Unreferenced (GLContext);
 
-      use type Ada.Real_Time.Time;
       use type OpenGL.GLfloat_Matrix_4x4;
       use type OpenGL.GLbitfield;
 
@@ -702,49 +659,8 @@ package body GUI.Graphics_Views is
       Self.Line_Program.Set_Color ([0, 255, 0]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
-      --  Compute next tick and request timeout callback.
-
-      if Self.Next_Tick = Ada.Real_Time.Time_First then
-         Self.Next_Tick := Ada.Real_Time.Clock + Self.Tick_Duration;
-
-      else
-         loop
-            Self.Next_Tick := @ + Self.Tick_Duration;
-            Self.Frame_Counter := @ + 1;
-
-            exit when Ada.Real_Time.Clock < Self.Next_Tick;
-
-            declare
-               Template : VSS.Strings.Templates.Virtual_String_Template :=
-                 "Draw frame skipped ({} of {})";
-               Stream   : VSS.Text_Streams.Output_Text_Stream'Class :=
-                 VSS.Text_Streams.Standards.Standard_Output;
-               Success  : Boolean := True;
-
-            begin
-               Self.Skip_Frame_Counter := @ + 1;
-               Stream.Put_Line
-                 (Template.Format
-                    (VSS.Strings.Formatters.Integers.Image
-                         (Self.Skip_Frame_Counter),
-                     VSS.Strings.Formatters.Integers.Image
-                       (Self.Frame_Counter)),
-                  Success);
-            end;
-         end loop;
-      end if;
-
-      declare
-         Interval : constant Duration :=
-           Ada.Real_Time.To_Duration (Self.Next_Tick - Ada.Real_Time.Clock);
-
-      begin
-         Self.Timer_Source :=
-           Sources.Timeout_Add
-             (Interval => Glib.Guint (Interval * 1000.0),
-              Func     => On_Timeout'Access,
-              Data     => Self'Unchecked_Access);
-      end;
+      Self.Queue_Draw;
+      --  Request redraw of the scene.
 
       return True;
    end On_Render;
@@ -771,19 +687,6 @@ package body GUI.Graphics_Views is
          Self.Viewport_Matrix (2, 2) := W / H;
       end if;
    end On_Resize;
-
-   ----------------
-   -- On_Timeout --
-   ----------------
-
-   function On_Timeout (Data : Graphics_View) return Boolean is
-   begin
-      Data.Queue_Draw;
-
-      Data.Timer_Source := Glib.Main.No_Source_Id;
-
-      return False;
-   end On_Timeout;
 
    --------------
    -- Rotate_X --

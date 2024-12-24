@@ -6,10 +6,7 @@
 
 pragma Ada_2022;
 
-private with Ada.Real_Time;
-
 with Glib;
-private with Glib.Main;
 private with Gtk.GLArea;
 with Gtk.Widget;
 
@@ -43,22 +40,15 @@ private
    type Line_Program_Access is access all GUI.Programs.Lines.Line_Program;
 
    type Graphics_View_Record is new Gtk.GLArea.Gtk_GLArea_Record with record
-      Horizontal_Angle   : OpenGL.GLfloat;
-      Vertical_Angle     : OpenGL.GLfloat;
-      Scale              : OpenGL.GLfloat;
-      Viewport_Matrix    : OpenGL.GLfloat_Matrix_4x4;
+      Horizontal_Angle : OpenGL.GLfloat;
+      Vertical_Angle   : OpenGL.GLfloat;
+      Scale            : OpenGL.GLfloat;
+      Viewport_Matrix  : OpenGL.GLfloat_Matrix_4x4;
 
-      Scene              : GUI.Scene_States.Scene_Information;
+      Scene            : GUI.Scene_States.Scene_Information;
 
-      Line_Program       : Line_Program_Access;
-      Line_Elements      : OpenGL.GLsizei;
-
-      Tick_Duration      : Ada.Real_Time.Time_Span;
-      Next_Tick          : Ada.Real_Time.Time;
-      Frame_Counter      : Natural;
-      Skip_Frame_Counter : Natural;
-
-      Timer_Source       : Glib.Main.G_Source_Id;
+      Line_Program     : Line_Program_Access;
+      Line_Elements    : OpenGL.GLsizei;
    end record;
 
 end GUI.Graphics_Views;
