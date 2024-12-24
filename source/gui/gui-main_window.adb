@@ -130,7 +130,7 @@ package body GUI.Main_Window is
 
       VA :=
         Gtk.Adjustment.Gtk_Adjustment_New
-          (Value          => -70.0,
+          (Value          => -45.0,
            Lower          => -90.0,
            Upper          => 90.0,
            Step_Increment => 1.0,
