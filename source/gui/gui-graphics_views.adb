@@ -8,6 +8,10 @@ pragma Ada_2022;
 
 with Ada.Numerics.Generic_Elementary_Functions;
 
+with VSS.Strings.Formatters.Integers;
+with VSS.Strings.Templates;
+with VSS.Text_Streams.Standards;
+
 with Gdk.GLContext;
 
 with epoxy;
@@ -618,12 +622,18 @@ package body GUI.Graphics_Views is
    begin
       Gtk.GLArea.Initialize (Self);
 
-      Self.Viewport_Matrix :=
+      Self.Viewport_Matrix    :=
         [[1.0, 0.0, 0.0, 0.0],
          [0.0, 1.0, 0.0, 0.0],
          [0.0, 0.0, 1.0, 0.0],
          [0.0, 0.0, 0.0, 1.0]];
-      Self.Timer_Source := Glib.Main.No_Source_Id;
+      Self.Timer_Source       := Glib.Main.No_Source_Id;
+      Self.Next_Tick          := Ada.Real_Time.Time_First;
+      Self.Tick_Duration      :=
+        Ada.Real_Time.To_Time_Span
+          (Hexapod.Parameters.Control_Cycle.Tick_Duration);
+      Self.Frame_Counter      := 0;
+      Self.Skip_Frame_Counter := 0;
 
       Self.On_Realize (Call => Dispatch_Realize'Access);
       Self.On_Destroy (Call => Dispatch_Destroy'Access);
@@ -669,14 +679,6 @@ package body GUI.Graphics_Views is
       Self.Line_Program.Initialize;
       Self.Line_Program.Bind;
       Self.Line_Program.Set_Vertex_Data_Buffer (Buffer);
-
-      Self.Timer_Source :=
-        Sources.Timeout_Add
-          (Interval =>
-             Glib.Guint
-               (Hexapod.Parameters.Control_Cycle.Tick_Duration * 1_000),
-           Func     => On_Timeout'Access,
-           Data     => Self'Unchecked_Access);
    end On_Realize;
 
    ---------------
@@ -690,6 +692,7 @@ package body GUI.Graphics_Views is
    is
       pragma Unreferenced (GLContext);
 
+      use type Ada.Real_Time.Time;
       use type OpenGL.GLfloat_Matrix_4x4;
       use type OpenGL.GLbitfield;
 
@@ -721,6 +724,50 @@ package body GUI.Graphics_Views is
       Self.Build_Robot;
       Self.Line_Program.Set_Color ([0, 255, 0]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
+
+      --  Compute next tick and request timeout callback.
+
+      if Self.Next_Tick = Ada.Real_Time.Time_First then
+         Self.Next_Tick := Ada.Real_Time.Clock + Self.Tick_Duration;
+
+      else
+         loop
+            Self.Next_Tick := @ + Self.Tick_Duration;
+            Self.Frame_Counter := @ + 1;
+
+            exit when Ada.Real_Time.Clock < Self.Next_Tick;
+
+            declare
+               Template : VSS.Strings.Templates.Virtual_String_Template :=
+                 "Draw frame skipped ({} of {})";
+               Stream   : VSS.Text_Streams.Output_Text_Stream'Class :=
+                 VSS.Text_Streams.Standards.Standard_Output;
+               Success  : Boolean := True;
+
+            begin
+               Self.Skip_Frame_Counter := @ + 1;
+               Stream.Put_Line
+                 (Template.Format
+                    (VSS.Strings.Formatters.Integers.Image
+                         (Self.Skip_Frame_Counter),
+                     VSS.Strings.Formatters.Integers.Image
+                       (Self.Frame_Counter)),
+                  Success);
+            end;
+         end loop;
+      end if;
+
+      declare
+         Interval : constant Duration :=
+           Ada.Real_Time.To_Duration (Self.Next_Tick - Ada.Real_Time.Clock);
+
+      begin
+         Self.Timer_Source :=
+           Sources.Timeout_Add
+             (Interval => Glib.Guint (Interval * 1000.0),
+              Func     => On_Timeout'Access,
+              Data     => Self'Unchecked_Access);
+      end;
 
       return True;
    end On_Render;
@@ -810,7 +857,9 @@ package body GUI.Graphics_Views is
 
       Data.Queue_Draw;
 
-      return True;
+      Data.Timer_Source := Glib.Main.No_Source_Id;
+
+      return False;
    end On_Timeout;
 
    --------------
