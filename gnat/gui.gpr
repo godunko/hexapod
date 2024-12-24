@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with "../telemetry/config/hexapod_telemetry_gui_config.gpr";
+with "../applications/gui/config/hexapod_simulation_telemetry_config.gpr";
 
 with "trajectory.gpr";
 
@@ -14,7 +14,8 @@ project GUI is
      ("../source/gui",
       "../source/hexapod",        --  XXX Shared, should be moved to own project?
       "../source/legs");          --  XXX Shared, should be moved to own project?
-   for Object_Dir use "obj/" & Hexapod_Telemetry_GUI_Config.Build_Profile;
+   for Object_Dir
+     use "../.objs/gui/" & Hexapod_Simulation_Telemetry_Config.Build_Profile;
    for Exec_Dir use "../bin";
    for Main use ("gui-driver.adb");
 
@@ -23,7 +24,8 @@ project GUI is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use Hexapod_Telemetry_GUI_Config.Ada_Compiler_Switches;
+      for Default_Switches ("Ada")
+        use Hexapod_Simulation_Telemetry_Config.Ada_Compiler_Switches;
    end Compiler;
 
    package Binder is

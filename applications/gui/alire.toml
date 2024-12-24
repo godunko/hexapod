@@ -1,5 +1,5 @@
-name = "hexapod_telemetry"
-description = "Phoenyx Hexapod Telemetry GUI"
+name = "hexapod_simulation_telemetry"
+description = "Phoenyx Hexapod Simulation/Telemetry GUI"
 version = "0.1.0-dev"
 
 authors = ["Vadim Godunko"]
@@ -9,7 +9,7 @@ licenses = "Apache-2.0 WITH LLVM-exception"
 website = "https://github.com/godunko/hexapod/"
 tags = ["hexapod", "robot", "gui"]
 
-project-files = ["../gnat/gui.gpr"]
+project-files = ["../../gnat/gui.gpr"]
 
 [configuration]
 generate_ada = false
@@ -25,5 +25,5 @@ adagl_gtk3 = "*"
 cgk = "*"
 
 [[pins]]
-adagl_gtk3 = { path='../subprojects/adagl/adagl_gtk3' }
-cgk = { path='../subprojects/cgk' }
+adagl_gtk3 = { path='../../subprojects/adagl/adagl_gtk3' }
+cgk = { path='../../subprojects/cgk' }
