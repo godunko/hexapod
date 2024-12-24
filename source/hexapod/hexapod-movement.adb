@@ -9,7 +9,7 @@
 with Ada.Numerics;
 with Interfaces;
 
-with A0B.ARMv7M.DWT;
+with A0B.ARMv7M.SCS.DWT;
 with A0B.Callbacks.Generic_Parameterless;
 with A0B.Tasking;
 with A0B.Time.Clock;
@@ -467,12 +467,12 @@ package body Hexapod.Movement is
                      Console.Put ("-");
                   end if;
 
-                  A0B.ARMv7M.DWT.DWT_CTRL.CYCCNTENA := True;
-                  A0B.ARMv7M.DWT.DWT_CYCCNT.CYCCNT  := 0;
+                  A0B.ARMv7M.SCS.DWT.DWT_CTRL.CYCCNTENA := True;
+                  A0B.ARMv7M.SCS.DWT.DWT_CYCCNT.CYCCNT  := 0;
 
                   Step;
 
-                  Cur_Cycles := A0B.ARMv7M.DWT.DWT_CYCCNT.CYCCNT;
+                  Cur_Cycles := A0B.ARMv7M.SCS.DWT.DWT_CYCCNT.CYCCNT;
                   Max_Cycles := A0B.Types.Unsigned_32'Max (@, Cur_Cycles);
                   Min_Cycles := A0B.Types.Unsigned_32'Min (@, Cur_Cycles);
             end case;
