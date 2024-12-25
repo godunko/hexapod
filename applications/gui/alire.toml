@@ -23,7 +23,6 @@ cgk.Float_Size = "32"
 adagl_gtk3 = "*"
 cgk = "*"
 gtkada = "*"
-vss = "*"
 
 [[pins]]
 adagl_gtk3 = { path='../../subprojects/adagl/adagl_gtk3' }
