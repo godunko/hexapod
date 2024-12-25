@@ -6,36 +6,29 @@
 
 pragma Ada_2022;
 
-with League.Characters.Latin;
-with League.Strings;
+with VSS.Strings;
+with VSS.String_Vectors;
 
 package body GUI.Programs.Lines is
 
-   use type League.Strings.Universal_String;
+   Text_V : constant VSS.String_Vectors.Virtual_String_Vector :=
+     ["#version 130",
+      "uniform mat4 mvp;",
+      "in vec3 vp;",
+      "void main() {",
+      "  gl_Position = mvp * vec4(vp, 1.0);",
+      "}"];
+   Text_F : constant VSS.String_Vectors.Virtual_String_Vector :=
+     ["#version 130",
+      "uniform vec3 c;",
+      "out vec4 frag_colour;",
+      "void main() {",
+      "  frag_colour = vec4(c, 1.0);",
+      "}"];
 
-   Text_V : constant League.Strings.Universal_String :=
-     League.Strings.To_Universal_String
-       ("#version 130") & League.Characters.Latin.Line_Feed &
-     "uniform mat4 mvp;" &
-     "in vec3 vp;" &
-     "void main() {" &
-     "  gl_Position = mvp * vec4(vp, 1.0);" &
-     "}";
-   Text_F : constant League.Strings.Universal_String :=
-     League.Strings.To_Universal_String
-       ("#version 130") & League.Characters.Latin.Line_Feed &
-     "uniform vec3 c;" &
-     "out vec4 frag_colour;" &
-     "void main() {" &
-     "  frag_colour = vec4(c, 1.0);" &
-     "}";
-
-   MVP_Name : constant League.Strings.Universal_String :=
-     League.Strings.To_Universal_String ("mvp");
-   C_Name   : constant League.Strings.Universal_String :=
-     League.Strings.To_Universal_String ("c");
-   VP_Name  : constant League.Strings.Universal_String :=
-     League.Strings.To_Universal_String ("vp");
+   MVP_Name : constant VSS.Strings.Virtual_String := "mvp";
+   C_Name   : constant VSS.Strings.Virtual_String := "c";
+   VP_Name  : constant VSS.Strings.Virtual_String := "vp";
 
    ----------------
    -- Initialize --
@@ -43,8 +36,10 @@ package body GUI.Programs.Lines is
 
    procedure Initialize (Self : in out Line_Program'Class) is
    begin
-      Self.Add_Shader_From_Source_Code (OpenGL.Vertex, Text_V);
-      Self.Add_Shader_From_Source_Code (OpenGL.Fragment, Text_F);
+      Self.Add_Shader_From_Source_Code
+        (OpenGL.Vertex, Text_V.Join_Lines (VSS.Strings.LF));
+      Self.Add_Shader_From_Source_Code
+        (OpenGL.Fragment, Text_F.Join_Lines (VSS.Strings.LF));
    end Initialize;
 
    ----------
