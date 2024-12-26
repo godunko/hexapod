@@ -1,6 +1,6 @@
 name = "hexapod_simulation_telemetry"
 description = "Phoenyx Hexapod Simulation/Telemetry GUI"
-version = "0.0.1"
+version = "0.1.0-dev"
 
 authors = ["Vadim Godunko"]
 maintainers = ["Vadim Godunko <vgodunko@gmail.com>"]
