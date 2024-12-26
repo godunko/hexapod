@@ -36,10 +36,8 @@ package body GUI.Programs.Lines is
 
    procedure Initialize (Self : in out Line_Program'Class) is
    begin
-      Self.Add_Shader_From_Source_Code
-        (OpenGL.Vertex, Text_V.Join_Lines (VSS.Strings.LF));
-      Self.Add_Shader_From_Source_Code
-        (OpenGL.Fragment, Text_F.Join_Lines (VSS.Strings.LF));
+      Self.Add_Shader_From_Source_Code (OpenGL.Vertex, Text_V);
+      Self.Add_Shader_From_Source_Code (OpenGL.Fragment, Text_F);
    end Initialize;
 
    ----------
