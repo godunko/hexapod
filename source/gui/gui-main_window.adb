@@ -132,7 +132,7 @@ package body GUI.Main_Window is
         Gtk.Adjustment.Gtk_Adjustment_New
           (Value          => -45.0,
            Lower          => -90.0,
-           Upper          => 90.0,
+           Upper          => 0.0,
            Step_Increment => 1.0,
            Page_Increment => 10.0);
       VA.On_Value_Changed
