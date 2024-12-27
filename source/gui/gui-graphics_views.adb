@@ -42,6 +42,8 @@ package body GUI.Graphics_Views is
 
    function Rotate_Z (Angle : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4;
 
+   function Mirror_Z return OpenGL.GLfloat_Matrix_4x4;
+
    function Degrees_To_Radians (Item : OpenGL.GLfloat) return OpenGL.GLfloat;
 
    --  XXX END stub transition
@@ -590,6 +592,19 @@ package body GUI.Graphics_Views is
       Self.On_Render (Call => Dispatch_Render'Access);
    end Initialize;
 
+   --------------
+   -- Mirror_Z --
+   --------------
+
+   function Mirror_Z return OpenGL.GLfloat_Matrix_4x4 is
+   begin
+      return
+        [[1.0, 0.0,  0.0, 0.0],
+         [0.0, 1.1,  0.0, 0.0],
+         [0.0, 0.0, -1.0, 0.0],
+         [0.0, 0.0,  0.0, 1.0]];
+   end Mirror_Z;
+
    ----------------
    -- On_Realize --
    ----------------
@@ -628,17 +643,14 @@ package body GUI.Graphics_Views is
       use type OpenGL.GLfloat_Matrix_4x4;
       use type OpenGL.GLbitfield;
 
-      View_Matrix : OpenGL.GLfloat_Matrix_4x4 :=
-        [[1.0, 0.0, 0.0, 0.0],
-         [0.0, 1.0, 0.0, 0.0],
-         [0.0, 0.0, 1.0, 0.0],
-         [0.0, 0.0, 0.0, 1.0]];
+      View_Matrix : OpenGL.GLfloat_Matrix_4x4;
 
    begin
       Self.Scene := Simulation.Control_Loop.Get_Scene;
 
       View_Matrix :=
         Scale (Self.Scale)
+          * Mirror_Z
           * Rotate_X (Degrees_To_Radians (Self.Vertical_Angle))
           * Rotate_Z (Degrees_To_Radians (Self.Horizontal_Angle));
 
