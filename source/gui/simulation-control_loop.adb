@@ -99,8 +99,17 @@ package body Simulation.Control_Loop is
          Legs.Trajectory_Generator.Tick;
          Legs.Gait_Generator.Tick;
 
+         --  Extract legs position
+
          Scene.Legs_Posture :=
            [for J in Legs.Leg_Index => Legs.State.Posture (J)];
+
+         --  Extract workspace shapes
+
+         Scene.Legs_Workspace :=
+           [for J in Legs.Leg_Index => Legs.Workspace.Get_Workspace_Shape (J)];
+
+         --  Compute movement
 
          declare
             P0              : CGK.Primitives.Points_2D.Point_2D :=

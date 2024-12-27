@@ -10,8 +10,10 @@ with Glib;
 private with Gtk.GLArea;
 with Gtk.Widget;
 
+private with epoxy;
 private with OpenGL;
 
+private with GUI.Programs.Circles;
 private with GUI.Programs.Lines;
 private with GUI.Scene_States;
 
@@ -37,6 +39,12 @@ package GUI.Graphics_Views is
 
 private
 
+   type Circle_Buffer_Access is
+     access all GUI.Programs.Circles.Vertex_Data_Buffers.OpenGL_Buffer;
+
+   type Circle_Program_Access is
+     access all GUI.Programs.Circles.Circle_Program;
+
    type Line_Program_Access is access all GUI.Programs.Lines.Line_Program;
 
    type Graphics_View_Record is new Gtk.GLArea.Gtk_GLArea_Record with record
@@ -49,6 +57,12 @@ private
 
       Line_Program     : Line_Program_Access;
       Line_Elements    : OpenGL.GLsizei;
+      Line_VAO         : aliased epoxy.GLuint;
+
+      Circle_Buffer    : Circle_Buffer_Access;
+      Circle_Program   : Circle_Program_Access;
+      --  Circle_Elements  : OpenGL.GLsizei;
+      Circle_VAO       : aliased epoxy.GLuint;
    end record;
 
 end GUI.Graphics_Views;

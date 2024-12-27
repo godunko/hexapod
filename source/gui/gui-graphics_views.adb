@@ -10,10 +10,10 @@ with Ada.Numerics.Generic_Elementary_Functions;
 
 with Gdk.GLContext;
 
-with epoxy;
 with epoxy_gl_generated_h;
 with OpenGL.Contexts;
 
+with CGK.Primitives.Circles_2D;
 with CGK.Primitives.Points_2D;
 with CGK.Primitives.Transformations_2D;
 with CGK.Reals;
@@ -74,10 +74,6 @@ package body GUI.Graphics_Views is
      (Self      : access Gtk.GLArea.Gtk_GLArea_Record'Class;
       GLContext : not null access Gdk.GLContext.Gdk_GLContext_Record'Class)
       return Boolean;
-
-   --  function On_Timeout (Data : Graphics_View) return Boolean;
-
-   --  package Sources is new Glib.Main.Generic_Sources (Graphics_View);
 
    procedure Build_Grid (Self : in out Graphics_View_Record'Class);
 
@@ -590,6 +586,8 @@ package body GUI.Graphics_Views is
       Self.On_Realize (Call => Dispatch_Realize'Access);
       Self.On_Resize (Call => Dispatch_Resize'Access);
       Self.On_Render (Call => Dispatch_Render'Access);
+
+      Self.Set_Has_Depth_Buffer (True);
    end Initialize;
 
    --------------
@@ -610,15 +608,13 @@ package body GUI.Graphics_Views is
    ----------------
 
    procedure On_Realize (Self : in out Graphics_View_Record'Class) is
-      VAO : aliased epoxy.GLuint;
-
    begin
       Self.Make_Current;
 
       Context.Create (Self.Get_Context);
 
-      epoxy_gl_generated_h.glGenVertexArrays (1, VAO'Access);
-      epoxy_gl_generated_h.glBindVertexArray (VAO);
+      epoxy_gl_generated_h.glGenVertexArrays (1, Self.Line_VAO'Access);
+      epoxy_gl_generated_h.glBindVertexArray (Self.Line_VAO);
 
       Buffer.Create;
       Buffer.Bind;
@@ -627,6 +623,20 @@ package body GUI.Graphics_Views is
       Self.Line_Program.Initialize;
       Self.Line_Program.Bind;
       Self.Line_Program.Set_Vertex_Data_Buffer (Buffer);
+
+      epoxy_gl_generated_h.glGenVertexArrays (1, Self.Circle_VAO'Access);
+      epoxy_gl_generated_h.glBindVertexArray (Self.Circle_VAO);
+
+      Self.Circle_Buffer :=
+        new GUI.Programs.Circles.Vertex_Data_Buffers.OpenGL_Buffer
+              (OpenGL.Vertex);
+      Self.Circle_Buffer.Create;
+      Self.Circle_Buffer.Bind;
+
+      Self.Circle_Program := new GUI.Programs.Circles.Circle_Program;
+      Self.Circle_Program.Initialize;
+      Self.Circle_Program.Bind;
+      Self.Circle_Program.Set_Vertex_Data_Buffer (Self.Circle_Buffer.all);
    end On_Realize;
 
    ---------------
@@ -655,10 +665,15 @@ package body GUI.Graphics_Views is
           * Rotate_Z (Degrees_To_Radians (Self.Horizontal_Angle));
 
       Context.Functions.Enable (OpenGL.GL_DEPTH_TEST);
+      Context.Functions.Depth_Func (OpenGL.GL_LESS);
       Context.Functions.Clear_Color (0.2, 0.2, 0.2, 1.0);
 
       Context.Functions.Clear
         (OpenGL.GL_DEPTH_BUFFER_BIT + OpenGL.GL_COLOR_BUFFER_BIT);
+
+      --  Draw ground grid and robot
+
+      epoxy_gl_generated_h.glBindVertexArray (Self.Line_VAO);
 
       Self.Line_Program.Bind;
       Self.Line_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
@@ -670,6 +685,46 @@ package body GUI.Graphics_Views is
       Self.Build_Robot;
       Self.Line_Program.Set_Color ([0, 255, 0]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
+
+      --  Draw workspaces
+
+      epoxy_gl_generated_h.glBindVertexArray (Self.Circle_VAO);
+
+      declare
+         Circles : GUI.Programs.Circles.Vertex_Data_Array (1 .. 6);
+
+      begin
+         for J in Legs.Leg_Index loop
+            declare
+               Circle : constant CGK.Primitives.Circles_2D.Circle_2D :=
+                 Self.Scene.Legs_Workspace (J);
+
+            begin
+               Circles (Legs.Leg_Index'Pos (J) + 1) :=
+           (Center =>
+              [OpenGL.GLfloat
+                 (CGK.Primitives.Points_2D.X
+                    (CGK.Primitives.Circles_2D.Center
+                       (Circle))),
+               OpenGL.GLfloat
+                 (CGK.Primitives.Points_2D.Y
+                    (CGK.Primitives.Circles_2D.Center
+                       (Circle)))],
+            Radius =>
+              OpenGL.GLfloat
+                (CGK.Primitives.Circles_2D.Radius
+                     (Circle)));
+            end;
+         end loop;
+
+         Self.Circle_Buffer.Bind;
+         Self.Circle_Buffer.Allocate (Circles);
+      end;
+
+      Self.Circle_Program.Bind;
+      Self.Circle_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
+      Self.Circle_Program.Set_Color ([63, 0, 0]);
+      Context.Functions.Draw_Arrays (OpenGL.GL_POINTS, 0, 6);
 
       Self.Queue_Draw;
       --  Request redraw of the scene.
