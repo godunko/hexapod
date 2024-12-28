@@ -15,12 +15,15 @@ with OpenGL.Contexts;
 
 with CGK.Primitives.Circles_2D;
 with CGK.Primitives.Points_2D;
+with CGK.Primitives.Points_3D;
 with CGK.Primitives.Transformations_2D;
+with CGK.Primitives.Transformations_3D;
+with CGK.Primitives.Vectors_3D;
+with CGK.Primitives.XYZs;
 with CGK.Reals;
 
-with Kinematics.Configuration.Derived;
+with Kinematics.Configuration;
 with Legs;
-with Reals;
 with Simulation.Control_Loop;
 
 package body GUI.Graphics_Views is
@@ -181,8 +184,7 @@ package body GUI.Graphics_Views is
         (Base_X     : CGK.Reals.Real;
          Base_Y     : CGK.Reals.Real;
          Base_Z     : CGK.Reals.Real;
-         Base_Gamma_Sin : CGK.Reals.Real;
-         Base_Gamma_Cos : CGK.Reals.Real;
+         Base_Gamma : CGK.Reals.Real;
          d_1        : CGK.Reals.Real;
          r_1        : CGK.Reals.Real;
          α_1        : CGK.Reals.Real;
@@ -202,8 +204,7 @@ package body GUI.Graphics_Views is
         (Base_X     : CGK.Reals.Real;
          Base_Y     : CGK.Reals.Real;
          Base_Z     : CGK.Reals.Real;
-         Base_Gamma_Sin : CGK.Reals.Real;
-         Base_Gamma_Cos : CGK.Reals.Real;
+         Base_Gamma : CGK.Reals.Real;
          d_1        : CGK.Reals.Real;
          r_1        : CGK.Reals.Real;
          α_1        : CGK.Reals.Real;
@@ -215,109 +216,99 @@ package body GUI.Graphics_Views is
          α_3        : CGK.Reals.Real;
          Posture    : Kinematics.Posture)
       is
-         use type Reals.Transformations_3D.Transformation_3D;
+         use type CGK.Primitives.Points_3D.Point_3D;
 
-         Origin           : constant Reals.Vectors_3D.Vector_3D :=
-           Reals.Vectors_3D.To_Vector_3D (0.0, 0.0, 0.0);
-         Point            : Reals.Vectors_3D.Vector_3D :=
-           Reals.Vectors_3D.To_Vector_3D (0.0, 0.0, 0.0);
+         function As_GLfloat_Vector_3
+           (Item : CGK.Primitives.Points_3D.Point_3D)
+            return OpenGL.GLfloat_Vector_3;
 
-         Transformation   : Reals.Transformations_3D.Transformation_3D;
-         Transformation_0 : Reals.Transformations_3D.Transformation_3D;
-         Transformation_1 : constant
-           Reals.Transformations_3D.Transformation_3D :=
-             Reals.Transformation_3D_HD_Constructors.Create_Transformation_3D
-               (d => d_1, θ => Kinematics.Theta_1 (Posture), r => r_1, α => α_1);
-         Transformation_2 : constant
-           Reals.Transformations_3D.Transformation_3D :=
-             Reals.Transformation_3D_HD_Constructors.Create_Transformation_3D
-               (d => d_2, θ => Kinematics.Theta_2 (Posture), r => r_2, α => α_2);
-         Transformation_3 : constant
-           Reals.Transformations_3D.Transformation_3D :=
-             Reals.Transformation_3D_HD_Constructors.Create_Transformation_3D
-               (d => d_3, θ => Kinematics.Theta_3 (Posture), r => r_3, α => α_3);
+         -------------------------
+         -- As_GLfloat_Vector_3 --
+         -------------------------
+
+         function As_GLfloat_Vector_3
+           (Item : CGK.Primitives.Points_3D.Point_3D)
+            return OpenGL.GLfloat_Vector_3 is
+         begin
+            return
+              [1 => OpenGL.GLfloat (CGK.Primitives.Points_3D.X (Item)),
+               2 => OpenGL.GLfloat (CGK.Primitives.Points_3D.Y (Item)),
+               3 => OpenGL.GLfloat (CGK.Primitives.Points_3D.Z (Item))];
+         end As_GLfloat_Vector_3;
+
+         Offset  : constant CGK.Primitives.Vectors_3D.Vector_3D :=
+           CGK.Primitives.Vectors_3D.As_Vector_3D
+             (0.0, 0.0, Self.Scene.Body_Height);
+         Origin  : constant CGK.Primitives.Points_3D.Point_3D :=
+           CGK.Primitives.Points_3D.As_Point_3D (0.0, 0.0, 0.0);
+         Point_1 : CGK.Primitives.Points_3D.Point_3D := Origin;
+         Point_2 : CGK.Primitives.Points_3D.Point_3D := Origin;
+         Point_3 : CGK.Primitives.Points_3D.Point_3D := Origin;
+         Point_E : CGK.Primitives.Points_3D.Point_3D := Origin;
+         T       : CGK.Primitives.Transformations_3D.Transformation_3D;
+         T_0_1   : CGK.Primitives.Transformations_3D.Transformation_3D;
+         T_1_2   : CGK.Primitives.Transformations_3D.Transformation_3D;
+         T_2_3   : CGK.Primitives.Transformations_3D.Transformation_3D;
+         T_3_E   : CGK.Primitives.Transformations_3D.Transformation_3D;
 
       begin
-         Reals.Transformations_3D.Initialize
-           (Self => Transformation_0,
-            M_11 => Base_Gamma_Cos,
-            M_12 => -Base_Gamma_Sin,
-            M_13 => 0.0,
-            M_14 => Base_X,
-            M_21 => Base_Gamma_Sin,
-            M_22 => Base_Gamma_Cos,
-            M_23 => 0.0,
-            M_24 => Base_Y,
-            M_31 => 0.0,
-            M_32 => 0.0,
-            M_33 => 1.0,
-            M_34 => Base_Z);
+         CGK.Primitives.Transformations_3D.Set_Identity (T_0_1);
+         CGK.Primitives.Transformations_3D.Translate
+           (T_0_1, CGK.Primitives.XYZs.As_XYZ (Base_X, Base_Y, Base_Z));
+         CGK.Primitives.Transformations_3D.Rotate_Z (T_0_1, Base_Gamma);
 
-         Transformation := Transformation_0;
-         Point := Reals.Transformations_3D.Transform (Transformation, Origin);
+         CGK.Primitives.Transformations_3D.Set_Denavit_Hartenberg
+           (Self => T_1_2,
+            d    => d_1,
+            θ    => Kinematics.Theta_1 (Posture),
+            r    => r_1,
+            α    => α_1);
+         CGK.Primitives.Transformations_3D.Set_Denavit_Hartenberg
+           (Self => T_2_3,
+            d    => d_2,
+            θ    => Kinematics.Theta_2 (Posture),
+            r    => r_2,
+            α    => α_2);
+         CGK.Primitives.Transformations_3D.Set_Denavit_Hartenberg
+           (Self => T_3_E,
+            d    => d_3,
+            θ    => Kinematics.Theta_3 (Posture),
+            r    => r_3,
+            α    => α_3);
+
+         T := T_0_1;
+
+         CGK.Primitives.Points_3D.Transform (Point_1, T_0_1);
+
+         CGK.Primitives.Transformations_3D.Multiply (T, T_1_2);
+         CGK.Primitives.Points_3D.Transform (Point_2, T);
+
+         CGK.Primitives.Transformations_3D.Multiply (T, T_2_3);
+         CGK.Primitives.Points_3D.Transform (Point_3, T);
+
+         CGK.Primitives.Transformations_3D.Multiply (T, T_3_E);
+         CGK.Primitives.Points_3D.Transform (Point_E, T);
 
          --  Coxa
 
          Last := @ + 1;
-         Points (Last) :=
-           (VP =>
-              [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat
-                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
-
-         Transformation := Transformation * Transformation_1;
-         Point := Reals.Transformations_3D.Transform (Transformation, Origin);
-
+         Points (Last) := (VP => As_GLfloat_Vector_3 (Point_1 + Offset));
          Last := @ + 1;
-         Points (Last) :=
-           (VP =>
-              [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat
-                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
+         Points (Last) := (VP => As_GLfloat_Vector_3 (Point_2 + Offset));
 
          --  Femur
 
          Last := @ + 1;
-         Points (Last) :=
-           (VP =>
-              [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat
-                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
-
-         Transformation := Transformation * Transformation_2;
-         Point := Reals.Transformations_3D.Transform (Transformation, Origin);
-
+         Points (Last) := (VP => As_GLfloat_Vector_3 (Point_2 + Offset));
          Last := @ + 1;
-         Points (Last) :=
-           (VP =>
-              [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat
-                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
+         Points (Last) := (VP => As_GLfloat_Vector_3 (Point_3 + Offset));
 
          --  Tibia
 
          Last := @ + 1;
-         Points (Last) :=
-           (VP =>
-              [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat
-                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
-
-         Transformation := Transformation * Transformation_3;
-         Point := Reals.Transformations_3D.Transform (Transformation, Origin);
-
+         Points (Last) := (VP => As_GLfloat_Vector_3 (Point_3 + Offset));
          Last := @ + 1;
-         Points (Last) :=
-           (VP =>
-              [OpenGL.GLfloat (Reals.Vectors_3D.X (Point)),
-               OpenGL.GLfloat (Reals.Vectors_3D.Y (Point)),
-               OpenGL.GLfloat
-                 (Reals.Vectors_3D.Z (Point) + Self.Scene.Body_Height)]);
+         Points (Last) := (VP => As_GLfloat_Vector_3 (Point_E + Offset));
       end Build_Leg;
 
    begin
@@ -412,102 +403,96 @@ package body GUI.Graphics_Views is
               (Kinematics.Configuration.LF_Base_Z + Self.Scene.Body_Height)]);
 
       Build_Leg
-        (Base_X         => Kinematics.Configuration.LF_Base_X,
-         Base_Y         => Kinematics.Configuration.LF_Base_Y,
-         Base_Z         => Kinematics.Configuration.LF_Base_Z,
-         Base_Gamma_Sin => Kinematics.Configuration.Derived.LF_Sin_Gamma_0,
-         Base_Gamma_Cos => Kinematics.Configuration.Derived.LF_Cos_Gamma_0,
-         d_1            => Kinematics.Configuration.LF_DH_D1,
-         r_1            => Kinematics.Configuration.LF_DH_R1,
-         α_1            => Kinematics.Configuration.LF_DH_Alpha1,
-         d_2            => Kinematics.Configuration.LF_DH_D2,
-         r_2            => Kinematics.Configuration.LF_DH_R2,
-         α_2            => Kinematics.Configuration.LF_DH_Alpha2,
-         d_3            => Kinematics.Configuration.LF_DH_D3,
-         r_3            => Kinematics.Configuration.LF_DH_R3,
-         α_3            => Kinematics.Configuration.LF_DH_Alpha3,
-         Posture        => Self.Scene.Legs_Posture (Legs.Left_Front));
+        (Base_X     => Kinematics.Configuration.LF_Base_X,
+         Base_Y     => Kinematics.Configuration.LF_Base_Y,
+         Base_Z     => Kinematics.Configuration.LF_Base_Z,
+         Base_Gamma => Kinematics.Configuration.LF_Base_Gamma,
+         d_1        => Kinematics.Configuration.LF_DH_D1,
+         r_1        => Kinematics.Configuration.LF_DH_R1,
+         α_1        => Kinematics.Configuration.LF_DH_Alpha1,
+         d_2        => Kinematics.Configuration.LF_DH_D2,
+         r_2        => Kinematics.Configuration.LF_DH_R2,
+         α_2        => Kinematics.Configuration.LF_DH_Alpha2,
+         d_3        => Kinematics.Configuration.LF_DH_D3,
+         r_3        => Kinematics.Configuration.LF_DH_R3,
+         α_3        => Kinematics.Configuration.LF_DH_Alpha3,
+         Posture    => Self.Scene.Legs_Posture (Legs.Left_Front));
       Build_Leg
-        (Base_X         => Kinematics.Configuration.LM_Base_X,
-         Base_Y         => Kinematics.Configuration.LM_Base_Y,
-         Base_Z         => Kinematics.Configuration.LM_Base_Z,
-         Base_Gamma_Sin => Kinematics.Configuration.Derived.LM_Sin_Gamma_0,
-         Base_Gamma_Cos => Kinematics.Configuration.Derived.LM_Cos_Gamma_0,
-         d_1            => Kinematics.Configuration.LM_DH_D1,
-         r_1            => Kinematics.Configuration.LM_DH_R1,
-         α_1            => Kinematics.Configuration.LM_DH_Alpha1,
-         d_2            => Kinematics.Configuration.LM_DH_D2,
-         r_2            => Kinematics.Configuration.LM_DH_R2,
-         α_2            => Kinematics.Configuration.LM_DH_Alpha2,
-         d_3            => Kinematics.Configuration.LM_DH_D3,
-         r_3            => Kinematics.Configuration.LM_DH_R3,
-         α_3            => Kinematics.Configuration.LM_DH_Alpha3,
-         Posture        => Self.Scene.Legs_Posture (Legs.Left_Middle));
+        (Base_X     => Kinematics.Configuration.LM_Base_X,
+         Base_Y     => Kinematics.Configuration.LM_Base_Y,
+         Base_Z     => Kinematics.Configuration.LM_Base_Z,
+         Base_Gamma => Kinematics.Configuration.LM_Base_Gamma,
+         d_1        => Kinematics.Configuration.LM_DH_D1,
+         r_1        => Kinematics.Configuration.LM_DH_R1,
+         α_1        => Kinematics.Configuration.LM_DH_Alpha1,
+         d_2        => Kinematics.Configuration.LM_DH_D2,
+         r_2        => Kinematics.Configuration.LM_DH_R2,
+         α_2        => Kinematics.Configuration.LM_DH_Alpha2,
+         d_3        => Kinematics.Configuration.LM_DH_D3,
+         r_3        => Kinematics.Configuration.LM_DH_R3,
+         α_3        => Kinematics.Configuration.LM_DH_Alpha3,
+         Posture    => Self.Scene.Legs_Posture (Legs.Left_Middle));
       Build_Leg
-        (Base_X         => Kinematics.Configuration.LH_Base_X,
-         Base_Y         => Kinematics.Configuration.LH_Base_Y,
-         Base_Z         => Kinematics.Configuration.LH_Base_Z,
-         Base_Gamma_Sin => Kinematics.Configuration.Derived.LH_Sin_Gamma_0,
-         Base_Gamma_Cos => Kinematics.Configuration.Derived.LH_Cos_Gamma_0,
-         d_1            => Kinematics.Configuration.LH_DH_D1,
-         r_1            => Kinematics.Configuration.LH_DH_R1,
-         α_1            => Kinematics.Configuration.LH_DH_Alpha1,
-         d_2            => Kinematics.Configuration.LH_DH_D2,
-         r_2            => Kinematics.Configuration.LH_DH_R2,
-         α_2            => Kinematics.Configuration.LH_DH_Alpha2,
-         d_3            => Kinematics.Configuration.LH_DH_D3,
-         r_3            => Kinematics.Configuration.LH_DH_R3,
-         α_3            => Kinematics.Configuration.LH_DH_Alpha3,
-         Posture        => Self.Scene.Legs_Posture (Legs.Left_Hind));
+        (Base_X     => Kinematics.Configuration.LH_Base_X,
+         Base_Y     => Kinematics.Configuration.LH_Base_Y,
+         Base_Z     => Kinematics.Configuration.LH_Base_Z,
+         Base_Gamma => Kinematics.Configuration.LH_Base_Gamma,
+         d_1        => Kinematics.Configuration.LH_DH_D1,
+         r_1        => Kinematics.Configuration.LH_DH_R1,
+         α_1        => Kinematics.Configuration.LH_DH_Alpha1,
+         d_2        => Kinematics.Configuration.LH_DH_D2,
+         r_2        => Kinematics.Configuration.LH_DH_R2,
+         α_2        => Kinematics.Configuration.LH_DH_Alpha2,
+         d_3        => Kinematics.Configuration.LH_DH_D3,
+         r_3        => Kinematics.Configuration.LH_DH_R3,
+         α_3        => Kinematics.Configuration.LH_DH_Alpha3,
+         Posture    => Self.Scene.Legs_Posture (Legs.Left_Hind));
 
       Build_Leg
-        (Base_X         => Kinematics.Configuration.RF_Base_X,
-         Base_Y         => Kinematics.Configuration.RF_Base_Y,
-         Base_Z         => Kinematics.Configuration.RF_Base_Z,
-         Base_Gamma_Sin => Kinematics.Configuration.Derived.RF_Sin_Gamma_0,
-         Base_Gamma_Cos => Kinematics.Configuration.Derived.RF_Cos_Gamma_0,
-         d_1            => Kinematics.Configuration.RF_DH_D1,
-         r_1            => Kinematics.Configuration.RF_DH_R1,
-         α_1            => Kinematics.Configuration.RF_DH_Alpha1,
-         d_2            => Kinematics.Configuration.RF_DH_D2,
-         r_2            => Kinematics.Configuration.RF_DH_R2,
-         α_2            => Kinematics.Configuration.RF_DH_Alpha2,
-         d_3            => Kinematics.Configuration.RF_DH_D3,
-         r_3            => Kinematics.Configuration.RF_DH_R3,
-         α_3            => Kinematics.Configuration.RF_DH_Alpha3,
-         Posture        => Self.Scene.Legs_Posture (Legs.Right_Front));
+        (Base_X     => Kinematics.Configuration.RF_Base_X,
+         Base_Y     => Kinematics.Configuration.RF_Base_Y,
+         Base_Z     => Kinematics.Configuration.RF_Base_Z,
+         Base_Gamma => Kinematics.Configuration.RF_Base_Gamma,
+         d_1        => Kinematics.Configuration.RF_DH_D1,
+         r_1        => Kinematics.Configuration.RF_DH_R1,
+         α_1        => Kinematics.Configuration.RF_DH_Alpha1,
+         d_2        => Kinematics.Configuration.RF_DH_D2,
+         r_2        => Kinematics.Configuration.RF_DH_R2,
+         α_2        => Kinematics.Configuration.RF_DH_Alpha2,
+         d_3        => Kinematics.Configuration.RF_DH_D3,
+         r_3        => Kinematics.Configuration.RF_DH_R3,
+         α_3        => Kinematics.Configuration.RF_DH_Alpha3,
+         Posture    => Self.Scene.Legs_Posture (Legs.Right_Front));
       Build_Leg
-        (Base_X         => Kinematics.Configuration.RM_Base_X,
-         Base_Y         => Kinematics.Configuration.RM_Base_Y,
-         Base_Z         => Kinematics.Configuration.RM_Base_Z,
-         Base_Gamma_Sin => Kinematics.Configuration.Derived.RM_Sin_Gamma_0,
-         Base_Gamma_Cos => Kinematics.Configuration.Derived.RM_Cos_Gamma_0,
-         d_1            => Kinematics.Configuration.RM_DH_D1,
-         r_1            => Kinematics.Configuration.RM_DH_R1,
-         α_1            => Kinematics.Configuration.RM_DH_Alpha1,
-         d_2            => Kinematics.Configuration.RM_DH_D2,
-         r_2            => Kinematics.Configuration.RM_DH_R2,
-         α_2            => Kinematics.Configuration.RM_DH_Alpha2,
-         d_3            => Kinematics.Configuration.RM_DH_D3,
-         r_3            => Kinematics.Configuration.RM_DH_R3,
-         α_3            => Kinematics.Configuration.RM_DH_Alpha3,
-         Posture        => Self.Scene.Legs_Posture (Legs.Right_Middle));
+        (Base_X     => Kinematics.Configuration.RM_Base_X,
+         Base_Y     => Kinematics.Configuration.RM_Base_Y,
+         Base_Z     => Kinematics.Configuration.RM_Base_Z,
+         Base_Gamma => Kinematics.Configuration.RM_Base_Gamma,
+         d_1        => Kinematics.Configuration.RM_DH_D1,
+         r_1        => Kinematics.Configuration.RM_DH_R1,
+         α_1        => Kinematics.Configuration.RM_DH_Alpha1,
+         d_2        => Kinematics.Configuration.RM_DH_D2,
+         r_2        => Kinematics.Configuration.RM_DH_R2,
+         α_2        => Kinematics.Configuration.RM_DH_Alpha2,
+         d_3        => Kinematics.Configuration.RM_DH_D3,
+         r_3        => Kinematics.Configuration.RM_DH_R3,
+         α_3        => Kinematics.Configuration.RM_DH_Alpha3,
+         Posture    => Self.Scene.Legs_Posture (Legs.Right_Middle));
       Build_Leg
-        (Base_X         => Kinematics.Configuration.RH_Base_X,
-         Base_Y         => Kinematics.Configuration.RH_Base_Y,
-         Base_Z         => Kinematics.Configuration.RH_Base_Z,
-         Base_Gamma_Sin => Kinematics.Configuration.Derived.RH_Sin_Gamma_0,
-         Base_Gamma_Cos => Kinematics.Configuration.Derived.RH_Cos_Gamma_0,
-         d_1            => Kinematics.Configuration.RH_DH_D1,
-         r_1            => Kinematics.Configuration.RH_DH_R1,
-         α_1            => Kinematics.Configuration.RH_DH_Alpha1,
-         d_2            => Kinematics.Configuration.RH_DH_D2,
-         r_2            => Kinematics.Configuration.RH_DH_R2,
-         α_2            => Kinematics.Configuration.RH_DH_Alpha2,
-         d_3            => Kinematics.Configuration.RH_DH_D3,
-         r_3            => Kinematics.Configuration.RH_DH_R3,
-         α_3            => Kinematics.Configuration.RH_DH_Alpha3,
-         Posture        => Self.Scene.Legs_Posture (Legs.Right_Hind));
+        (Base_X     => Kinematics.Configuration.RH_Base_X,
+         Base_Y     => Kinematics.Configuration.RH_Base_Y,
+         Base_Z     => Kinematics.Configuration.RH_Base_Z,
+         Base_Gamma => Kinematics.Configuration.RH_Base_Gamma,
+         d_1        => Kinematics.Configuration.RH_DH_D1,
+         r_1        => Kinematics.Configuration.RH_DH_R1,
+         α_1        => Kinematics.Configuration.RH_DH_Alpha1,
+         d_2        => Kinematics.Configuration.RH_DH_D2,
+         r_2        => Kinematics.Configuration.RH_DH_R2,
+         α_2        => Kinematics.Configuration.RH_DH_Alpha2,
+         d_3        => Kinematics.Configuration.RH_DH_D3,
+         r_3        => Kinematics.Configuration.RH_DH_R3,
+         α_3        => Kinematics.Configuration.RH_DH_Alpha3,
+         Posture    => Self.Scene.Legs_Posture (Legs.Right_Hind));
 
       Self.Line_Elements := OpenGL.GLsizei (Last);
 
