@@ -4,7 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-pragma Restrictions (No_Elaboration_Code);
+--  pragma Restrictions (No_Elaboration_Code);
+
+with CGK.Primitives.XYZs;
 
 with Kinematics.Configuration;
 with Kinematics.Inverse.Geometric;
@@ -32,6 +34,66 @@ package body Legs is
       Segment_2 : Leg_Segment_Parameters;
       Segment_3 : Leg_Segment_Parameters);
 
+   ------------------------
+   -- Forward_Kinematics --
+   ------------------------
+
+   procedure Forward_Kinematics
+     (Self     : Leg_Information;
+      Posture  : Kinematics.Posture;
+      Base     : out CGK.Primitives.Points_3D.Point_3D;
+      Joint_1  : out CGK.Primitives.Points_3D.Point_3D;
+      Joint_2  : out CGK.Primitives.Points_3D.Point_3D;
+      Joint_3  : out CGK.Primitives.Points_3D.Point_3D;
+      Effector : out CGK.Primitives.Points_3D.Point_3D)
+   is
+      Origin : constant CGK.Primitives.Points_3D.Point_3D :=
+        CGK.Primitives.Points_3D.As_Point_3D (0.0, 0.0, 0.0);
+
+      T      : CGK.Primitives.Transformations_3D.Transformation_3D;
+      T_1_2  : CGK.Primitives.Transformations_3D.Transformation_3D;
+      T_2_3  : CGK.Primitives.Transformations_3D.Transformation_3D;
+      T_3_E  : CGK.Primitives.Transformations_3D.Transformation_3D;
+
+   begin
+      Base     := Origin;
+      Joint_1  := Origin;
+      Joint_2  := Origin;
+      Joint_3  := Origin;
+      Effector := Origin;
+
+      CGK.Primitives.Transformations_3D.Set_Denavit_Hartenberg
+        (Self => T_1_2,
+         d    => Self.D_1,
+         θ    => Kinematics.Theta_1 (Posture),
+         r    => Self.R_1,
+         α    => Self.α_1);
+      CGK.Primitives.Transformations_3D.Set_Denavit_Hartenberg
+        (Self => T_2_3,
+         d    => Self.D_2,
+         θ    => Kinematics.Theta_2 (Posture),
+         r    => Self.R_2,
+         α    => Self.α_2);
+      CGK.Primitives.Transformations_3D.Set_Denavit_Hartenberg
+        (Self => T_3_E,
+         d    => Self.D_3,
+         θ    => Kinematics.Theta_3 (Posture),
+         r    => Self.R_3,
+         α    => Self.α_3);
+
+      T := Self.T_B_1;
+      CGK.Primitives.Points_3D.Transform (Joint_1, T);
+
+      CGK.Primitives.Transformations_3D.Multiply (T, T_1_2);
+      CGK.Primitives.Points_3D.Transform (Joint_2, T);
+
+      CGK.Primitives.Transformations_3D.Multiply (T, T_2_3);
+      CGK.Primitives.Points_3D.Transform (Joint_3, T);
+
+      CGK.Primitives.Transformations_3D.Multiply (T, T_3_E);
+      CGK.Primitives.Points_3D.Transform (Effector, T);
+   end Forward_Kinematics;
+
    ----------------
    -- Initialize --
    ----------------
@@ -51,14 +113,25 @@ package body Legs is
       Self.Z_0     := Base.Z;
       Self.Gamma_0 := Base.Gamma;
 
+      Self.D_1     := Segment_1.D;
       Self.R_1     := Segment_1.R;
+      Self.α_1     := Segment_1.Alpha;
 
+      Self.D_2     := Segment_2.D;
       Self.R_2     := Segment_2.R;
+      Self.α_2     := Segment_2.Alpha;
 
+      Self.D_3     := Segment_3.D;
       Self.R_3     := Segment_3.R;
+      Self.α_3     := Segment_3.Alpha;
 
       Self.Cos_Gamma_0 := Reals.Elementary_Functions.Cos (Self.Gamma_0);
       Self.Sin_Gamma_0 := Reals.Elementary_Functions.Sin (Self.Gamma_0);
+
+      CGK.Primitives.Transformations_3D.Set_Identity (Self.T_B_1);
+      CGK.Primitives.Transformations_3D.Translate
+        (Self.T_B_1, CGK.Primitives.XYZs.As_XYZ (Base.X, Base.Y, Base.Z));
+      CGK.Primitives.Transformations_3D.Rotate_Z (Self.T_B_1, Base.Gamma);
    end Initialize;
 
    ----------------
