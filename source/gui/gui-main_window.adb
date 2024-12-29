@@ -183,6 +183,7 @@ package body GUI.Main_Window is
         Gtk.Application_Window.Gtk_Application_Window_New
           (Gtk.Application.Gtk_Application (Self));
       AW.Add (G);
+      AW.Set_Size_Request (800, 600);
       AW.Show_All;
 
       GV.Set_Horizontal_Rotation (HA.Get_Value);
