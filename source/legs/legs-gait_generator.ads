@@ -25,4 +25,7 @@ is
       RVW : CGK.Reals.Real);
    --  Sets desired velocity
 
+   function Is_Support (Leg : Standard.Legs.Leg_Index) return Boolean;
+   --  Returns True when given leg is in support state.
+
 end Legs.Gait_Generator;

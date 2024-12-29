@@ -26,6 +26,7 @@ package body GUI.Graphics_Views is
 
    --  XXX BEGIN stub transition
 
+   use type CGK.Primitives.Points_3D.Point_3D;
    use type OpenGL.GLfloat;
 
    Context : OpenGL.Contexts.OpenGL_Context;
@@ -62,6 +63,8 @@ package body GUI.Graphics_Views is
       return Boolean;
 
    procedure Build_Grid (Self : in out Graphics_View_Record'Class);
+
+   procedure Build_Support (Self : in out Graphics_View_Record'Class);
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class);
 
@@ -175,9 +178,6 @@ package body GUI.Graphics_Views is
    -----------------
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class) is
-
-      use type CGK.Primitives.Points_3D.Point_3D;
-
       Offset   : constant CGK.Primitives.Vectors_3D.Vector_3D :=
         CGK.Primitives.Vectors_3D.As_Vector_3D
           (0.0, 0.0, Self.Scene.Body_Height);
@@ -247,6 +247,50 @@ package body GUI.Graphics_Views is
       Buffer.Bind;
       Buffer.Allocate (Verteces (Verteces'First .. Last));
    end Build_Robot;
+
+   -------------------
+   -- Build_Support --
+   -------------------
+
+   procedure Build_Support (Self : in out Graphics_View_Record'Class) is
+      Offset   : constant CGK.Primitives.Vectors_3D.Vector_3D :=
+        CGK.Primitives.Vectors_3D.As_Vector_3D
+          (0.0, 0.0, Self.Scene.Body_Height);
+      Initial  : CGK.Primitives.Points_3D.Point_3D;
+      Verteces : GUI.Programs.Lines.Vertex_Data_Array (1 .. 12);
+      Last     : Natural := 0;
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append (Point : CGK.Primitives.Points_3D.Point_3D) is
+      begin
+         Last := @ + 1;
+         Verteces (Last) := (VP => As_GLfloat_Vector_3 (Point + Offset));
+      end Append;
+
+   begin
+      for J in Legs.Leg_Index loop
+         if Self.Scene.Legs (J).Is_Support then
+            if Last = 0 then
+               Initial := Self.Scene.Legs (J).Effector;
+
+            else
+               Append (Self.Scene.Legs (J).Effector);
+            end if;
+
+            Append (Self.Scene.Legs (J).Effector);
+         end if;
+      end loop;
+
+      Append (Initial);
+
+      Self.Line_Elements := OpenGL.GLsizei (Last);
+
+      Buffer.Bind;
+      Buffer.Allocate (Verteces (Verteces'First .. Last));
+   end Build_Support;
 
    ----------------------
    -- Dispatch_Realize --
@@ -393,6 +437,10 @@ package body GUI.Graphics_Views is
 
       Self.Build_Robot;
       Self.Line_Program.Set_Color ([0, 255, 0]);
+      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
+
+      Self.Build_Support;
+      Self.Line_Program.Set_Color ([128, 128, 128]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
       --  Draw workspaces

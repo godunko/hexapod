@@ -247,6 +247,15 @@ package body Legs.Gait_Generator is
       return Modulus (XY_1 - XY_2) < 0.001;
    end Is_Identical;
 
+   ----------------
+   -- Is_Support --
+   ----------------
+
+   function Is_Support (Leg : Standard.Legs.Leg_Index) return Boolean is
+   begin
+      return State (Leg).Kind = Stance;
+   end Is_Support;
+
    ------------------
    -- Is_Identical --
    ------------------

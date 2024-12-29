@@ -18,15 +18,18 @@ with Legs;
 package GUI.Scene_States is
 
    type Leg_Information is record
-      Posture   : Kinematics.Posture;
-      Joint_1   : CGK.Primitives.Points_3D.Point_3D;
-      Joint_2   : CGK.Primitives.Points_3D.Point_3D;
-      Joint_3   : CGK.Primitives.Points_3D.Point_3D;
-      Effector  : CGK.Primitives.Points_3D.Point_3D;
+      Posture    : Kinematics.Posture;
+      Joint_1    : CGK.Primitives.Points_3D.Point_3D;
+      Joint_2    : CGK.Primitives.Points_3D.Point_3D;
+      Joint_3    : CGK.Primitives.Points_3D.Point_3D;
+      Effector   : CGK.Primitives.Points_3D.Point_3D;
       --  Posture of the leg, precomputed coordinates of the joints and end
       --  effector.
 
-      Workspace : CGK.Primitives.Circles_2D.Circle_2D;
+      Is_Support : Boolean;
+      --  Whether leg supports the robot.
+
+      Workspace  : CGK.Primitives.Circles_2D.Circle_2D;
    end record;
 
    type Leg_Information_Array is array (Legs.Leg_Index) of Leg_Information;

@@ -116,6 +116,10 @@ package body Simulation.Control_Loop is
                Joint_3  => Scene.Legs (J).Joint_3,
                Effector => Scene.Legs (J).Effector);
 
+            --  Extract support state
+
+            Scene.Legs (J).Is_Support := Legs.Gait_Generator.Is_Support (J);
+
             --  Extract workspace shapes
 
             Scene.Legs (J).Workspace := Legs.Workspace.Get_Workspace_Shape (J);
