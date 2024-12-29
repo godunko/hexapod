@@ -6,8 +6,6 @@
 
 pragma Ada_2022;
 
-with Ada.Numerics.Generic_Elementary_Functions;
-
 with Gdk.GLContext;
 
 with epoxy_gl_generated_h;
@@ -20,6 +18,7 @@ with CGK.Primitives.Transformations_2D;
 with CGK.Primitives.Vectors_3D;
 with CGK.Reals;
 
+with GUI.Utilities;
 with Legs;
 with Simulation.Control_Loop;
 
@@ -32,19 +31,6 @@ package body GUI.Graphics_Views is
    Context : OpenGL.Contexts.OpenGL_Context;
    Buffer  : GUI.Programs.Lines.Vertex_Data_Buffers.OpenGL_Buffer
                (OpenGL.Vertex);
-
-   package Elementary_Function is
-     new Ada.Numerics.Generic_Elementary_Functions (OpenGL.GLfloat);
-
-   function Scale (Scale : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4;
-
-   function Rotate_X (Angle : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4;
-
-   function Rotate_Z (Angle : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4;
-
-   function Mirror_Z return OpenGL.GLfloat_Matrix_4x4;
-
-   function Degrees_To_Radians (Item : OpenGL.GLfloat) return OpenGL.GLfloat;
 
    --  XXX END stub transition
 
@@ -262,15 +248,6 @@ package body GUI.Graphics_Views is
       Buffer.Allocate (Verteces (Verteces'First .. Last));
    end Build_Robot;
 
-   ------------------------
-   -- Degrees_To_Radians --
-   ------------------------
-
-   function Degrees_To_Radians (Item : OpenGL.GLfloat) return OpenGL.GLfloat is
-   begin
-      return Item / 180.0 * Ada.Numerics.Pi;
-   end Degrees_To_Radians;
-
    ----------------------
    -- Dispatch_Realize --
    ----------------------
@@ -324,11 +301,7 @@ package body GUI.Graphics_Views is
    begin
       Gtk.GLArea.Initialize (Self);
 
-      Self.Viewport_Matrix    :=
-        [[1.0, 0.0, 0.0, 0.0],
-         [0.0, 1.0, 0.0, 0.0],
-         [0.0, 0.0, 1.0, 0.0],
-         [0.0, 0.0, 0.0, 1.0]];
+      Self.Viewport_Matrix := GUI.Utilities.Identity;
 
       Self.On_Realize (Call => Dispatch_Realize'Access);
       Self.On_Resize (Call => Dispatch_Resize'Access);
@@ -336,19 +309,6 @@ package body GUI.Graphics_Views is
 
       Self.Set_Has_Depth_Buffer (True);
    end Initialize;
-
-   --------------
-   -- Mirror_Z --
-   --------------
-
-   function Mirror_Z return OpenGL.GLfloat_Matrix_4x4 is
-   begin
-      return
-        [[1.0, 0.0,  0.0, 0.0],
-         [0.0, 1.1,  0.0, 0.0],
-         [0.0, 0.0, -1.0, 0.0],
-         [0.0, 0.0,  0.0, 1.0]];
-   end Mirror_Z;
 
    ----------------
    -- On_Realize --
@@ -406,10 +366,12 @@ package body GUI.Graphics_Views is
       Self.Scene := Simulation.Control_Loop.Get_Scene;
 
       View_Matrix :=
-        Scale (Self.Scale)
-          * Mirror_Z
-          * Rotate_X (Degrees_To_Radians (Self.Vertical_Angle))
-          * Rotate_Z (Degrees_To_Radians (Self.Horizontal_Angle));
+        GUI.Utilities.Scale (Self.Scale)
+          * GUI.Utilities.Mirror_Z
+          * GUI.Utilities.Rotate_X
+              (GUI.Utilities.Degrees_To_Radians (Self.Vertical_Angle))
+          * GUI.Utilities.Rotate_Z
+              (GUI.Utilities.Degrees_To_Radians (Self.Horizontal_Angle));
 
       Context.Functions.Enable (OpenGL.GL_DEPTH_TEST);
       Context.Functions.Depth_Func (OpenGL.GL_LESS);
@@ -501,55 +463,6 @@ package body GUI.Graphics_Views is
          Self.Viewport_Matrix (2, 2) := W / H;
       end if;
    end On_Resize;
-
-   --------------
-   -- Rotate_X --
-   --------------
-
-   function Rotate_X
-     (Angle : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4
-   is
-      C : constant OpenGL.GLfloat := Elementary_Function.Cos (Angle);
-      S : constant OpenGL.GLfloat := Elementary_Function.Sin (Angle);
-
-   begin
-      return
-        [[1.0, 0.0, 0.0, 0.0],
-         [0.0, C,   -S,  0.0],
-         [0.0, S,   C,   0.0],
-         [0.0, 0.0, 0.0, 1.0]];
-   end Rotate_X;
-
-   --------------
-   -- Rotate_Z --
-   --------------
-
-   function Rotate_Z
-     (Angle : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4
-   is
-      C : constant OpenGL.GLfloat := Elementary_Function.Cos (Angle);
-      S : constant OpenGL.GLfloat := Elementary_Function.Sin (Angle);
-
-   begin
-      return
-        [[C,   -S,  0.0, 0.0],
-         [S,   C,   0.0, 0.0],
-         [0.0, 0.0, 1.0, 0.0],
-         [0.0, 0.0, 0.0, 1.0]];
-   end Rotate_Z;
-
-   -----------
-   -- Scale --
-   -----------
-
-   function Scale (Scale : OpenGL.GLfloat) return OpenGL.GLfloat_Matrix_4x4 is
-   begin
-      return
-        [[Scale, 0.0,   0.0,   0.0],
-         [0.0,   Scale, 0.0,   0.0],
-         [0.0,   0.0,   Scale, 0.0],
-         [0.0,   0.0,   0.0,   1.0]];
-   end Scale;
 
    -----------------------------
    -- Set_Horizontal_Rotation --
