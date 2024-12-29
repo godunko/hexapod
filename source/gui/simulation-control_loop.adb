@@ -6,6 +6,7 @@
 
 pragma Ada_2022;
 
+with Ada.Exceptions;
 with Ada.Real_Time;
 
 with CGK.Primitives.Points_2D;
@@ -14,6 +15,7 @@ with CGK.Primitives.Transformations_2D;
 with CGK.Primitives.Vectors_2D;
 with CGK.Reals.Elementary_Functions;
 
+with Debug.Log;
 with Hexapod.Parameters.Control_Cycle;
 with Legs.Gait_Generator;
 with Legs.State;
@@ -98,8 +100,16 @@ package body Simulation.Control_Loop is
             delay until Next_Tick;
          end select;
 
-         Legs.Trajectory_Generator.Tick;
-         Legs.Gait_Generator.Tick;
+         begin
+            Legs.Trajectory_Generator.Tick;
+            Legs.Gait_Generator.Tick;
+
+         exception
+            when E : others =>
+               Debug.Log.Put_Line (Ada.Exceptions.Exception_Information (E));
+
+               exit;
+         end;
 
          for J in Legs.Leg_Index loop
             --  Extract legs posture, compute position of joints and end
