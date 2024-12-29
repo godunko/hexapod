@@ -20,10 +20,10 @@ package body GUI.Programs.Lines is
       "}"];
    Text_F : constant VSS.String_Vectors.Virtual_String_Vector :=
      ["#version 130",
-      "uniform vec3 c;",
+      "uniform vec4 c;",
       "out vec4 frag_colour;",
       "void main() {",
-      "  frag_colour = vec4(c, 1.0);",
+      "  frag_colour = c;",
       "}"];
 
    MVP_Name : constant VSS.Strings.Virtual_String := "mvp";
@@ -63,11 +63,11 @@ package body GUI.Programs.Lines is
 
    procedure Set_Color
      (Self : in out Line_Program'Class;
-      To   : OpenGL.GLubyte_Vector_3)
+      To   : OpenGL.GLubyte_Vector_4)
    is
       use type OpenGL.GLfloat;
 
-      C : constant OpenGL.GLfloat_Vector_3 :=
+      C : constant OpenGL.GLfloat_Vector_4 :=
         [for J in To'Range => OpenGL.GLfloat (To (J)) / 255.0];
 
    begin

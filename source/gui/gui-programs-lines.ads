@@ -37,7 +37,7 @@ package GUI.Programs.Lines is
 
    procedure Set_Color
      (Self : in out Line_Program'Class;
-      To   : OpenGL.GLubyte_Vector_3);
+      To   : OpenGL.GLubyte_Vector_4);
    --  Sets color to be used to draw lines
 
 private

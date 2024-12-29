@@ -65,6 +65,8 @@ package body GUI.Graphics_Views is
    procedure Build_Grid (Self : in out Graphics_View_Record'Class);
 
    procedure Build_Support (Self : in out Graphics_View_Record'Class);
+   --  Fill line segments to draw support polygon's border as lines or support
+   --  polygon as triangle fan.
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class);
 
@@ -253,9 +255,12 @@ package body GUI.Graphics_Views is
    -------------------
 
    procedure Build_Support (Self : in out Graphics_View_Record'Class) is
+
+      use type CGK.Reals.Real;
+
       Offset   : constant CGK.Primitives.Vectors_3D.Vector_3D :=
         CGK.Primitives.Vectors_3D.As_Vector_3D
-          (0.0, 0.0, Self.Scene.Body_Height);
+          (0.0, 0.0, Self.Scene.Body_Height + 0.000_1);
       Initial  : CGK.Primitives.Points_3D.Point_3D;
       Verteces : GUI.Programs.Lines.Vertex_Data_Array (1 .. 12);
       Last     : Natural := 0;
@@ -420,28 +425,12 @@ package body GUI.Graphics_Views is
       Context.Functions.Enable (OpenGL.GL_DEPTH_TEST);
       Context.Functions.Depth_Func (OpenGL.GL_LESS);
       Context.Functions.Clear_Color (0.2, 0.2, 0.2, 1.0);
+      Context.Functions.Enable (OpenGL.GL_BLEND);
+      Context.Functions.Blend_Func
+        (OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
 
       Context.Functions.Clear
         (OpenGL.GL_DEPTH_BUFFER_BIT + OpenGL.GL_COLOR_BUFFER_BIT);
-
-      --  Draw ground grid and robot
-
-      epoxy_gl_generated_h.glBindVertexArray (Self.Line_VAO);
-
-      Self.Line_Program.Bind;
-      Self.Line_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
-
-      Self.Build_Grid;
-      Self.Line_Program.Set_Color ([0, 0, 255]);
-      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
-
-      Self.Build_Robot;
-      Self.Line_Program.Set_Color ([0, 255, 0]);
-      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
-
-      Self.Build_Support;
-      Self.Line_Program.Set_Color ([128, 128, 128]);
-      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
       --  Draw workspaces
 
@@ -482,6 +471,29 @@ package body GUI.Graphics_Views is
       Self.Circle_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
       Self.Circle_Program.Set_Color ([63, 0, 0]);
       Context.Functions.Draw_Arrays (OpenGL.GL_POINTS, 0, 6);
+
+      --  Draw ground grid and robot
+
+      epoxy_gl_generated_h.glBindVertexArray (Self.Line_VAO);
+
+      Self.Line_Program.Bind;
+      Self.Line_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
+
+      Self.Build_Grid;
+      Self.Line_Program.Set_Color ([0, 0, 255, 255]);
+      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
+
+      Self.Build_Robot;
+      Self.Line_Program.Set_Color ([0, 255, 0, 255]);
+      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
+
+      Self.Build_Support;
+      Self.Line_Program.Set_Color ([128, 128, 128, 255]);
+      Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
+
+      Self.Line_Program.Set_Color ([31, 31, 31, 127]);
+      Context.Functions.Draw_Arrays
+        (OpenGL.GL_TRIANGLE_FAN, 0, Self.Line_Elements);
 
       Self.Queue_Draw;
       --  Request redraw of the scene.
