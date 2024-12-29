@@ -192,14 +192,9 @@ package body GUI.Graphics_Views is
 
       use type CGK.Primitives.Points_3D.Point_3D;
 
-      type Point_Array is array (1 .. 4) of CGK.Primitives.Points_3D.Point_3D;
-
       Offset   : constant CGK.Primitives.Vectors_3D.Vector_3D :=
         CGK.Primitives.Vectors_3D.As_Vector_3D
           (0.0, 0.0, Self.Scene.Body_Height);
-      Points   : array (Legs.Leg_Index) of Point_Array;
-      Aux      : CGK.Primitives.Points_3D.Point_3D;
-
       Verteces : GUI.Programs.Lines.Vertex_Data_Array (1 .. 12 + 36);
       Last     : Natural := 0;
 
@@ -226,32 +221,21 @@ package body GUI.Graphics_Views is
       begin
          --  Coxa
 
-         Append (Points (Leg) (1));
-         Append (Points (Leg) (2));
+         Append (Self.Scene.Legs (Leg).Joint_1);
+         Append (Self.Scene.Legs (Leg).Joint_2);
 
          --  Femur
 
-         Append (Points (Leg) (2));
-         Append (Points (Leg) (3));
+         Append (Self.Scene.Legs (Leg).Joint_2);
+         Append (Self.Scene.Legs (Leg).Joint_3);
 
          --  Tibia
 
-         Append (Points (Leg) (3));
-         Append (Points (Leg) (4));
+         Append (Self.Scene.Legs (Leg).Joint_3);
+         Append (Self.Scene.Legs (Leg).Effector);
       end Build_Leg;
 
    begin
-      for J in Legs.Leg_Index loop
-         Legs.Forward_Kinematics
-           (Self     => Legs.Legs (J),
-            Posture  => Self.Scene.Legs_Posture (J),
-            Base     => Aux,
-            Joint_1  => Points (J) (1),
-            Joint_2  => Points (J) (2),
-            Joint_3  => Points (J) (3),
-            Effector => Points (J) (4));
-      end loop;
-
       for J in Legs.Leg_Index loop
          declare
             use type Legs.Leg_Index;
@@ -263,8 +247,8 @@ package body GUI.Graphics_Views is
                  else Legs.Leg_Index'First);
 
          begin
-            Append (Points (Leg_1) (1));
-            Append (Points (Leg_2) (1));
+            Append (Self.Scene.Legs (Leg_1).Joint_1);
+            Append (Self.Scene.Legs (Leg_2).Joint_1);
          end;
       end loop;
 
@@ -460,7 +444,7 @@ package body GUI.Graphics_Views is
          for J in Legs.Leg_Index loop
             declare
                Circle : constant CGK.Primitives.Circles_2D.Circle_2D :=
-                 Self.Scene.Legs_Workspace (J);
+                 Self.Scene.Legs (J).Workspace;
 
             begin
                Circles (Legs.Leg_Index'Pos (J) + 1) :=

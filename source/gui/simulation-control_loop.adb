@@ -9,6 +9,7 @@ pragma Ada_2022;
 with Ada.Real_Time;
 
 with CGK.Primitives.Points_2D;
+with CGK.Primitives.Points_3D;
 with CGK.Primitives.Transformations_2D;
 with CGK.Primitives.Vectors_2D;
 with CGK.Reals.Elementary_Functions;
@@ -75,6 +76,7 @@ package body Simulation.Control_Loop is
 
       Scene     : GUI.Scene_States.Scene_Information;
       Next_Tick : Ada.Real_Time.Time;
+      Aux_Base  : CGK.Primitives.Points_3D.Point_3D;
 
    begin
       Legs.Initialize;
@@ -99,15 +101,25 @@ package body Simulation.Control_Loop is
          Legs.Trajectory_Generator.Tick;
          Legs.Gait_Generator.Tick;
 
-         --  Extract legs position
+         for J in Legs.Leg_Index loop
+            --  Extract legs posture, compute position of joints and end
+            --  effector.
 
-         Scene.Legs_Posture :=
-           [for J in Legs.Leg_Index => Legs.State.Posture (J)];
+            Scene.Legs (J).Posture := Legs.State.Posture (J);
 
-         --  Extract workspace shapes
+            Legs.Forward_Kinematics
+              (Self     => Legs.Legs (J),
+               Posture  => Scene.Legs (J).Posture,
+               Base     => Aux_Base,
+               Joint_1  => Scene.Legs (J).Joint_1,
+               Joint_2  => Scene.Legs (J).Joint_2,
+               Joint_3  => Scene.Legs (J).Joint_3,
+               Effector => Scene.Legs (J).Effector);
 
-         Scene.Legs_Workspace :=
-           [for J in Legs.Leg_Index => Legs.Workspace.Get_Workspace_Shape (J)];
+            --  Extract workspace shapes
+
+            Scene.Legs (J).Workspace := Legs.Workspace.Get_Workspace_Shape (J);
+         end loop;
 
          --  Compute movement
 
