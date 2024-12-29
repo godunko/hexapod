@@ -11,7 +11,7 @@
 with CGK.Reals;
 
 package Legs.Gait_Generator
-  --  with Preelaborate
+  with Preelaborate
 is
 
    procedure Initialize;
