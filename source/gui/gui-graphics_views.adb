@@ -480,7 +480,7 @@ package body GUI.Graphics_Views is
       Self.Line_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
 
       Self.Build_Grid;
-      Self.Line_Program.Set_Color ([0, 0, 255, 255]);
+      Self.Line_Program.Set_Color ([0, 0, 191, 255]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
       Self.Build_Robot;
