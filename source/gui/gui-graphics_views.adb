@@ -70,6 +70,9 @@ package body GUI.Graphics_Views is
 
    procedure Build_Robot (Self : in out Graphics_View_Record'Class);
 
+   procedure Build_Robot_Joints (Self : in out Graphics_View_Record'Class);
+   --  Fill points buffer by coordinates of the joints
+
    function As_GLfloat_Vector_3
      (Item : CGK.Primitives.Points_3D.Point_3D)
       return OpenGL.GLfloat_Vector_3;
@@ -250,6 +253,67 @@ package body GUI.Graphics_Views is
       Buffer.Allocate (Verteces (Verteces'First .. Last));
    end Build_Robot;
 
+   ------------------------
+   -- Build_Robot_Joints --
+   ------------------------
+
+   procedure Build_Robot_Joints (Self : in out Graphics_View_Record'Class) is
+      Offset   : constant CGK.Primitives.Vectors_3D.Vector_3D :=
+        CGK.Primitives.Vectors_3D.As_Vector_3D
+          (0.0, 0.0, Self.Scene.Body_Height);
+      Verteces : GUI.Programs.Points.Vertex_Data_Array (1 .. 18);
+      Last     : Natural := 0;
+
+      procedure Append (Point : CGK.Primitives.Points_3D.Point_3D);
+
+      --  procedure Build_Leg (Leg : Legs.Leg_Index);
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append (Point : CGK.Primitives.Points_3D.Point_3D) is
+      begin
+         Last := @ + 1;
+         Verteces (Last) :=
+           (VP => As_GLfloat_Vector_3 (Point + Offset));
+      end Append;
+
+      --  ---------------
+      --  -- Build_Leg --
+      --  ---------------
+      --
+      --  procedure Build_Leg (Leg : Legs.Leg_Index) is
+      --  begin
+      --     --  Coxa
+      --
+      --     Append (Self.Scene.Legs (Leg).Joint_1);
+      --     Append (Self.Scene.Legs (Leg).Joint_2);
+      --
+      --     --  Femur
+      --
+      --     Append (Self.Scene.Legs (Leg).Joint_2);
+      --     Append (Self.Scene.Legs (Leg).Joint_3);
+      --
+      --     --  Tibia
+      --
+      --     Append (Self.Scene.Legs (Leg).Joint_3);
+      --     Append (Self.Scene.Legs (Leg).Effector);
+      --  end Build_Leg;
+
+   begin
+      for J in Legs.Leg_Index loop
+         Append (Self.Scene.Legs (J).Joint_1);
+         Append (Self.Scene.Legs (J).Joint_2);
+         Append (Self.Scene.Legs (J).Joint_3);
+      end loop;
+
+      --  Self.Line_Elements := OpenGL.GLsizei (Last);
+
+      Self.Point_Buffer.Bind;
+      Self.Point_Buffer.Allocate (Verteces (Verteces'First .. Last));
+   end Build_Robot_Joints;
+
    -------------------
    -- Build_Support --
    -------------------
@@ -393,6 +457,20 @@ package body GUI.Graphics_Views is
       Self.Circle_Program.Initialize;
       Self.Circle_Program.Bind;
       Self.Circle_Program.Set_Vertex_Data_Buffer (Self.Circle_Buffer.all);
+
+      epoxy_gl_generated_h.glGenVertexArrays (1, Self.Point_VAO'Access);
+      epoxy_gl_generated_h.glBindVertexArray (Self.Point_VAO);
+
+      Self.Point_Buffer :=
+        new GUI.Programs.Points.Vertex_Data_Buffers.OpenGL_Buffer
+              (OpenGL.Vertex);
+      Self.Point_Buffer.Create;
+      Self.Point_Buffer.Bind;
+
+      Self.Point_Program := new GUI.Programs.Points.Point_Program;
+      Self.Point_Program.Initialize;
+      Self.Point_Program.Bind;
+      Self.Point_Program.Set_Vertex_Data_Buffer (Self.Point_Buffer.all);
    end On_Realize;
 
    ---------------
@@ -428,6 +506,7 @@ package body GUI.Graphics_Views is
       Context.Functions.Enable (OpenGL.GL_BLEND);
       Context.Functions.Blend_Func
         (OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
+      Context.Functions.Enable (OpenGL.GL_PROGRAM_POINT_SIZE);
 
       Context.Functions.Clear
         (OpenGL.GL_DEPTH_BUFFER_BIT + OpenGL.GL_COLOR_BUFFER_BIT);
@@ -472,7 +551,7 @@ package body GUI.Graphics_Views is
       Self.Circle_Program.Set_Color ([63, 0, 0]);
       Context.Functions.Draw_Arrays (OpenGL.GL_POINTS, 0, 6);
 
-      --  Draw ground grid and robot
+      --  Draw ground grid
 
       epoxy_gl_generated_h.glBindVertexArray (Self.Line_VAO);
 
@@ -483,9 +562,27 @@ package body GUI.Graphics_Views is
       Self.Line_Program.Set_Color ([0, 0, 191, 255]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
 
+      --  Draw robot body
+
       Self.Build_Robot;
       Self.Line_Program.Set_Color ([0, 255, 0, 255]);
       Context.Functions.Draw_Arrays (OpenGL.GL_LINES, 0, Self.Line_Elements);
+
+      epoxy_gl_generated_h.glBindVertexArray (Self.Point_VAO);
+
+      Self.Point_Program.Bind;
+      Self.Point_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
+
+      Self.Build_Robot_Joints;
+      Self.Point_Program.Set_Color ([0, 255, 0]);
+      Context.Functions.Draw_Arrays (OpenGL.GL_POINTS, 0, 18);
+
+      --  Draw support polygon
+
+      epoxy_gl_generated_h.glBindVertexArray (Self.Line_VAO);
+
+      Self.Line_Program.Bind;
+      Self.Line_Program.Set_MVP (Self.Viewport_Matrix * View_Matrix);
 
       Self.Build_Support;
       Self.Line_Program.Set_Color ([128, 128, 128, 255]);
