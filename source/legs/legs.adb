@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -27,7 +27,7 @@ package body Legs is
    end record;
 
    procedure Initialize
-     (Self      : out Leg_Information;
+     (Self      : out Leg_Kinematics_Parameters;
       Side      : Leg_Side;
       Base      : Leg_Base_Parameters;
       Segment_1 : Leg_Segment_Parameters;
@@ -39,7 +39,7 @@ package body Legs is
    ------------------------
 
    procedure Forward_Kinematics
-     (Self     : Leg_Information;
+     (Self     : Leg_Kinematics_Parameters;
       Posture  : Kinematics.Posture;
       Base     : out CGK.Primitives.Points_3D.Point_3D;
       Joint_1  : out CGK.Primitives.Points_3D.Point_3D;
@@ -99,7 +99,7 @@ package body Legs is
    ----------------
 
    procedure Initialize
-     (Self      : out Leg_Information;
+     (Self      : out Leg_Kinematics_Parameters;
       Side      : Leg_Side;
       Base      : Leg_Base_Parameters;
       Segment_1 : Leg_Segment_Parameters;
@@ -267,7 +267,7 @@ package body Legs is
    ------------------------
 
    procedure Inverse_Kinematics
-     (Self             : Leg_Information;
+     (Self             : Leg_Kinematics_Parameters;
       Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean) is

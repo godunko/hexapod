@@ -1,12 +1,10 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 pragma Restrictions (No_Elaboration_Code);
-
-with CGK.Reals;
 
 package body Legs.Workspace is
 
@@ -23,7 +21,7 @@ package body Legs.Workspace is
    Workspaces : array (Leg_Index) of Workspace;
 
    procedure Compute_Workspace
-     (Leg         : Leg_Information;
+     (Leg         : Leg_Kinematics_Parameters;
       Self        : in out Workspace;
       Body_Height : Reals.Real);
 
@@ -43,7 +41,7 @@ package body Legs.Workspace is
    -----------------------
 
    procedure Compute_Workspace
-     (Leg         : Leg_Information;
+     (Leg         : Leg_Kinematics_Parameters;
       Self        : in out Workspace;
       Body_Height : Reals.Real)
    is

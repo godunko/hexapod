@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -18,7 +18,7 @@ is
 
    type Leg_Side is (Left, Right);
 
-   type Leg_Information is record
+   type Leg_Kinematics_Parameters is record
       Side        : Leg_Side;
 
       X_0         : Reals.Real;
@@ -41,10 +41,9 @@ is
       R_3         : Reals.Real;
       α_3         : Reals.Real;
 
-      --  Workspace   : Legs.Workspace;
-
       T_B_1       : CGK.Primitives.Transformations_3D.Transformation_3D;
    end record;
+   --  Kinematics parameters of the leg.
 
    type Leg_Index is
      (Right_Front, Right_Middle, Right_Hind,
@@ -54,18 +53,18 @@ is
    --  Legs are listed in counter-clockwise order to avoid use of the mapping
    --  by the free gait generator.
 
-   Legs : array (Leg_Index) of Leg_Information;
+   Legs : array (Leg_Index) of Leg_Kinematics_Parameters;
 
    procedure Initialize;
 
    procedure Inverse_Kinematics
-     (Self             : Leg_Information;
+     (Self             : Leg_Kinematics_Parameters;
       Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean);
 
    procedure Forward_Kinematics
-     (Self     : Leg_Information;
+     (Self     : Leg_Kinematics_Parameters;
       Posture  : Kinematics.Posture;
       Base     : out CGK.Primitives.Points_3D.Point_3D;
       Joint_1  : out CGK.Primitives.Points_3D.Point_3D;
