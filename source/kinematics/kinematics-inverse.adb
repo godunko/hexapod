@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -46,17 +46,17 @@ package body Kinematics.Inverse is
       Result  : out Jacobian_Matrix)
    is
       Cos_Theta_1 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Posture.Theta.M_1);
+        Reals.Elementary_Functions.Cos (Posture.Theta (0));
       Sin_Theta_1 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Posture.Theta.M_1);
+        Reals.Elementary_Functions.Sin (Posture.Theta (0));
       Cos_Theta_2 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Posture.Theta.M_2);
+        Reals.Elementary_Functions.Cos (Posture.Theta (1));
       Sin_Theta_2 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Posture.Theta.M_2);
+        Reals.Elementary_Functions.Sin (Posture.Theta (1));
       Cos_Theta_3 : constant Reals.Real :=
-        Reals.Elementary_Functions.Cos (Posture.Theta.M_3);
+        Reals.Elementary_Functions.Cos (Posture.Theta (2));
       Sin_Theta_3 : constant Reals.Real :=
-        Reals.Elementary_Functions.Sin (Posture.Theta.M_3);
+        Reals.Elementary_Functions.Sin (Posture.Theta (2));
 
    begin
       Compute_Jv_Matrix

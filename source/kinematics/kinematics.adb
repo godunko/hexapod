@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -14,13 +14,13 @@ package body Kinematics is
 
    procedure Set
      (Self : out Position;
-      X    : Reals.Real;
-      Y    : Reals.Real;
-      Z    : Reals.Real) is
+      X    : CGK.Reals.Real;
+      Y    : CGK.Reals.Real;
+      Z    : CGK.Reals.Real) is
    begin
-      Self.Value.M_1 := X;
-      Self.Value.M_2 := Y;
-      Self.Value.M_3 := Z;
+      Self.Value (0) := X;
+      Self.Value (1) := Y;
+      Self.Value (2) := Z;
    end Set;
 
    ---------
@@ -29,13 +29,13 @@ package body Kinematics is
 
    procedure Set
      (Self    : out Posture;
-      Theta_1 : Reals.Real;
-      Theta_2 : Reals.Real;
-      Theta_3 : Reals.Real) is
+      Theta_1 : CGK.Reals.Real;
+      Theta_2 : CGK.Reals.Real;
+      Theta_3 : CGK.Reals.Real) is
    begin
-      Self.Theta.M_1 := Theta_1;
-      Self.Theta.M_2 := Theta_2;
-      Self.Theta.M_3 := Theta_3;
+      Self.Theta (0) := Theta_1;
+      Self.Theta (1) := Theta_2;
+      Self.Theta (2) := Theta_3;
    end Set;
 
 end Kinematics;
