@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2019-2024, Vadim Godunko
+--  Copyright (C) 2019-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -35,17 +35,17 @@ package body Hexapod.Movement is
    use type CGK.Reals.Real;
 
    LF_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Left_Front);
+     renames Legs.State.Legs (Legs.Left_Front).Configuration.Posture;
    LM_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Left_Middle);
+     renames Legs.State.Legs (Legs.Left_Middle).Configuration.Posture;
    LH_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Left_Hind);
+     renames Legs.State.Legs (Legs.Left_Hind).Configuration.Posture;
    RF_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Right_Front);
+     renames Legs.State.Legs (Legs.Right_Front).Configuration.Posture;
    RM_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Right_Middle);
+     renames Legs.State.Legs (Legs.Right_Middle).Configuration.Posture;
    RH_Posture  : Kinematics.Posture
-     renames Legs.State.Posture (Legs.Right_Hind);
+     renames Legs.State.Legs (Legs.Right_Hind).Configuration.Posture;
 
    TCB : aliased A0B.Tasking.Task_Control_Block;
 
@@ -242,7 +242,7 @@ package body Hexapod.Movement is
 
    procedure Initialize is
    begin
-      Legs.Initialize;
+      Legs.State.Initialize;
       Legs.Workspace.Compute (Body_Height);
       Legs.Trajectory.Initialize;
       Legs.Trajectory_Generator.Initialize;

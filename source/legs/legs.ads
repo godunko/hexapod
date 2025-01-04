@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
---  pragma Restrictions (No_Elaboration_Code);
+pragma Restrictions (No_Elaboration_Code);
 
 with CGK.Primitives.Points_3D;
 with CGK.Primitives.Transformations_3D;
@@ -45,6 +45,20 @@ is
    end record;
    --  Kinematics parameters of the leg.
 
+   type Leg_Configuration is record
+      Posture  : Kinematics.Posture;
+      Position : Kinematics.Position;
+   end record;
+
+   type Leg
+     --  (Kinematics_Parameters :
+     --     not null access constant Leg_Kinematics_Parameters;
+     --   Configuration         : not null access Leg_Configuration)
+   is record
+      Kinematics_Parameters : Leg_Kinematics_Parameters;
+      Configuration         : Leg_Configuration;
+   end record;
+
    type Leg_Index is
      (Right_Front, Right_Middle, Right_Hind,
       Left_Hind, Left_Middle, Left_Front);
@@ -52,10 +66,6 @@ is
    --
    --  Legs are listed in counter-clockwise order to avoid use of the mapping
    --  by the free gait generator.
-
-   Legs : array (Leg_Index) of Leg_Kinematics_Parameters;
-
-   procedure Initialize;
 
    procedure Inverse_Kinematics
      (Self             : Leg_Kinematics_Parameters;

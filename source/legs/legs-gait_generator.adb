@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -23,7 +23,6 @@ package body Legs.Gait_Generator is
    use CGK.Primitives.Circles_2D;
    use CGK.Primitives.Points_2D;
    use CGK.Reals;
-   use Standard.Legs.State;
 
    Swing_Ticks            : constant := 50;
    --  Parameters of the control loop.
@@ -78,7 +77,8 @@ package body Legs.Gait_Generator is
    is
       Current       : constant Point_2D :=
         Create_Point_2D
-          (Kinematics.X (Position (Leg)), Kinematics.Y (Position (Leg)));
+          (Kinematics.X (Legs.State.Legs (Leg).Configuration.Position),
+           Kinematics.Y (Legs.State.Legs (Leg).Configuration.Position));
       Workspace     : constant Circle_2D :=
         Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
       Shape         : constant Circle_2D :=
@@ -381,7 +381,9 @@ package body Legs.Gait_Generator is
                          (Velocity (Velocity_Bank).Trajectory, Leg);
 
                   begin
-                     if Is_Identical (AEP, Position (Leg)) then
+                     if Is_Identical
+                          (AEP, Legs.State.Legs (Leg).Configuration.Position)
+                     then
                         --  Don't switch to swing when position is close to AEP
 
                         Compute_Linear (Leg);

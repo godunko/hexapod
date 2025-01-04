@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -85,7 +85,7 @@ package body Simulation.Control_Loop is
          select
             accept Start;
 
-            Legs.Initialize;
+            Legs.State.Initialize;
             Legs.Workspace.Compute (Scene.Body_Height);
             Legs.Trajectory.Initialize;
             Legs.Trajectory_Generator.Initialize;
@@ -125,10 +125,11 @@ package body Simulation.Control_Loop is
                --  Extract legs posture, compute position of joints and end
                --  effector.
 
-               Scene.Legs (J).Posture := Legs.State.Posture (J);
+               Scene.Legs (J).Posture :=
+                 Legs.State.Legs (J).Configuration.Posture;
 
                Legs.Forward_Kinematics
-                 (Self     => Legs.Legs (J),
+                 (Self     => Legs.State.Legs (J).Kinematics_Parameters,
                   Posture  => Scene.Legs (J).Posture,
                   Base     => Aux_Base,
                   Joint_1  => Scene.Legs (J).Joint_1,

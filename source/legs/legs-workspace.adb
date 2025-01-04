@@ -6,6 +6,8 @@
 
 pragma Restrictions (No_Elaboration_Code);
 
+with Legs.State;
+
 package body Legs.Workspace is
 
    use type CGK.Reals.Real;
@@ -32,7 +34,10 @@ package body Legs.Workspace is
    procedure Compute (Body_Height : Reals.Real) is
    begin
       for J in Leg_Index loop
-         Compute_Workspace (Legs (J), Workspaces (J), Body_Height);
+         Compute_Workspace
+           (State.Legs (J).Kinematics_Parameters,
+            Workspaces (J),
+            Body_Height);
       end loop;
    end Compute;
 

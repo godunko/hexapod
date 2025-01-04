@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -16,7 +16,6 @@ with Legs.Workspace;
 
 package body Legs.Trajectory_Generator is
 
-   use Standard.Legs.State;
    use Standard.Legs.Trajectory;
    use CGK.Reals;
 
@@ -93,7 +92,6 @@ package body Legs.Trajectory_Generator is
          X := CGK.Primitives.Points_2D.X (Point);
          Y := CGK.Primitives.Points_2D.Y (Point);
 
-
       else
          --  Swing of the leg
 
@@ -149,12 +147,13 @@ package body Legs.Trajectory_Generator is
       for Leg in Leg_Index loop
          State (Leg) := (Kind => Linear);
 
-         Standard.Legs.Workspace.Ground_Center (Leg, Position (Leg));
+         Standard.Legs.Workspace.Ground_Center
+           (Leg, Legs.State.Legs (Leg).Configuration.Position);
 
          Standard.Legs.Inverse_Kinematics
-           (Self             => Legs (Leg),
-            Desired_Position => Position (Leg),
-            Found_Posture    => Posture (Leg),
+           (Self             => Legs.State.Legs (Leg).Kinematics_Parameters,
+            Desired_Position => Legs.State.Legs (Leg).Configuration.Position,
+            Found_Posture    => Legs.State.Legs (Leg).Configuration.Posture,
             Success          => Success);
 
          if not Success then
@@ -184,11 +183,11 @@ package body Legs.Trajectory_Generator is
    begin
       State (Leg) :=
         (Kind   => Swing,
-         PEP_X  => Kinematics.X (Position (Leg)),
-         PEP_Y  => Kinematics.Y (Position (Leg)),
+         PEP_X  => Kinematics.X (Legs.State.Legs (Leg).Configuration.Position),
+         PEP_Y  => Kinematics.Y (Legs.State.Legs (Leg).Configuration.Position),
          AEP_X  => AEP_X,
          AEP_Y  => AEP_Y,
-         Base_Z => Kinematics.Z (Position (Leg)),
+         Base_Z => Kinematics.Z (Legs.State.Legs (Leg).Configuration.Position),
          Height => Height,
          Fase   => 0.0,
          D_Fase => 1.0 / 50.0);  --  XXX Must be configurable!
@@ -198,9 +197,7 @@ package body Legs.Trajectory_Generator is
    -- Tick --
    ----------
 
-   procedure Tick
-     --  (Trajectory : Standard.Legs.Trajectory.Trajectory_Information)
-   is
+   procedure Tick is
       X, Y, Z : Real;
       Success : Boolean;
 
@@ -212,18 +209,19 @@ package body Legs.Trajectory_Generator is
             State (Leg).Fase := Real'Min (@ + State (Leg).D_Fase, 1.0);
          end if;
 
-         X := Kinematics.X (Position (Leg));
-         Y := Kinematics.Y (Position (Leg));
-         Z := Kinematics.Z (Position (Leg));
+         X := Kinematics.X (Legs.State.Legs (Leg).Configuration.Position);
+         Y := Kinematics.Y (Legs.State.Legs (Leg).Configuration.Position);
+         Z := Kinematics.Z (Legs.State.Legs (Leg).Configuration.Position);
 
          Position_XYZ (State (Leg), Trajectory.all, 1.0, X, Y, Z);
 
-         Kinematics.Set (Position (Leg), X, Y, Z);
+         Kinematics.Set
+           (Legs.State.Legs (Leg).Configuration.Position, X, Y, Z);
 
          Standard.Legs.Inverse_Kinematics
-           (Self             => Legs (Leg),
-            Desired_Position => Position (Leg),
-            Found_Posture    => Posture (Leg),
+           (Self             => Legs.State.Legs (Leg).Kinematics_Parameters,
+            Desired_Position => Legs.State.Legs (Leg).Configuration.Position,
+            Found_Posture    => Legs.State.Legs (Leg).Configuration.Posture,
             Success          => Success);
 
          if not Success then
