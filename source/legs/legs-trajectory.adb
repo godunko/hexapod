@@ -784,8 +784,8 @@ package body Legs.Trajectory is
 
             Set_Rotation_Z (Self.Tick_Transformation_3, Angle);
 
-            Offset := Transform (Self.Tick_Transformation_3, As_XYZ (-Point));
-            Offset := @ + As_XYZ (Point);
+            Offset := Transform (Self.Tick_Transformation_3, As_XYZ (Point));
+            Offset := @ - As_XYZ (Point);
             Translate (Self.Tick_Transformation_3, Offset);
          end;
 
