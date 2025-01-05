@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -25,7 +25,8 @@ project GUI is
 
    package Compiler is
       for Default_Switches ("Ada")
-        use Hexapod_Simulation_Telemetry_Config.Ada_Compiler_Switches;
+        use Hexapod_Simulation_Telemetry_Config.Ada_Compiler_Switches
+              & ("-gnaty-B");  --  check no use of AND/OR for boolean expressions
    end Compiler;
 
    package Binder is
