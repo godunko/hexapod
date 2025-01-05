@@ -8,14 +8,15 @@ pragma Ada_2022;
 --  pragma Restrictions (No_Elaboration_Code);
 
 --  with Ada.Numerics;
---  with Ada.Text_IO; use Ada.Text_IO;
 
+with CGK.Mathematics.Vectors_3;
 with CGK.Primitives.Analytical_Intersections_2D;
 with CGK.Primitives.Directions_2D.Builders;
 with CGK.Primitives.Lines_2D;
 with CGK.Primitives.Points_2D.Containers;
 with CGK.Primitives.Vectors_2D;
 with CGK.Primitives.XYs;
+with CGK.Primitives.XYZs;
 with CGK.Reals.Elementary_Functions;
 
 with Debug.Log;
@@ -24,21 +25,19 @@ with Legs.Workspace;
 
 package body Legs.Trajectory is
 
-   --  use Ada.Numerics;
    use CGK.Primitives.Analytical_Intersections_2D;
    use CGK.Primitives.Circles_2D;
-   use CGK.Primitives.Directions_2D;
    use CGK.Primitives.Directions_2D.Builders;
    use CGK.Primitives.Lines_2D;
    use CGK.Primitives.Points_2D;
    use CGK.Primitives.Transformations_2D;
    use CGK.Primitives.Vectors_2D;
-   --  use CGK.Reals.Elementary_Functions;
-   use CGK.Reals;
 
    use type CGK.Primitives.Points_2D.Containers.Point_2D_Array_Count;
 
-   function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean;
+   function Is_Forward
+     (Path  : CGK.Primitives.Lines_2D.Line_2D;
+      Point : CGK.Primitives.Points_2D.Point_2D) return Boolean;
 
    --  package Real_IO is new Ada.Text_IO.Float_IO (CGK.Reals.Real);
 
@@ -255,6 +254,17 @@ package body Legs.Trajectory is
       return Self.Leg_Information (Leg).AEP;
    end Anterior_Extreme_Position;
 
+   --------------------------------------
+   -- Get_Bodypath_Tick_Transformation --
+   --------------------------------------
+
+   function Get_Bodypath_Tick_Transformation
+     (Self : Trajectory_Information)
+      return CGK.Primitives.Transformations_3D.Transformation_3D is
+   begin
+      return Self.Tick_Transformation_3;
+   end Get_Bodypath_Tick_Transformation;
+
    ----------------
    -- Initialize --
    ----------------
@@ -333,8 +343,12 @@ package body Legs.Trajectory is
    -- Is_Forward --
    ----------------
 
-   function Is_Forward (Path : Line_2D; Point : Point_2D) return Boolean is
+   function Is_Forward
+     (Path  : CGK.Primitives.Lines_2D.Line_2D;
+      Point : CGK.Primitives.Points_2D.Point_2D) return Boolean
+   is
       use type CGK.Primitives.XYs.XY;
+      use CGK.Primitives.Directions_2D;
 
       C : CGK.Primitives.XYs.XY := XY (Point) - XY (Location (Path));
 
@@ -351,7 +365,6 @@ package body Legs.Trajectory is
       Workspace : CGK.Primitives.Circles_2D.Circle_2D;
       Position  : CGK.Primitives.Points_2D.Point_2D) return Natural
    is
-      use CGK.Primitives.Vectors_2D;
       use CGK.Reals;
 
       Path          : Line_2D;
@@ -576,7 +589,10 @@ package body Legs.Trajectory is
       Velocity_Y : CGK.Reals.Real;
       Velocity_W : CGK.Reals.Real)
    is
+      use type CGK.Mathematics.Vectors_3.Vector_3;
       use type CGK.Primitives.XYs.XY;
+      use CGK.Primitives.Transformations_3D;
+      use CGK.Reals;
 
       function Normalize_Linear_Velocity return Vector_2D;
 
@@ -587,8 +603,8 @@ package body Legs.Trajectory is
       function Normalize_Linear_Velocity return Vector_2D is
          Result : Vector_2D     :=
            Create_Vector_2D (X => Velocity_X, Y => Velocity_Y);
-         Length : constant Real := Magnitude (Result);
-         Scale  : Real;
+         Length : constant CGK.Reals.Real := Magnitude (Result);
+         Scale  : CGK.Reals.Real;
 
       begin
          if Velocity_X = 0.0 and Velocity_Y = 0.0 then
@@ -607,7 +623,7 @@ package body Legs.Trajectory is
       end Normalize_Linear_Velocity;
 
       Linear_Velocity        : constant Vector_2D := Normalize_Linear_Velocity;
-      Linear_Speed           : constant Real      :=
+      Linear_Speed           : constant Real :=
         Magnitude (Linear_Velocity);
 
       --  Linear_Velocity_Normal : Vector_2D          := -Normal (Linear_Velocity);
@@ -655,6 +671,7 @@ package body Legs.Trajectory is
            and Y (Absolute_Linear_Velocity) = 0.0
          then
             Set_Identity (Self.Tick_Transformation);
+            Set_Identity (Self.Tick_Transformation_3);
 
             for Leg in Leg_Index loop
                Self.Leg_Information (Leg).AEP :=
@@ -666,6 +683,14 @@ package body Legs.Trajectory is
               (Self.Tick_Transformation,
                -CGK.Primitives.Vectors_2D.XY (Absolute_Linear_Velocity)
                  * Hexapod.Parameters.Control_Cycle.Tick_Duration);
+            Set_Translation
+              (Self.Tick_Transformation_3,
+               CGK.Primitives.XYZs.As_XYZ
+                 (-CGK.Mathematics.Vectors_3.Vector_3'
+                      (0 => X (Absolute_Linear_Velocity),
+                       1 => Y (Absolute_Linear_Velocity),
+                       2 => 0.0)
+                  * Hexapod.Parameters.Control_Cycle.Tick_Duration));
 
             for Leg in Leg_Index loop
                declare
@@ -734,11 +759,35 @@ package body Legs.Trajectory is
          --  Put_Length_Image (-Absolute_Angular_Velocity
          --                    * Hexapod.Parameters.Control_Cycle.Tick_Duration);
 
-         Set_Rotation
-           (Self.Tick_Transformation,
-            Self.Trajectory_Center,
-            -Self.Angular_Velocity
-               * Hexapod.Parameters.Control_Cycle.Tick_Duration);
+         declare
+            use CGK.Primitives.XYZs;
+
+            Angle  : constant Real :=
+              -Self.Angular_Velocity
+                * Hexapod.Parameters.Control_Cycle.Tick_Duration;
+            Point  : constant CGK.Mathematics.Vectors_3.Vector_3 :=
+              -CGK.Mathematics.Vectors_3.Vector_3'
+                 (0 => X (Self.Trajectory_Center),
+                  1 => Y (Self.Trajectory_Center),
+                  2 => 0.0);
+            Offset : CGK.Primitives.XYZs.XYZ;
+
+         begin
+            --  2D rotation
+
+            Set_Rotation
+              (Self.Tick_Transformation,
+               Self.Trajectory_Center,
+               Angle);
+
+            --  3D rotation
+
+            Set_Rotation_Z (Self.Tick_Transformation_3, Angle);
+
+            Offset := Transform (Self.Tick_Transformation_3, As_XYZ (-Point));
+            Offset := @ + As_XYZ (Point);
+            Translate (Self.Tick_Transformation_3, Offset);
+         end;
 
       --  Put_Length_Image (Absolute_Angular_Velocity);
 

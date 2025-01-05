@@ -9,11 +9,8 @@ pragma Ada_2022;
 with Ada.Exceptions;
 with Ada.Real_Time;
 
-with CGK.Primitives.Points_2D;
 with CGK.Primitives.Points_3D;
-with CGK.Primitives.Transformations_2D;
-with CGK.Primitives.Vectors_2D;
-with CGK.Reals.Elementary_Functions;
+with CGK.Reals;
 
 with Debug.Log;
 with Hexapod.Parameters.Control_Cycle;
@@ -149,54 +146,26 @@ package body Simulation.Control_Loop is
 
             --  Compute movement
 
-            declare
-               P0              : CGK.Primitives.Points_2D.Point_2D :=
-                 CGK.Primitives.Points_2D.Create_Point_2D (X => 0.0, Y => 0.0);
-               P1              : CGK.Primitives.Points_2D.Point_2D :=
-                 CGK.Primitives.Points_2D.Create_Point_2D (X => 1.0, Y => 0.0);
-               V               : CGK.Primitives.Vectors_2D.Vector_2D;
-               Transformation  :
-               CGK.Primitives.Transformations_2D.Transformation_2D;
+            Legs.Trajectory_Generator.Accumulated_Transformation
+              (X => Scene.Ground_Offset_X,
+               Y => Scene.Ground_Offset_Y,
+               W => Scene.Ground_Rotate_Z);
 
-            begin
-               --  Compute rotation vector
+            --  Climb coordinates offset
 
-               Legs.Trajectory.Transform
-                 (Legs.Trajectory_Generator.Trajectory.all, P0);
-               Legs.Trajectory.Transform
-                 (Legs.Trajectory_Generator.Trajectory.all, P1);
+            if Scene.Ground_Offset_X < -0.1 then
+               Scene.Ground_Offset_X := @ + 0.1;
 
-               V := CGK.Primitives.Vectors_2D.Create_Vector_2D (P0, P1);
+            elsif Scene.Ground_Offset_X > 0.1 then
+               Scene.Ground_Offset_X := @ - 0.1;
+            end if;
 
-               Scene.Ground_Rotate_Z :=
-                 @ + CGK.Reals.Elementary_Functions.Arctan
-                 (X => CGK.Primitives.Vectors_2D.X (V),
-                  Y => CGK.Primitives.Vectors_2D.Y (V));
+            if Scene.Ground_Offset_Y < -0.1 then
+               Scene.Ground_Offset_Y := @ + 0.1;
 
-               --  Compute coordinates offset
-
-               CGK.Primitives.Transformations_2D.Set_Identity (Transformation);
-               CGK.Primitives.Transformations_2D.Rotate
-                 (Transformation, -Scene.Ground_Rotate_Z);
-               CGK.Primitives.Points_2D.Transform (P0, Transformation);
-
-               Scene.Ground_Offset_X := @ + CGK.Primitives.Points_2D.X (P0);
-               Scene.Ground_Offset_Y := @ + CGK.Primitives.Points_2D.Y (P0);
-
-               if Scene.Ground_Offset_X < -0.1 then
-                  Scene.Ground_Offset_X := @ + 0.1;
-
-               elsif Scene.Ground_Offset_X > 0.1 then
-                  Scene.Ground_Offset_X := @ - 0.1;
-               end if;
-
-               if Scene.Ground_Offset_Y < -0.1 then
-                  Scene.Ground_Offset_Y := @ + 0.1;
-
-               elsif Scene.Ground_Offset_Y > 0.1 then
-                  Scene.Ground_Offset_Y := @ - 0.1;
-               end if;
-            end;
+            elsif Scene.Ground_Offset_Y > 0.1 then
+               Scene.Ground_Offset_Y := @ - 0.1;
+            end if;
 
             Simulation.Control_Loop.Scene.Set (Scene);
             Next_Tick :=

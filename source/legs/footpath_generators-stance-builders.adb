@@ -11,10 +11,13 @@ package body Footpath_Generators.Stance.Builders is
    -----------
 
    procedure Build
-     (Self : in out Stance_Footpath_Generator_Builder;
-      Leg  : not null access Legs.Leg) is
+     (Self     : in out Stance_Footpath_Generator_Builder;
+      Leg      : not null access Legs.Leg;
+      Bodypath :
+        not null access Bodypath_Generators.Abstract_Bodypath_Generator'Class)
+   is
    begin
-      Self.Value := (Leg => Leg);
+      Self.Value := (Leg => Leg, Bodypath => Bodypath);
       Self.Valid := True;
    end Build;
 

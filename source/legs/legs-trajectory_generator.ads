@@ -8,15 +8,12 @@
 
 --  pragma Restrictions (No_Elaboration_Code);
 
+with CGK.Primitives.Transformations_3D;
 with CGK.Reals;
-
-with Legs.Trajectory;
 
 package Legs.Trajectory_Generator
   with Preelaborate
 is
-
-   Trajectory : access Standard.Legs.Trajectory.Trajectory_Information;
 
    procedure Initialize;
 
@@ -32,5 +29,15 @@ is
       AEP_Y  : CGK.Reals.Real;
       Height : CGK.Reals.Real);
    --  Sets leg's trajectory to swing info AEP
+
+   procedure Set_Bodypath
+     (Transformation : CGK.Primitives.Transformations_3D.Transformation_3D);
+   --  Sets transformation
+
+   procedure Accumulated_Transformation
+     (X : in out CGK.Reals.Real;
+      Y : in out CGK.Reals.Real;
+      W : in out CGK.Reals.Real);
+   --  Update accumulated transformation for GUI
 
 end Legs.Trajectory_Generator;

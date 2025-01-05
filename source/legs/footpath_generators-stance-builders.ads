@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with Bodypath_Generators;
+
 package Footpath_Generators.Stance.Builders
   with Preelaborate
 is
@@ -11,8 +13,10 @@ is
    type Stance_Footpath_Generator_Builder is limited private;
 
    procedure Build
-     (Self : in out Stance_Footpath_Generator_Builder;
-      Leg  : not null access Legs.Leg);
+     (Self     : in out Stance_Footpath_Generator_Builder;
+      Leg      : not null access Legs.Leg;
+      Bodypath :
+        not null access Bodypath_Generators.Abstract_Bodypath_Generator'Class);
 
    function Value
      (Self : Stance_Footpath_Generator_Builder)

@@ -7,6 +7,10 @@
 pragma Ada_2022;
 --  pragma Restrictions (No_Elaboration_Code);
 
+with CGK.Primitives.Vectors_3D;
+with CGK.Reals.Elementary_Functions;
+
+with Bodypath_Generators.Constant_Velocity.Builders;
 with Footpath_Generators.Stance.Builders;
 with Footpath_Generators.Swing.Builders;
 with Legs.State;
@@ -20,7 +24,51 @@ package body Legs.Trajectory_Generator is
       Swing  : aliased Footpath_Generators.Swing.Swing_Footpath_Generator;
    end record;
 
-   State : array (Leg_Index) of Trajectory_State;
+   State    : array (Leg_Index) of Trajectory_State;
+   Bodypath : aliased
+     Bodypath_Generators.Constant_Velocity
+       .Constant_Velocity_Bodypath_Generator;
+
+   --------------------------------
+   -- Accumulated_Transformation --
+   --------------------------------
+
+   procedure Accumulated_Transformation
+     (X : in out CGK.Reals.Real;
+      Y : in out CGK.Reals.Real;
+      W : in out CGK.Reals.Real)
+   is
+      use type CGK.Reals.Real;
+
+      P0              : CGK.Primitives.Points_3D.Point_3D :=
+        CGK.Primitives.Points_3D.As_Point_3D (X => 0.0, Y => 0.0, Z => 0.0);
+      P1              : CGK.Primitives.Points_3D.Point_3D :=
+        CGK.Primitives.Points_3D.As_Point_3D (X => 1.0, Y => 0.0, Z => 0.0);
+      V               : CGK.Primitives.Vectors_3D.Vector_3D;
+      Transformation  : CGK.Primitives.Transformations_3D.Transformation_3D;
+
+   begin
+      --  Compute rotation vector
+
+      Bodypath_Generators.Constant_Velocity.Transform (Bodypath, P0);
+      Bodypath_Generators.Constant_Velocity.Transform (Bodypath, P1);
+
+      V := CGK.Primitives.Vectors_3D.Create_Vector_3D (P0, P1);
+
+      W :=
+        @ + CGK.Reals.Elementary_Functions.Arctan
+              (X => CGK.Primitives.Vectors_3D.X (V),
+               Y => CGK.Primitives.Vectors_3D.Y (V));
+
+      --  Compute coordinates offset
+
+      --  CGK.Primitives.Transformations_2D.Set_Identity (Transformation);
+      CGK.Primitives.Transformations_3D.Set_Rotation_Z (Transformation, -W);
+      CGK.Primitives.Points_3D.Transform (P0, Transformation);
+
+      X := @ + CGK.Primitives.Points_3D.X (P0);
+      Y := @ + CGK.Primitives.Points_3D.Y (P0);
+   end Accumulated_Transformation;
 
    ----------------
    -- Initialize --
@@ -48,6 +96,25 @@ package body Legs.Trajectory_Generator is
       end loop;
    end Initialize;
 
+   ------------------
+   -- Set_Bodypath --
+   ------------------
+
+   procedure Set_Bodypath
+     (Transformation : CGK.Primitives.Transformations_3D.Transformation_3D)
+   is
+      Builder : Bodypath_Generators.Constant_Velocity.Builders
+                  .Constant_Velocity_Bodypath_Generator_Builder;
+
+   begin
+      Bodypath_Generators.Constant_Velocity.Builders.Build
+        (Self           => Builder,
+         Transformation => Transformation);
+
+      Bodypath :=
+        Bodypath_Generators.Constant_Velocity.Builders.Generator (Builder);
+   end Set_Bodypath;
+
    ----------------
    -- Set_Stance --
    ----------------
@@ -58,8 +125,9 @@ package body Legs.Trajectory_Generator is
 
    begin
       Footpath_Generators.Stance.Builders.Build
-        (Self => Builder,
-         Leg  => Legs.State.Legs (Leg)'Access);
+        (Self     => Builder,
+         Leg      => Legs.State.Legs (Leg)'Access,
+         Bodypath => Bodypath'Access);
 
       State (Leg).Stance :=
         Footpath_Generators.Stance.Builders.Value (Builder);

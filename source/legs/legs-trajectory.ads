@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -11,6 +11,7 @@
 with CGK.Primitives.Circles_2D;
 with CGK.Primitives.Points_2D;
 private with CGK.Primitives.Transformations_2D;
+with CGK.Primitives.Transformations_3D;
 with CGK.Reals;
 
 package Legs.Trajectory
@@ -69,6 +70,10 @@ is
          and Velocity_W in -1.0 .. 1.0;
    --  Compute trajectory by relative velocity.
 
+   function Get_Bodypath_Tick_Transformation
+     (Self : Trajectory_Information)
+      return CGK.Primitives.Transformations_3D.Transformation_3D;
+
 private
 
    type Leg_Trajectory_Information is record
@@ -79,15 +84,17 @@ private
      array (Leg_Index) of Leg_Trajectory_Information;
 
    type Trajectory_Information is record
-      Angular_Velocity    : CGK.Reals.Real;
+      Angular_Velocity      : CGK.Reals.Real;
       --  Absolute value of the angular velocity.
 
-      Trajectory_Center   : CGK.Primitives.Points_2D.Point_2D;
+      Trajectory_Center     : CGK.Primitives.Points_2D.Point_2D;
       --  Angular_Delta       : CGK.Reals.Real;
 
-      Tick_Transformation :
+      Tick_Transformation   :
         CGK.Primitives.Transformations_2D.Transformation_2D;
-      Leg_Information     : Leg_Trajectory_Information_Array;
+      Tick_Transformation_3 :
+        CGK.Primitives.Transformations_3D.Transformation_3D;
+      Leg_Information       : Leg_Trajectory_Information_Array;
    end record;
 
 end Legs.Trajectory;

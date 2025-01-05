@@ -179,9 +179,6 @@ package body Legs.Gait_Generator is
             PEP_Tick  => Natural'Last,
             MPEP_Tick => Natural'Last);
       end loop;
-
-      Trajectory_Generator.Trajectory :=
-        Velocity (Velocity_Bank).Trajectory'Access;
    end Initialize;
 
    --------------
@@ -369,8 +366,10 @@ package body Legs.Gait_Generator is
                Debug.Log.New_Line;
             end if;
          end;
-         Trajectory_Generator.Trajectory :=
-           Velocity (Velocity_Bank).Trajectory'Access;
+
+         Legs.Trajectory_Generator.Set_Bodypath
+           (Legs.Trajectory.Get_Bodypath_Tick_Transformation
+              (Velocity (Velocity_Bank).Trajectory));
 
          Velocity_Changed := False;
       end if;

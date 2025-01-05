@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+private with Bodypath_Generators;
+
 package Footpath_Generators.Stance
   with Preelaborate
 is
@@ -15,7 +17,7 @@ private
 
    type Stance_Footpath_Generator is
      new Abstract_Footpath_Generator with record
-      null;
+      Bodypath : access Bodypath_Generators.Abstract_Bodypath_Generator'Class;
    end record;
 
    overriding procedure Tick (Self : in out Stance_Footpath_Generator);
