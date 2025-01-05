@@ -5,6 +5,7 @@
 --
 
 with CGK.Primitives.Points_2D;
+with CGK.Primitives.Points_3D;
 with CGK.Reals;
 
 with Kinematics;
@@ -25,9 +26,9 @@ package body Footpath_Generators.Stance is
       Success : Boolean;
 
    begin
-      X := Kinematics.X (Self.Leg.Configuration.Position);
-      Y := Kinematics.Y (Self.Leg.Configuration.Position);
-      Z := Kinematics.Z (Self.Leg.Configuration.Position);
+      X := CGK.Primitives.Points_3D.X (Self.Leg.Configuration.Position);
+      Y := CGK.Primitives.Points_3D.Y (Self.Leg.Configuration.Position);
+      Z := CGK.Primitives.Points_3D.Z (Self.Leg.Configuration.Position);
 
       Point := CGK.Primitives.Points_2D.Create_Point_2D (X, Y);
       --  Legs.Trajectory.Transform (Self.Trajectory.all, Point);

@@ -6,20 +6,15 @@
 
 pragma Restrictions (No_Elaboration_Code);
 
-private with CGK.Mathematics.Vectors_3;
+with CGK.Primitives.Points_3D;
 with CGK.Reals;
+with Reals;
 
-package Kinematics
-  with Pure
-is
+package Kinematics is
 
-   type Position is private
-     with Preelaborable_Initialization;
+   pragma Pure;
 
-   function X (Self : Position) return CGK.Reals.Real with Inline;
-   function Y (Self : Position) return CGK.Reals.Real with Inline;
-   function Z (Self : Position) return CGK.Reals.Real with Inline;
-   --  Coordinates of the position.
+   subtype Position is CGK.Primitives.Points_3D.Point_3D;
 
    procedure Set
      (Self : out Position;
@@ -28,9 +23,9 @@ is
       Z    : CGK.Reals.Real) with Inline;
 
    type Orientation is record
-      U : CGK.Reals.Real;
-      V : CGK.Reals.Real;
-      W : CGK.Reals.Real;
+      U : Reals.Real;
+      V : Reals.Real;
+      W : Reals.Real;
    end record;
 
    type Pose is record
@@ -42,35 +37,27 @@ is
      with Preelaborable_Initialization;
    --  Container of joint variables and a set of internal information.
 
-   function Theta_1 (Self : Posture) return CGK.Reals.Real with Inline;
-   function Theta_2 (Self : Posture) return CGK.Reals.Real with Inline;
-   function Theta_3 (Self : Posture) return CGK.Reals.Real with Inline;
+   function Theta_1 (Self : Posture) return Reals.Real with Inline;
+   function Theta_2 (Self : Posture) return Reals.Real with Inline;
+   function Theta_3 (Self : Posture) return Reals.Real with Inline;
    --  Angular values of joint variables.
 
    procedure Set
      (Self    : out Posture;
-      Theta_1 : CGK.Reals.Real;
-      Theta_2 : CGK.Reals.Real;
-      Theta_3 : CGK.Reals.Real);
+      Theta_1 : Reals.Real;
+      Theta_2 : Reals.Real;
+      Theta_3 : Reals.Real);
    --  Set values of joint variables.
 
 private
 
-   type Position is record
-      Value : CGK.Mathematics.Vectors_3.Vector_3;
-   end record;
-
-   function X (Self : Position) return CGK.Reals.Real is (Self.Value (0));
-   function Y (Self : Position) return CGK.Reals.Real is (Self.Value (1));
-   function Z (Self : Position) return CGK.Reals.Real is (Self.Value (2));
-
    type Posture is record
-      Theta : CGK.Mathematics.Vectors_3.Vector_3;
+      Theta : Reals.Vectors_3.Vector_3;
       --  Vector of the joint variables.
    end record;
 
-   function Theta_1 (Self : Posture) return CGK.Reals.Real is (Self.Theta (0));
-   function Theta_2 (Self : Posture) return CGK.Reals.Real is (Self.Theta (1));
-   function Theta_3 (Self : Posture) return CGK.Reals.Real is (Self.Theta (2));
+   function Theta_1 (Self : Posture) return Reals.Real is (Self.Theta.M_1);
+   function Theta_2 (Self : Posture) return Reals.Real is (Self.Theta.M_2);
+   function Theta_3 (Self : Posture) return Reals.Real is (Self.Theta.M_3);
 
 end Kinematics;

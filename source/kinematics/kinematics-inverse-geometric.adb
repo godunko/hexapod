@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023-2024, Vadim Godunko
+--  Copyright (C) 2023-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -59,9 +59,9 @@ package body Kinematics.Inverse.Geometric is
          R_1         => R_1,
          R_2         => R_2,
          R_3         => R_3,
-         E_X         => Kinematics.X (Desired_Position),
-         E_Y         => Kinematics.Y (Desired_Position),
-         E_Z         => Kinematics.Z (Desired_Position),
+         E_X         => CGK.Primitives.Points_3D.X (Desired_Position),
+         E_Y         => CGK.Primitives.Points_3D.Y (Desired_Position),
+         E_Z         => CGK.Primitives.Points_3D.Z (Desired_Position),
          Theta_1     => Theta_1,
          Theta_2     => Theta_2,
          Theta_3     => Theta_3,

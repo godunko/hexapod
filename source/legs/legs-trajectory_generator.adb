@@ -14,16 +14,10 @@ with Legs.Workspace;
 
 package body Legs.Trajectory_Generator is
 
-   type Trajectory_Kind is (Stance, Swing);
-
-   type Trajectory_State (Kind : Trajectory_Kind := Stance) is record
-      case Kind is
-         when Stance =>
-            Stance : Footpath_Generators.Stance.Stance_Footpath_Generator;
-
-         when Swing =>
-            Swing  : Footpath_Generators.Swing.Swing_Footpath_Generator;
-      end case;
+   type Trajectory_State is record
+      Active : access Footpath_Generators.Abstract_Footpath_Generator'Class;
+      Stance : aliased Footpath_Generators.Stance.Stance_Footpath_Generator;
+      Swing  : aliased Footpath_Generators.Swing.Swing_Footpath_Generator;
    end record;
 
    State : array (Leg_Index) of Trajectory_State;
@@ -67,9 +61,9 @@ package body Legs.Trajectory_Generator is
         (Self => Builder,
          Leg  => Legs.State.Legs (Leg)'Access);
 
-      State (Leg) :=
-        (Kind   => Stance,
-         Stance => Footpath_Generators.Stance.Builders.Value (Builder));
+      State (Leg).Stance :=
+        Footpath_Generators.Stance.Builders.Value (Builder);
+      State (Leg).Active := State (Leg).Stance'Access;
    end Set_Stance;
 
    ---------------
@@ -89,16 +83,21 @@ package body Legs.Trajectory_Generator is
       Footpath_Generators.Swing.Builders.Build
         (Self   => Builder,
          Leg    => Legs.State.Legs (Leg)'Access,
-         PEP_X  => Kinematics.X (Legs.State.Legs (Leg).Configuration.Position),
-         PEP_Y  => Kinematics.Y (Legs.State.Legs (Leg).Configuration.Position),
+         PEP_X  =>
+           CGK.Primitives.Points_3D.X
+             (Legs.State.Legs (Leg).Configuration.Position),
+         PEP_Y  =>
+           CGK.Primitives.Points_3D.Y
+             (Legs.State.Legs (Leg).Configuration.Position),
          AEP_X  => AEP_X,
          AEP_Y  => AEP_Y,
-         Base_Z => Kinematics.Z (Legs.State.Legs (Leg).Configuration.Position),
+         Base_Z =>
+           CGK.Primitives.Points_3D.Z
+             (Legs.State.Legs (Leg).Configuration.Position),
          Height => Height,
          Ticks  => 50);  --  XXX Must be configurable!
-      State (Leg) :=
-        (Kind  => Swing,
-         Swing => Footpath_Generators.Swing.Builders.Value (Builder));
+      State (Leg).Swing  := Footpath_Generators.Swing.Builders.Value (Builder);
+      State (Leg).Active := State (Leg).Swing'Access;
    end Set_Swing;
 
    ----------
@@ -108,13 +107,7 @@ package body Legs.Trajectory_Generator is
    procedure Tick is
    begin
       for Leg in Leg_Index loop
-         case State (Leg).Kind is
-            when Stance =>
-               State (Leg).Stance.Tick;
-
-            when Swing =>
-               State (Leg).Swing.Tick;
-         end case;
+         State (Leg).Active.Tick;
       end loop;
    end Tick;
 

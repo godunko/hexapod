@@ -77,8 +77,10 @@ package body Legs.Gait_Generator is
    is
       Current       : constant Point_2D :=
         Create_Point_2D
-          (Kinematics.X (Legs.State.Legs (Leg).Configuration.Position),
-           Kinematics.Y (Legs.State.Legs (Leg).Configuration.Position));
+          (CGK.Primitives.Points_3D.X
+             (Legs.State.Legs (Leg).Configuration.Position),
+           CGK.Primitives.Points_3D.Y
+             (Legs.State.Legs (Leg).Configuration.Position));
       Workspace     : constant Circle_2D :=
         Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
       Shape         : constant Circle_2D :=
@@ -268,7 +270,9 @@ package body Legs.Gait_Generator is
       Point_XY    : constant CGK.Primitives.XYs.XY :=
         CGK.Primitives.Points_2D.XY (Point);
       Position_XY : constant CGK.Primitives.XYs.XY :=
-        Create_XY (Kinematics.X (Position), Kinematics.Y (Position));
+        Create_XY
+          (X => CGK.Primitives.Points_3D.X (Position),
+           Y => CGK.Primitives.Points_3D.Y (Position));
 
    begin
       return Modulus (Point_XY - Position_XY) < 0.001;
