@@ -10,7 +10,7 @@ package Legs.State
   with Preelaborate
 is
 
-   Legs : array (Leg_Index) of Leg;
+   Legs : array (Leg_Index) of aliased Leg;
 
    procedure Initialize;
 

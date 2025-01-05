@@ -13,7 +13,7 @@ with Kinematics;
 with Reals;
 
 package Legs
-  with Preelaborate
+  with Pure
 is
 
    type Leg_Side is (Left, Right);

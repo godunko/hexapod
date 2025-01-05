@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -15,34 +15,6 @@ with Legs.Trajectory;
 package Legs.Trajectory_Generator
   with Preelaborate
 is
-
-   --  type Leg_Trajectory_Kind is (Linear, Swing);
-   --
-   --  type Leg_Trajectory_Plan (Kind : Leg_Trajectory_Kind := Linear) is record
-   --     case Kind is
-   --        when Linear =>
-   --           D_X : Reals.Real;
-   --           D_Y : Reals.Real;
-   --           --  Leg's trajectory delta at each control tick.
-   --
-   --        when Swing =>
-   --           PEP_X    : Reals.Real;
-   --           PEP_Y    : Reals.Real;
-   --           --  Posterior extreme position: lift-off point
-   --           AEP_X    : Reals.Real;
-   --           AEP_Y    : Reals.Real;
-   --           --  anterior extreme position: touch-down point
-   --
-   --           Height_Z : Reals.Real;
-   --           --  Height of the swing.
-   --     end case;
-   --  end record;
-
-   --  Position : array (Leg_Index) of Kinematics.Position;
-   --  Posture  : array (Leg_Index) of Kinematics.Posture;
-
-   --  procedure Set_Plan (Plan : Leg_Trajectory_Plan);
-
 
    Trajectory : access Standard.Legs.Trajectory.Trajectory_Information;
 
