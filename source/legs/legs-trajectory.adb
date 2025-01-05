@@ -350,7 +350,7 @@ package body Legs.Trajectory is
       use type CGK.Primitives.XYs.XY;
       use CGK.Primitives.Directions_2D;
 
-      C : CGK.Primitives.XYs.XY := XY (Point) - XY (Location (Path));
+      C : constant CGK.Primitives.XYs.XY := XY (Point) - XY (Location (Path));
 
    begin
       return CGK.Primitives.XYs.Dot_Product (C, XY (Direction (Path))) >= 0.0;
@@ -439,9 +439,9 @@ package body Legs.Trajectory is
          declare
             --     Workspace_Circle  : Circle_2D :=
             --       Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
-            Trajectory_Radius : Real :=
+            Trajectory_Radius : constant Real :=
               Magnitude (Create_Vector_2D (Self.Trajectory_Center, Position));
-            Trajectory_Circle : Circle_2D :=
+            Trajectory_Circle : constant Circle_2D :=
               Create_Circle_2D (Self.Trajectory_Center, Trajectory_Radius);
             --     Intersections     : Analytical_Intersection_2D;
             --     Point_1           : Point_2D;
@@ -795,13 +795,13 @@ package body Legs.Trajectory is
 
          for Leg in Leg_Index loop
             declare
-               Workspace_Circle  : Circle_2D :=
+               Workspace_Circle  : constant Circle_2D :=
                  Standard.Legs.Workspace.Get_Bounded_Circle (Leg);
-               Trajectory_Radius : Real :=
+               Trajectory_Radius : constant Real :=
                  Magnitude
                    (Create_Vector_2D
                       (Self.Trajectory_Center, Center (Workspace_Circle)));
-               Trajectory_Circle : Circle_2D :=
+               Trajectory_Circle : constant Circle_2D :=
                  Create_Circle_2D (Self.Trajectory_Center, Trajectory_Radius);
                Intersections     : Analytical_Intersection_2D;
                Point_1           : Point_2D;
