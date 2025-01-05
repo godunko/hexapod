@@ -204,6 +204,11 @@ package body Simulation.Control_Loop is
               (Hexapod.Parameters.Control_Cycle.Tick_Duration);
          end loop;
       end loop;
+
+   exception
+      when E : others =>
+         Debug.Log.Put_Line
+           (Ada.Exceptions.Exception_Information (E));
    end Robot_Control_Loop;
 
    -----------
