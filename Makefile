@@ -1,5 +1,9 @@
 
-all: build-core build-arduino build-blackpill_stm32f401 build-gui
+all: build
+
+build: build-core build-blackpill_stm32f401 build-gui
+
+build-all: build build-arduino
 
 build-core:
 	# eval `alr printenv`; gprbuild gnat/kinematics.gpr --target='arm-eabi' --RTS='light-cortex-m3'
