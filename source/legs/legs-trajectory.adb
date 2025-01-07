@@ -524,7 +524,7 @@ package body Legs.Trajectory is
                --    (Real'Image (Angle_1)
                --         & Real'Image (Angle_2));
 
-               if Self.Angular_Velocity > 0.0 then
+               if Kinematics.Angular_Z (Self.Velocity) > 0.0 then
                   if Angle_1 > 0.0 then
                      return 0;
 
@@ -533,7 +533,7 @@ package body Legs.Trajectory is
                        Natural
                          (CGK.Reals.Real'Floor
                             (-Angle_1 /
-                               (Self.Angular_Velocity
+                               (Kinematics.Angular_Z (Self.Velocity)
                                 * Hexapod.Parameters.Control_Cycle.Tick_Duration)));
                   end if;
 
@@ -546,7 +546,7 @@ package body Legs.Trajectory is
                        Natural
                          (CGK.Reals.Real'Floor
                             (-Angle_2 /
-                               (Self.Angular_Velocity
+                               (Kinematics.Angular_Z (Self.Velocity)
                                 * Hexapod.Parameters.Control_Cycle.Tick_Duration)));
                   end if;
                end if;
@@ -661,8 +661,17 @@ package body Legs.Trajectory is
       --  --  Put_Length_Image (Y (Linear_Velocity) * Max_Step);
       --  --  Put_Length_Image ((Max_Step - Magnitude (Linear_Velocity) * Max_Step) / Max_Radius);
 
+
+      Kinematics.Set
+        (Self      => Self.Velocity,
+         Linear_X  => CGK.Primitives.Vectors_2D.X (Absolute_Linear_Velocity),
+         Linear_Y  => CGK.Primitives.Vectors_2D.Y (Absolute_Linear_Velocity),
+         Linear_Z  => 0.0,
+         Angular_X => 0.0,
+         Angular_Y => 0.0,
+         Angular_Z => 0.0);
+
       if Velocity_W = 0.0 then
-         Self.Angular_Velocity  := 0.0;
          Self.Trajectory_Center := Create_Point_2D (0.0, 0.0);
          --  Reset trajection center to origin of coordinate system for
          --  convenience.
@@ -741,7 +750,8 @@ package body Legs.Trajectory is
          end if;
 
       else
-         Self.Angular_Velocity := Max_Step / Max_Radius * Velocity_W;
+         Kinematics.Set_Angular_Z
+           (Self.Velocity, Max_Step / Max_Radius * Velocity_W);
 
          if Linear_Speed = 0.0 then
             Self.Trajectory_Center := Create_Point_2D (0.0, 0.0);
@@ -751,7 +761,7 @@ package body Legs.Trajectory is
               Create_Point_2D
                 (XY
                    (-Normal (Absolute_Linear_Velocity)
-                       / Self.Angular_Velocity));
+                       / Kinematics.Angular_Z (Self.Velocity)));
          end if;
 
          --  Put_Length_Image (X (Trajectory_Center));
@@ -763,7 +773,7 @@ package body Legs.Trajectory is
             use CGK.Primitives.XYZs;
 
             Angle  : constant Real :=
-              -Self.Angular_Velocity
+              -Kinematics.Angular_Z (Self.Velocity)
                 * Hexapod.Parameters.Control_Cycle.Tick_Duration;
             Point  : constant CGK.Mathematics.Vectors_3.Vector_3 :=
               -CGK.Mathematics.Vectors_3.Vector_3'
@@ -880,7 +890,7 @@ package body Legs.Trajectory is
                --  Put_Angle_Image (Angle_12);
                --  Put_Angle_Image (Angle_21);
 
-                  if Self.Angular_Velocity > 0.0 then
+                  if Kinematics.Angular_Z (Self.Velocity) > 0.0 then
                      Self.Leg_Information (Leg).AEP := Point_2;
 
                   else

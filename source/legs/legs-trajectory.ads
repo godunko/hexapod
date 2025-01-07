@@ -74,6 +74,10 @@ is
      (Self : Trajectory_Information)
       return CGK.Primitives.Transformations_3D.Transformation_3D;
 
+   function Get_Velocity
+     (Self : Trajectory_Information) return Kinematics.Velocity;
+   --  Returns current velocity of the robot's body.
+
 private
 
    type Leg_Trajectory_Information is record
@@ -84,11 +88,10 @@ private
      array (Leg_Index) of Leg_Trajectory_Information;
 
    type Trajectory_Information is record
-      Angular_Velocity      : CGK.Reals.Real;
-      --  Absolute value of the angular velocity.
+      Velocity              : Kinematics.Velocity;
+      --  Absolute value of the robot's body velocity.
 
       Trajectory_Center     : CGK.Primitives.Points_2D.Point_2D;
-      --  Angular_Delta       : CGK.Reals.Real;
 
       Tick_Transformation   :
         CGK.Primitives.Transformations_2D.Transformation_2D;
@@ -96,5 +99,9 @@ private
         CGK.Primitives.Transformations_3D.Transformation_3D;
       Leg_Information       : Leg_Trajectory_Information_Array;
    end record;
+
+   function Get_Velocity
+     (Self : Trajectory_Information) return Kinematics.Velocity
+        is (Self.Velocity);
 
 end Legs.Trajectory;

@@ -58,4 +58,13 @@ package body Kinematics is
          Angular_Z => Angular_Z);
    end Set;
 
+   -------------------
+   -- Set_Angular_Z --
+   -------------------
+
+   procedure Set_Angular_Z (Self : in out Velocity; To : CGK.Reals.Real) is
+   begin
+      Self.Angular_Z := To;
+   end Set_Angular_Z;
+
 end Kinematics;

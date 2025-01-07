@@ -52,6 +52,13 @@ package Kinematics is
    type Velocity is private with Preelaborable_Initialization;
    --  Velocity
 
+   function Linear_X (Self : Velocity) return CGK.Reals.Real;
+   function Linear_Y (Self : Velocity) return CGK.Reals.Real;
+   function Linear_Z (Self : Velocity) return CGK.Reals.Real;
+   function Angular_X (Self : Velocity) return CGK.Reals.Real;
+   function Angular_Y (Self : Velocity) return CGK.Reals.Real;
+   function Angular_Z (Self : Velocity) return CGK.Reals.Real;
+
    procedure Set
      (Self      : out Velocity;
       Linear_X  : CGK.Reals.Real;
@@ -61,12 +68,7 @@ package Kinematics is
       Angular_Y : CGK.Reals.Real;
       Angular_Z : CGK.Reals.Real);
 
-   function Linear_X (Self : Velocity) return CGK.Reals.Real;
-   function Linear_Y (Self : Velocity) return CGK.Reals.Real;
-   function Linear_Z (Self : Velocity) return CGK.Reals.Real;
-   function Angular_X (Self : Velocity) return CGK.Reals.Real;
-   function Angular_Y (Self : Velocity) return CGK.Reals.Real;
-   function Angular_Z (Self : Velocity) return CGK.Reals.Real;
+   procedure Set_Angular_Z (Self : in out Velocity; To : CGK.Reals.Real);
 
 private
 
