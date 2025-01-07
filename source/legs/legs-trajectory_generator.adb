@@ -101,7 +101,8 @@ package body Legs.Trajectory_Generator is
    ------------------
 
    procedure Set_Bodypath
-     (Transformation : CGK.Primitives.Transformations_3D.Transformation_3D)
+     (Transformation : CGK.Primitives.Transformations_3D.Transformation_3D;
+      Velocity       : Kinematics.Velocity)
    is
       Builder : Bodypath_Generators.Constant_Velocity.Builders
                   .Constant_Velocity_Bodypath_Generator_Builder;
@@ -109,7 +110,8 @@ package body Legs.Trajectory_Generator is
    begin
       Bodypath_Generators.Constant_Velocity.Builders.Build
         (Self           => Builder,
-         Transformation => Transformation);
+         Transformation => Transformation,
+         Velocity       => Velocity);
 
       Bodypath :=
         Bodypath_Generators.Constant_Velocity.Builders.Generator (Builder);
@@ -174,6 +176,8 @@ package body Legs.Trajectory_Generator is
 
    procedure Tick is
    begin
+      Bodypath.Tick;
+
       for Leg in Leg_Index loop
          State (Leg).Active.Tick;
       end loop;

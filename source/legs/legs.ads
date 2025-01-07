@@ -18,6 +18,14 @@ is
 
    type Leg_Side is (Left, Right);
 
+   type Leg_Index is
+     (Right_Front, Right_Middle, Right_Hind,
+      Left_Hind, Left_Middle, Left_Front);
+   --  Leg's indicies.
+   --
+   --  Legs are listed in counter-clockwise order to avoid use of the mapping
+   --  by the free gait generator.
+
    type Leg_Kinematics_Parameters is record
       Side        : Leg_Side;
 
@@ -55,23 +63,21 @@ is
      --     not null access constant Leg_Kinematics_Parameters;
      --   Configuration         : not null access Leg_Configuration)
    is record
+      Index                 : Leg_Index;
       Kinematics_Parameters : Leg_Kinematics_Parameters;
       Configuration         : Leg_Configuration;
    end record;
-
-   type Leg_Index is
-     (Right_Front, Right_Middle, Right_Hind,
-      Left_Hind, Left_Middle, Left_Front);
-   --  Leg's indicies.
-   --
-   --  Legs are listed in counter-clockwise order to avoid use of the mapping
-   --  by the free gait generator.
 
    procedure Inverse_Kinematics
      (Self             : Leg_Kinematics_Parameters;
       Desired_Position : Kinematics.Position;
       Found_Posture    : out Kinematics.Posture;
       Success          : out Boolean);
+
+   function Forward_Kinematics
+     (Self    : Leg;
+      Posture : Kinematics.Posture) return Kinematics.Position;
+   --  Returns position of the end effector in body's coordinate system.
 
    procedure Forward_Kinematics
      (Self     : Leg_Kinematics_Parameters;

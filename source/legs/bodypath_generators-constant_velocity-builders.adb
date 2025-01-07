@@ -12,9 +12,13 @@ package body Bodypath_Generators.Constant_Velocity.Builders is
 
    procedure Build
      (Self           : in out Constant_Velocity_Bodypath_Generator_Builder;
-      Transformation : CGK.Primitives.Transformations_3D.Transformation_3D) is
+      Transformation : CGK.Primitives.Transformations_3D.Transformation_3D;
+      Velocity       : Kinematics.Velocity) is
    begin
-      Self.Value := (Transformation => Transformation);
+      Self.Value :=
+        (Transformation => Transformation,
+         Velocity       => Velocity,
+         Configuration  => <>);
       Self.Valid := True;
    end Build;
 

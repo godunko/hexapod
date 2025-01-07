@@ -6,9 +6,34 @@
 
 --  pragma Restrictions (No_Elaboration_Code);
 
+with Kinematics.Forward;
 with Kinematics.Inverse.Geometric;
 
 package body Legs is
+
+   ------------------------
+   -- Forward_Kinematics --
+   ------------------------
+
+   function Forward_Kinematics
+     (Self    : Leg;
+      Posture : Kinematics.Posture) return Kinematics.Position is
+   begin
+      case Self.Index is
+         when Left_Front =>
+            return Kinematics.Forward.LF_E_Position (Posture);
+         when Left_Middle =>
+            return Kinematics.Forward.LM_E_Position (Posture);
+         when Left_Hind =>
+            return Kinematics.Forward.LH_E_Position (Posture);
+         when Right_Front =>
+            return Kinematics.Forward.RF_E_Position (Posture);
+         when Right_Middle =>
+            return Kinematics.Forward.RM_E_Position (Posture);
+         when Right_Hind =>
+            return Kinematics.Forward.RH_E_Position (Posture);
+      end case;
+   end Forward_Kinematics;
 
    ------------------------
    -- Forward_Kinematics --

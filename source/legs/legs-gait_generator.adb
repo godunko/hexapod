@@ -369,6 +369,8 @@ package body Legs.Gait_Generator is
 
          Legs.Trajectory_Generator.Set_Bodypath
            (Legs.Trajectory.Get_Bodypath_Tick_Transformation
+              (Velocity (Velocity_Bank).Trajectory),
+            Legs.Trajectory.Get_Velocity
               (Velocity (Velocity_Bank).Trajectory));
 
          Velocity_Changed := False;

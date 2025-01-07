@@ -7,7 +7,7 @@
 with CGK.Primitives.Transformations_3D;
 
 package Bodypath_Generators.Constant_Velocity.Builders
-  with Pure
+  with Preelaborate
 is
 
    type Constant_Velocity_Bodypath_Generator_Builder is limited private
@@ -15,7 +15,8 @@ is
 
    procedure Build
      (Self           : in out Constant_Velocity_Bodypath_Generator_Builder;
-      Transformation : CGK.Primitives.Transformations_3D.Transformation_3D);
+      Transformation : CGK.Primitives.Transformations_3D.Transformation_3D;
+      Velocity       : Kinematics.Velocity);
 
    function Generator
      (Self : Constant_Velocity_Bodypath_Generator_Builder)

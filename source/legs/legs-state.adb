@@ -79,6 +79,13 @@ package body Legs.State is
 
    procedure Initialize is
    begin
+      Legs (Left_Front).Index   := Left_Front;
+      Legs (Left_Middle).Index  := Left_Middle;
+      Legs (Left_Hind).Index    := Left_Hind;
+      Legs (Right_Front).Index  := Right_Front;
+      Legs (Right_Middle).Index := Right_Middle;
+      Legs (Right_Hind).Index   := Right_Hind;
+
       Initialize
         (Self      => Legs (Left_Front).Kinematics_Parameters,
          Side      => Standard.Legs.Left,

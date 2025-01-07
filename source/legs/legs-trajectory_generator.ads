@@ -31,7 +31,8 @@ is
    --  Sets leg's trajectory to swing info AEP
 
    procedure Set_Bodypath
-     (Transformation : CGK.Primitives.Transformations_3D.Transformation_3D);
+     (Transformation : CGK.Primitives.Transformations_3D.Transformation_3D;
+      Velocity       : Kinematics.Velocity);
    --  Sets transformation
 
    procedure Accumulated_Transformation

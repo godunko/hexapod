@@ -5,6 +5,7 @@
 --
 
 with Kinematics;
+with Legs;
 
 package Bodypath_Generators
   with Pure
@@ -18,5 +19,10 @@ is
    not overriding procedure Transform
      (Self     : Abstract_Bodypath_Generator;
       Position : in out Kinematics.Position) is abstract;
+
+   not overriding procedure Update
+     (Self    : Abstract_Bodypath_Generator;
+      Leg     : Legs.Leg_Index;
+      Posture : in out Kinematics.Posture) is abstract;
 
 end Bodypath_Generators;
