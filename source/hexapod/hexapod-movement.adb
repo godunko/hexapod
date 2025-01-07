@@ -192,6 +192,16 @@ package body Hexapod.Movement is
    package On_PWM2_Completed_Callbacks is
      new A0B.Callbacks.Generic_Parameterless (On_PWM2_Completed);
 
+   type Performance is record
+      Min : A0B.Types.Unsigned_32 := A0B.Types.Unsigned_32'Last;
+      Max : A0B.Types.Unsigned_32 := A0B.Types.Unsigned_32'First;
+   end record;
+
+   Step_Performance : Performance with Export;
+
+   procedure Update
+     (Self : in out Performance; Cycles : A0B.Types.Unsigned_32);
+
    ---------------
    -- Configure --
    ---------------
@@ -428,10 +438,6 @@ package body Hexapod.Movement is
    -- Task_Subprogram --
    ---------------------
 
-   Cur_Cycles : A0B.Types.Unsigned_32 := 0 with Volatile;
-   Max_Cycles : A0B.Types.Unsigned_32 := 0 with Volatile;
-   Min_Cycles : A0B.Types.Unsigned_32 := A0B.Types.Unsigned_32'Last with Volatile;
-
    procedure Task_Subprogram is
    begin
       Hexapod.Hardware.PWMs.Initialize;
@@ -472,9 +478,8 @@ package body Hexapod.Movement is
 
                   Step;
 
-                  Cur_Cycles := A0B.ARMv7M.SCS.DWT.DWT_CYCCNT.CYCCNT;
-                  Max_Cycles := A0B.Types.Unsigned_32'Max (@, Cur_Cycles);
-                  Min_Cycles := A0B.Types.Unsigned_32'Min (@, Cur_Cycles);
+                  Update
+                    (Step_Performance, A0B.ARMv7M.SCS.DWT.DWT_CYCCNT.CYCCNT);
             end case;
 
             Next_Tick :=
@@ -484,5 +489,16 @@ package body Hexapod.Movement is
          end loop;
       end;
    end Task_Subprogram;
+
+   ------------
+   -- Update --
+   ------------
+
+   procedure Update
+     (Self : in out Performance; Cycles : A0B.Types.Unsigned_32) is
+   begin
+      Self.Max := A0B.Types.Unsigned_32'Max (@, Cycles);
+      Self.Min := A0B.Types.Unsigned_32'Min (@, Cycles);
+   end Update;
 
 end Hexapod.Movement;
