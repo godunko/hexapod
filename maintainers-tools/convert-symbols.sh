@@ -1,6 +1,18 @@
 #!/bin/sh
 
 cat $1 |
+  sed -e 's/cos(b_γ)/Cos_Base_Gamma/g' |
+  sed -e 's/sin(b_γ)/Sin_Base_Gamma/g' |
+  sed -e 's/cos(α_1)/Cos_Alpha_1/g' |
+  sed -e 's/sin(α_1)/Sin_Alpha_1/g' |
+  sed -e 's/cos(α_2)/Cos_Alpha_2/g' |
+  sed -e 's/sin(α_2)/Sin_Alpha_2/g' |
+  sed -e 's/cos(θ_1)/Cos_Theta_1/g' |
+  sed -e 's/sin(θ_1)/Sin_Theta_1/g' |
+  sed -e 's/cos(θ_2)/Cos_Theta_2/g' |
+  sed -e 's/sin(θ_2)/Sin_Theta_2/g' |
+  sed -e 's/cos(θ_3)/Cos_Theta_3/g' |
+  sed -e 's/sin(θ_3)/Sin_Theta_3/g' |
   sed -e 's/cos(%alpha_0)/Cos_Alpha_0/g' |
   sed -e 's/sin(%alpha_0)/Sin_Alpha_0/g' |
   sed -e 's/cos(%gamma_0)/Cos_Gamma_0/g' |
