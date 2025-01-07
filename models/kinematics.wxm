@@ -1,0 +1,155 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 20.12.1 ] */
+/* [wxMaxima: title   start ]
+Kinematics, общие элементы
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+Этот документ содержит объявления матриц преобразования, описывающих лапу, и используется другими документами.
+
+Обозначения:
+H_ij - матрица преобразования из узла i в узел j (R4x4)
+Q_ij - матрица поворота из узла i в узел j (R3x3)
+T_ij - матрица переноса из узла i в узел j (R3x1)
+
+i и j - идентификаторы узлов: b - базовый, 1..3 - узлы поворотов, e - кончик лапы
+
+Используемые в матрицах символы:
+α1 .. α3 - DH угол поворота вокруг OX
+θ1 .. θ3 - DH угол поворота вокруг OZ
+r_1 .. r_3 - DH длина сегмента
+d_1 .. d_3 - DH смещение по Z
+b_x, b_y, b_z - координаты первого узла в системе координат базы
+b_γ - поворот вокруг оси OZ в первом узле
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+declare(α_1, constant)$
+declare(α_2, constant)$
+declare(α_3, constant)$
+declare(r_1, constant)$
+declare(r_2, constant)$
+declare(r_3, constant)$
+declare(d_1, constant)$
+declare(d_2, constant)$
+declare(d_3, constant)$
+declare(b_x, constant)$
+declare(b_y, constant)$
+declare(b_z, constant)$
+declare(b_γ, constant)$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: section start ]
+Преобразования в общем виде
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: input   start ] */
+T_transformation (x_n, y_n, z_n) := matrix (
+    [1, 0, 0, x_n],
+    [0, 1, 0, y_n],
+    [0, 0, 1, z_n],
+    [0, 0, 0, 1]
+);
+
+Rx_transformation (α_n) := matrix (
+    [1, 0, 0, 0],
+    [0, cos(α_n), -sin(α_n), 0],
+    [0, sin(α_n), cos(α_n), 0],
+    [0, 0, 0, 1]
+);
+
+Ry_transformation (β_n) := matrix (
+    [cos(β_n), 0, sin(β_n), 0],
+    [0, 1, 0, 0],
+    [-sin(β_n), 0, cos(β_n), 0],
+    [0, 0, 0, 1]
+);
+
+Rz_transformation (γ_n)  := matrix (
+    [cos(γ_n), -sin(γ_n), 0, 0], 
+    [sin(γ_n), cos(γ_n), 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]
+);
+
+DH_transformation (α_n, θ_n, r_n, d_n) := matrix (
+    [cos(θ_n), -sin(θ_n)*cos(α_n), sin(θ_n)*sin(α_n), r_n*cos(θ_n)],
+    [sin(θ_n), cos(θ_n)*cos(α_n), -cos(θ_n)*sin(α_n), r_n*sin(θ_n)],
+    [0, sin(α_n), cos(α_n), d_n],
+    [0, 0, 0, 1]
+);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: section start ]
+Матрицы преобразования для робота
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Межузловые преобразования
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+H_b1: T_transformation (b_x, b_y, b_z) . Rz_transformation (b_γ);
+H_12:  DH_transformation (α_1, θ_1, r_1, d_1);
+H_23:  DH_transformation (α_2, θ_2, r_2, d_2);
+H_3e:  DH_transformation (α_3, θ_3, r_3, d_3);
+
+Q_b1: submatrix (4, H_b1, 4);
+T_b1: submatrix (4, H_b1, 1, 2, 3);
+Q_12: submatrix (4, H_12, 4);
+T_12: submatrix (4, H_12, 1, 2, 3);
+Q_23: submatrix (4, H_23, 4);
+T_23: submatrix (4, H_23, 1, 2, 3);
+Q_3e: submatrix (4, H_3e, 4);
+T_3e: submatrix (4, H_3e, 1, 2, 3);
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Преобразования относительно базы
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+H_b2: H_b1 . H_12;
+H_b3: H_b2 . H_23;
+H_be: H_b3 . H_3e;
+
+Q_b2: submatrix (4, H_b2, 4);
+T_b2: submatrix (4, H_b2, 1, 2, 3);
+Q_b3: submatrix (4, H_b3, 4);
+T_b3: submatrix (4, H_b3, 1, 2, 3);
+Q_be: submatrix (4, H_be, 4);
+T_be: submatrix (4, H_be, 1, 2, 3);
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Преобразования относительно лапы
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+H_13: H_12 . H_23;
+H_1e: H_13 . H_3e;
+
+Q_13: submatrix (4, H_13, 4);
+T_13: submatrix (4, H_13, 1, 2, 3);
+Q_1e: submatrix (4, H_1e, 4);
+T_1e: submatrix (4, H_1e, 1, 2, 3);
+
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 20.12.1"$
