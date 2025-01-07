@@ -43,7 +43,7 @@ is
         Cos_Alpha_2    => Kinematics.Configuration.Derived.LF_Cos_Alpha_2,
         Sin_Alpha_2    => Kinematics.Configuration.Derived.LF_Sin_Alpha_2,
         D_3            => Kinematics.Configuration.LF_DH_D3,
-        R_3            => Kinematics.Configuration.LF_DH_R2);
+        R_3            => Kinematics.Configuration.LF_DH_R3);
 
    procedure LM is
      new Kinematics.Generic_Linear_Velocity_Jacobian
@@ -57,7 +57,7 @@ is
         Cos_Alpha_2    => Kinematics.Configuration.Derived.LM_Cos_Alpha_2,
         Sin_Alpha_2    => Kinematics.Configuration.Derived.LM_Sin_Alpha_2,
         D_3            => Kinematics.Configuration.LM_DH_D3,
-        R_3            => Kinematics.Configuration.LM_DH_R2);
+        R_3            => Kinematics.Configuration.LM_DH_R3);
 
    procedure LH is
      new Kinematics.Generic_Linear_Velocity_Jacobian
@@ -71,7 +71,7 @@ is
         Cos_Alpha_2    => Kinematics.Configuration.Derived.LH_Cos_Alpha_2,
         Sin_Alpha_2    => Kinematics.Configuration.Derived.LH_Sin_Alpha_2,
         D_3            => Kinematics.Configuration.LH_DH_D3,
-        R_3            => Kinematics.Configuration.LH_DH_R2);
+        R_3            => Kinematics.Configuration.LH_DH_R3);
 
    procedure RF is
      new Kinematics.Generic_Linear_Velocity_Jacobian
@@ -85,7 +85,7 @@ is
         Cos_Alpha_2    => Kinematics.Configuration.Derived.RF_Cos_Alpha_2,
         Sin_Alpha_2    => Kinematics.Configuration.Derived.RF_Sin_Alpha_2,
         D_3            => Kinematics.Configuration.RF_DH_D3,
-        R_3            => Kinematics.Configuration.RF_DH_R2);
+        R_3            => Kinematics.Configuration.RF_DH_R3);
 
    procedure RM is
      new Kinematics.Generic_Linear_Velocity_Jacobian
@@ -99,7 +99,7 @@ is
         Cos_Alpha_2    => Kinematics.Configuration.Derived.RM_Cos_Alpha_2,
         Sin_Alpha_2    => Kinematics.Configuration.Derived.RM_Sin_Alpha_2,
         D_3            => Kinematics.Configuration.RM_DH_D3,
-        R_3            => Kinematics.Configuration.RM_DH_R2);
+        R_3            => Kinematics.Configuration.RM_DH_R3);
 
    procedure RH is
      new Kinematics.Generic_Linear_Velocity_Jacobian
@@ -113,6 +113,6 @@ is
         Cos_Alpha_2    => Kinematics.Configuration.Derived.RH_Cos_Alpha_2,
         Sin_Alpha_2    => Kinematics.Configuration.Derived.RH_Sin_Alpha_2,
         D_3            => Kinematics.Configuration.RH_DH_D3,
-        R_3            => Kinematics.Configuration.RH_DH_R2);
+        R_3            => Kinematics.Configuration.RH_DH_R3);
 
 end Kinematics.Jacobians;
