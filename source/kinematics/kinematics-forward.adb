@@ -1,7 +1,7 @@
 --
---  Copyright (C) 2023, Vadim Godunko
+--  Copyright (C) 2023-2025, Vadim Godunko
 --
---  SPDX - License - Identifier: Apache - 2.0
+--  SPDX-License-Identifier: Apache-2.0
 --
 
 --  Implementation of this package use mathematical formalas derived in
@@ -177,7 +177,7 @@ package body Kinematics.Forward is
          Y           => Y,
          Z           => Z);
 
-      return (Value => (X, Y, Z));
+      return CGK.Primitives.Points_3D.As_Point_3D (X, Y, Z);
    end LF_E_Position;
 
    -------------
@@ -314,7 +314,7 @@ package body Kinematics.Forward is
          Y           => Y,
          Z           => Z);
 
-      return (Value => (X, Y, Z));
+      return CGK.Primitives.Points_3D.As_Point_3D (X, Y, Z);
    end LH_E_Position;
 
    -------------------
@@ -365,7 +365,7 @@ package body Kinematics.Forward is
          Y           => Y,
          Z           => Z);
 
-      return (Value => (X, Y, Z));
+      return CGK.Primitives.Points_3D.As_Point_3D (X, Y, Z);
    end LM_E_Position;
 
    -------------------
@@ -416,7 +416,7 @@ package body Kinematics.Forward is
          Y           => Y,
          Z           => Z);
 
-      return (Value => (X, Y, Z));
+      return CGK.Primitives.Points_3D.As_Point_3D (X, Y, Z);
    end RF_E_Position;
 
    -------------------
@@ -467,7 +467,7 @@ package body Kinematics.Forward is
          Y           => Y,
          Z           => Z);
 
-      return (Value => (X, Y, Z));
+      return CGK.Primitives.Points_3D.As_Point_3D (X, Y, Z);
    end RH_E_Position;
 
    -------------------
@@ -518,7 +518,7 @@ package body Kinematics.Forward is
          Y           => Y,
          Z           => Z);
 
-      return (Value => (X, Y, Z));
+      return CGK.Primitives.Points_3D.As_Point_3D (X, Y, Z);
    end RM_E_Position;
 
 end Kinematics.Forward;
