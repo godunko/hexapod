@@ -49,6 +49,25 @@ package Kinematics is
       Theta_3 : Reals.Real);
    --  Set values of joint variables.
 
+   type Velocity is private with Preelaborable_Initialization;
+   --  Velocity
+
+   procedure Set
+     (Self      : out Velocity;
+      Linear_X  : CGK.Reals.Real;
+      Linear_Y  : CGK.Reals.Real;
+      Linear_Z  : CGK.Reals.Real;
+      Angular_X : CGK.Reals.Real;
+      Angular_Y : CGK.Reals.Real;
+      Angular_Z : CGK.Reals.Real);
+
+   function Linear_X (Self : Velocity) return CGK.Reals.Real;
+   function Linear_Y (Self : Velocity) return CGK.Reals.Real;
+   function Linear_Z (Self : Velocity) return CGK.Reals.Real;
+   function Angular_X (Self : Velocity) return CGK.Reals.Real;
+   function Angular_Y (Self : Velocity) return CGK.Reals.Real;
+   function Angular_Z (Self : Velocity) return CGK.Reals.Real;
+
 private
 
    type Posture is record
@@ -59,5 +78,27 @@ private
    function Theta_1 (Self : Posture) return Reals.Real is (Self.Theta.M_1);
    function Theta_2 (Self : Posture) return Reals.Real is (Self.Theta.M_2);
    function Theta_3 (Self : Posture) return Reals.Real is (Self.Theta.M_3);
+
+   type Velocity is record
+      Linear_X  : CGK.Reals.Real;
+      Linear_Y  : CGK.Reals.Real;
+      Linear_Z  : CGK.Reals.Real;
+      Angular_X : CGK.Reals.Real;
+      Angular_Y : CGK.Reals.Real;
+      Angular_Z : CGK.Reals.Real;
+   end record;
+
+   function Linear_X
+     (Self : Velocity) return CGK.Reals.Real is (Self.Linear_X);
+   function Linear_Y
+     (Self : Velocity) return CGK.Reals.Real is (Self.Linear_Y);
+   function Linear_Z
+     (Self : Velocity) return CGK.Reals.Real is (Self.Linear_Z);
+   function Angular_X
+     (Self : Velocity) return CGK.Reals.Real is (Self.Angular_X);
+   function Angular_Y
+     (Self : Velocity) return CGK.Reals.Real is (Self.Angular_Y);
+   function Angular_Z
+     (Self : Velocity) return CGK.Reals.Real is (Self.Angular_Z);
 
 end Kinematics;

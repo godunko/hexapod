@@ -36,4 +36,26 @@ package body Kinematics is
       Self.Theta.M_3 := Theta_3;
    end Set;
 
+   ---------
+   -- Set --
+   ---------
+
+   procedure Set
+     (Self      : out Velocity;
+      Linear_X  : CGK.Reals.Real;
+      Linear_Y  : CGK.Reals.Real;
+      Linear_Z  : CGK.Reals.Real;
+      Angular_X : CGK.Reals.Real;
+      Angular_Y : CGK.Reals.Real;
+      Angular_Z : CGK.Reals.Real) is
+   begin
+      Self :=
+        (Linear_X  => Linear_X,
+         Linear_Y  => Linear_Y,
+         Linear_Z  => Linear_Z,
+         Angular_X => Angular_X,
+         Angular_Y => Angular_Y,
+         Angular_Z => Angular_Z);
+   end Set;
+
 end Kinematics;
