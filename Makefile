@@ -24,3 +24,4 @@ update:
 	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-inverse-compute_jv_matrix.ada > source/kinematics/generated/kinematics-inverse-compute_jv_matrix.adb
 	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-inverse-algebraic-generic_compute_t.ada > source/kinematics/generated/kinematics-inverse-algebraic-generic_compute_t.adb
 	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-inverse-algebraic-generic_compute_12.ada > source/kinematics/generated/kinematics-inverse-algebraic-generic_compute_12.adb
+	./maintainers-tools/convert-symbols.sh source/kinematics/templates/kinematics-generic_linear_velocity_jacobian.ada > source/kinematics/generated/kinematics-generic_linear_velocity_jacobian.adb
