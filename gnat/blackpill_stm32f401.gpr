@@ -1,12 +1,11 @@
 --
---  Copyright (C) 2024, Vadim Godunko
+--  Copyright (C) 2024-2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with "../blackpill_stm32f401/config/phoenix_hexapod_blackpill_stm32f401_config.gpr";
+with "../firmware/blackpill_stm32f401/config/phoenix_hexapod_blackpill_stm32f401_config.gpr";
 
---with "../subprojects/b2f4a/gnat/bbf";
 with "light_blackpill_stm32f401";
 
 with "kinematics";
