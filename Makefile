@@ -14,7 +14,7 @@ build-arduino:
 	make -C obsolete/arduino_due
 
 build-blackpill_stm32f401:
-	make -C blackpill_stm32f401
+	make -C firmware/blackpill_stm32f401
 
 build-gui:
 	make -C applications/gui build
