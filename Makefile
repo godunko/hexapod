@@ -11,7 +11,7 @@ build-core:
 	# eval `alr printenv`; gprbuild gnat/examples.gpr
 
 build-arduino:
-	make -C arduino_due
+	make -C obsolete/arduino_due
 
 build-blackpill_stm32f401:
 	make -C blackpill_stm32f401
