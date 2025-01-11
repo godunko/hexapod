@@ -31,10 +31,13 @@ Implemented Features
    * Numerical (Gradient Descent and Levenberg-Marquardt)
  * Gait transition (fixed step)
  * Body trajectry control by the PlayStation/2 controller
- * Free gait genrator for crab movement and turns
- * Trajectory generator of the legs based on:
-   * 3D geometry transformation and inverse kinematics of legs
-   * whole body velocity transformation matrix, which transforms 6D velocity of the robot's body into velocities in all joints
+ * Free gait generator for crab movement and turns
+ * Trajectory generators of the legs:
+   * Stance phase
+     * 3D geometry transformation, generates coordinates of the points and use inverse kinematics of the legs to convert into joint's angle values
+     * whole body velocity transformation matrix, which transforms 6D velocity of the robot's body into velocities in all joints, and uses integration to produce joint's angle values
+   * Swing phase
+     * quintic polinomial interpolation
 
 Current Development
 -------------------
