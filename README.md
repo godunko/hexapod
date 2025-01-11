@@ -32,11 +32,14 @@ Implemented Features
  * Gait transition (fixed step)
  * Body trajectry control by the PlayStation/2 controller
  * Free gait genrator for crab movement and turns
+ * Trajectory generator of the legs based on:
+   * 3D geometry transformation and inverse kinematics of legs
+   * whole body velocity transformation matrix, which transforms 6D velocity of the robot's body into velocities in all joints
 
 Current Development
 -------------------
 
- * Use of Max-Plus linear system to implement free gait
+ * Improvement of free gait generator
 
 Notes
 -----
