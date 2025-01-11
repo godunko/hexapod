@@ -10,8 +10,10 @@ pragma Ada_2022;
 with CGK.Primitives.Vectors_3D;
 with CGK.Reals.Elementary_Functions;
 
-with Bodypath_Generators.Constant_Velocity.Builders;
-with Footpath_Generators.Stance.Builders;
+--  with Bodypath_Generators.Constant_Velocity.Builders;
+with Bodypath_Generators.Whole_Body.Builders;
+--  with Footpath_Generators.Stance.Builders;
+with Footpath_Generators.Stance_Whole_Body.Builders;
 with Footpath_Generators.Swing.Builders;
 with Legs.State;
 with Legs.Workspace;
@@ -20,14 +22,17 @@ package body Legs.Trajectory_Generator is
 
    type Trajectory_State is record
       Active : access Footpath_Generators.Abstract_Footpath_Generator'Class;
-      Stance : aliased Footpath_Generators.Stance.Stance_Footpath_Generator;
+      --  Stance : aliased Footpath_Generators.Stance.Stance_Footpath_Generator;
+      Stance : aliased
+        Footpath_Generators.Stance_Whole_Body.Stance_Footpath_Generator;
       Swing  : aliased Footpath_Generators.Swing.Swing_Footpath_Generator;
    end record;
 
    State    : array (Leg_Index) of Trajectory_State;
    Bodypath : aliased
-     Bodypath_Generators.Constant_Velocity
-       .Constant_Velocity_Bodypath_Generator;
+   --    Bodypath_Generators.Constant_Velocity
+   --      .Constant_Velocity_Bodypath_Generator;
+     Bodypath_Generators.Whole_Body.Whole_Body_Bodypath_Generator;
 
    --------------------------------
    -- Accumulated_Transformation --
@@ -50,8 +55,8 @@ package body Legs.Trajectory_Generator is
    begin
       --  Compute rotation vector
 
-      Bodypath_Generators.Constant_Velocity.Transform (Bodypath, P0);
-      Bodypath_Generators.Constant_Velocity.Transform (Bodypath, P1);
+      Bodypath.Transform (P0);
+      Bodypath.Transform (P1);
 
       V := CGK.Primitives.Vectors_3D.Create_Vector_3D (P0, P1);
 
@@ -104,17 +109,21 @@ package body Legs.Trajectory_Generator is
      (Transformation : CGK.Primitives.Transformations_3D.Transformation_3D;
       Velocity       : Kinematics.Velocity)
    is
-      Builder : Bodypath_Generators.Constant_Velocity.Builders
-                  .Constant_Velocity_Bodypath_Generator_Builder;
+      --  Builder : Bodypath_Generators.Constant_Velocity.Builders
+      --              .Constant_Velocity_Bodypath_Generator_Builder;
+      Builder : Bodypath_Generators.Whole_Body.Builders
+                  .Whole_Body_Bodypath_Generator_Builder;
 
    begin
-      Bodypath_Generators.Constant_Velocity.Builders.Build
+      --  Bodypath_Generators.Constant_Velocity.Builders.Build
+      Bodypath_Generators.Whole_Body.Builders.Build
         (Self           => Builder,
          Transformation => Transformation,
          Velocity       => Velocity);
 
       Bodypath :=
-        Bodypath_Generators.Constant_Velocity.Builders.Generator (Builder);
+        --  Bodypath_Generators.Constant_Velocity.Builders.Generator (Builder);
+        Bodypath_Generators.Whole_Body.Builders.Generator (Builder);
    end Set_Bodypath;
 
    ----------------
@@ -123,16 +132,19 @@ package body Legs.Trajectory_Generator is
 
    procedure Set_Stance (Leg : Leg_Index) is
       Builder :
-        Footpath_Generators.Stance.Builders.Stance_Footpath_Generator_Builder;
+        --  Footpath_Generators.Stance.Builders.Stance_Footpath_Generator_Builder;
+        Footpath_Generators.Stance_Whole_Body.Builders.Stance_Footpath_Generator_Builder;
 
    begin
-      Footpath_Generators.Stance.Builders.Build
+      --  Footpath_Generators.Stance.Builders.Build
+      Footpath_Generators.Stance_Whole_Body.Builders.Build
         (Self     => Builder,
          Leg      => Legs.State.Legs (Leg)'Access,
          Bodypath => Bodypath'Access);
 
       State (Leg).Stance :=
-        Footpath_Generators.Stance.Builders.Value (Builder);
+        --  Footpath_Generators.Stance.Builders.Value (Builder);
+        Footpath_Generators.Stance_Whole_Body.Builders.Value (Builder);
       State (Leg).Active := State (Leg).Stance'Access;
    end Set_Stance;
 

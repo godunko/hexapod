@@ -4,20 +4,21 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-package body Bodypath_Generators.Constant_Velocity.Builders is
+package body Bodypath_Generators.Whole_Body.Builders is
 
    -----------
    -- Build --
    -----------
 
    procedure Build
-     (Self           : in out Constant_Velocity_Bodypath_Generator_Builder;
+     (Self           : in out Whole_Body_Bodypath_Generator_Builder;
       Transformation : CGK.Primitives.Transformations_3D.Transformation_3D;
       Velocity       : Kinematics.Velocity) is
    begin
       Self.Value :=
         (Transformation => Transformation,
-         Velocity       => Velocity);
+         Velocity       => Velocity,
+         Configuration  => <>);
       Self.Valid := True;
    end Build;
 
@@ -26,8 +27,8 @@ package body Bodypath_Generators.Constant_Velocity.Builders is
    ---------------
 
    function Generator
-     (Self : Constant_Velocity_Bodypath_Generator_Builder)
-      return Constant_Velocity_Bodypath_Generator is
+     (Self : Whole_Body_Bodypath_Generator_Builder)
+      return Whole_Body_Bodypath_Generator is
    begin
       if not Self.Valid then
          raise Program_Error;
@@ -36,4 +37,4 @@ package body Bodypath_Generators.Constant_Velocity.Builders is
       return Self.Value;
    end Generator;
 
-end Bodypath_Generators.Constant_Velocity.Builders;
+end Bodypath_Generators.Whole_Body.Builders;

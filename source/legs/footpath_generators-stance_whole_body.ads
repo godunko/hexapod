@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2024-2025, Vadim Godunko
+--  Copyright (C) 2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-private with Bodypath_Generators.Constant_Velocity;
+private with Bodypath_Generators.Whole_Body;
 
-package Footpath_Generators.Stance
+package Footpath_Generators.Stance_Whole_Body
   with Preelaborate
 is
 
@@ -18,10 +18,9 @@ private
    type Stance_Footpath_Generator is
      new Abstract_Footpath_Generator with record
       Bodypath : access
-        Bodypath_Generators.Constant_Velocity
-          .Constant_Velocity_Bodypath_Generator'Class;
+        Bodypath_Generators.Whole_Body.Whole_Body_Bodypath_Generator'Class;
    end record;
 
    overriding procedure Tick (Self : in out Stance_Footpath_Generator);
 
-end Footpath_Generators.Stance;
+end Footpath_Generators.Stance_Whole_Body;

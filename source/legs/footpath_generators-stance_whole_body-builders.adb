@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2024-2025, Vadim Godunko
+--  Copyright (C) 2025, Vadim Godunko
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-package body Footpath_Generators.Stance.Builders is
+package body Footpath_Generators.Stance_Whole_Body.Builders is
 
    -----------
    -- Build --
@@ -14,8 +14,7 @@ package body Footpath_Generators.Stance.Builders is
      (Self     : in out Stance_Footpath_Generator_Builder;
       Leg      : not null access Legs.Leg;
       Bodypath : not null access
-        Bodypath_Generators.Constant_Velocity
-          .Constant_Velocity_Bodypath_Generator'Class)
+        Bodypath_Generators.Whole_Body.Whole_Body_Bodypath_Generator'Class)
    is
    begin
       Self.Value := (Leg => Leg, Bodypath => Bodypath);
@@ -37,4 +36,4 @@ package body Footpath_Generators.Stance.Builders is
       return Self.Value;
    end Value;
 
-end Footpath_Generators.Stance.Builders;
+end Footpath_Generators.Stance_Whole_Body.Builders;
